@@ -18,5 +18,7 @@ namespace BatteryApp.Data
         [Required]
         [Range(1, Int32.MaxValue, ErrorMessage = "Value should be greater than or equal to 1")]
         public int Order { get; set; }
+
+        public ICollection<Charge> Charges { get; set; }
     }
 }

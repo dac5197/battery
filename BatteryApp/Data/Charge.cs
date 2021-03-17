@@ -18,8 +18,7 @@ namespace BatteryApp.Data
         public string Description { get; set; }
 
         public bool IsComplete { get; set; } = false;
-
-        [MaxLength(20)]
-        public string Status { get; set; }
+        
+        public Status Status { get; set; }
     }
 }
