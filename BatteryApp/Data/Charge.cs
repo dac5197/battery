@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BatteryApp.Data
 {
-    public class Charge
+    public class Charge : BaseEntity
     {
         [Key]
         public int Id { get; set; }
@@ -21,9 +21,5 @@ namespace BatteryApp.Data
 
         [MaxLength(20)]
         public string Status { get; set; }
-
-        public DateTime Created { get; set; } = DateTime.UtcNow;
-
-        public DateTime Updated { get; set; } = DateTime.UtcNow;
     }
 }
