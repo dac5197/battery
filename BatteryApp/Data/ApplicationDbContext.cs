@@ -12,12 +12,5 @@ namespace BatteryApp.Data
             : base(options)
         {
         }
-
-        public DbSet<Charge> Charges { get; set; }
-
-        public override int SaveChanges()
-        {
-            return base.SaveChanges();
-        }
     }
 }

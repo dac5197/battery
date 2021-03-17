@@ -8,43 +8,58 @@ namespace BatteryApp.Data
 {
     public class ChargeService : IChargeService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IDbContextFactory<ChargeContext> _contextFactory;
 
-        public ChargeService(ApplicationDbContext context)
+        public ChargeService(IDbContextFactory<ChargeContext> contextFactory)
         {
-            _context = context;
+            _contextFactory = contextFactory;
         }
 
         public async Task<List<Charge>> Get()
         {
-            return await _context.Charges.ToListAsync();
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                return await context.Charges.ToListAsync();
+            }
         }
 
         public async Task<Charge> Get(int id)
         {
-            var charge = await _context.Charges.FindAsync(id);
-            return charge;
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var charge = await context.Charges.FindAsync(id);
+                return charge;
+            }
         }
 
         public async Task<Charge> Add(Charge charge)
         {
-            _context.Charges.Add(charge);
-            await _context.SaveChangesAsync();
-            return charge;
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                context.Charges.Add(charge);
+                await context.SaveChangesAsync();
+                return charge;
+            }
         }
 
         public async Task<Charge> Update(Charge charge)
         {
-            _context.Entry(charge).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return charge;
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                context.Entry(charge).State = EntityState.Modified;
+                await context.SaveChangesAsync();
+                return charge;
+            }
         }
 
         public async Task Delete(int id)
         {
-            var charge = await _context.Charges.FindAsync(id);
-            _context.Charges.Remove(charge);
-            await _context.SaveChangesAsync();
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var charge = await context.Charges.FindAsync(id);
+                context.Charges.Remove(charge);
+                await context.SaveChangesAsync();
+            }
         }
 
     }

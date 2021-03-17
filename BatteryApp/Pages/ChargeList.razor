@@ -1,6 +1,7 @@
 ﻿@page "/charges"
 
-@inject IChargeService chargeService
+@inject IChargeService ChargeService
+@inject DialogService DialogService
 
 <h3>Charge List</h3>
 
@@ -23,7 +24,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        charges = await chargeService.Get();
+        charges = await ChargeService.Get();
     }
 
     private void InitializeChargeObject()
