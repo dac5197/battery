@@ -1,0 +1,33 @@
+﻿@page "/charges"
+
+@inject IChargeService chargeService
+
+<h3>Charge List</h3>
+
+<div>
+    <button data-toggle="modal" data-target="#chargeModal" class="btn btn-primary" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
+</div>
+
+
+
+@foreach (var charge in charges)
+{
+    <ChargeItem Charge="@charge"></ChargeItem>
+}
+
+<ChargeDetail Charge="@newCharge"></ChargeDetail>
+
+@code {
+    private List<Charge> charges = new();
+    private Charge newCharge = new Charge();
+
+    protected override async Task OnInitializedAsync()
+    {
+        charges = await chargeService.Get();
+    }
+
+    private void InitializeChargeObject()
+    {
+        newCharge = new Charge();
+    }
+}
