@@ -18,5 +18,12 @@ namespace BatteryApp.Data
         public string Description { get; set; }
 
         public bool IsComplete { get; set; } = false;
+
+        [MaxLength(20)]
+        public string Status { get; set; }
+
+        public DateTime Created { get; set; } = DateTime.UtcNow;
+
+        public DateTime Updated { get; set; } = DateTime.UtcNow;
     }
 }
