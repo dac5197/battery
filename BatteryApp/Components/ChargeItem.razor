@@ -1,9 +1,55 @@
-﻿<div class="card bg-light shadow-sm my-2">
-    <h4>@Charge.Title</h4>
+﻿@inject IChargeService chargeService
+
+<div class="card bg-light shadow-sm my-2 pb-1 pt-2 px-2 @highlightedCssClass" @onmouseover="@SetHighlightedCssClass" @onmouseleave="@ClearHighlightedCssClass">
+    <div class="row">
+        <div class="col-11">
+            <a data-toggle="modal" data-target="#chargeModal" @onclick="@OnSetChargeItem"><h4 class="charge-detail">@Charge.Title</h4></a>
+        </div>
+        <div class="col-1 align-items-end">
+            <button type="button" class="close" data-toggle="modal" data-target="#confirmDeleteModal" @onclick="@OnSetChargeItem">
+                <span class="oi oi-x" aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
 </div>
 
+<style>
+    .highlighted {
+        border: solid;
+        border-color: deepskyblue;
+    }
+    .charge-detail:hover {
+        text-decoration: underline;
+    }
+</style>
 
 @code {
     [Parameter]
     public Charge Charge { get; set; }
+
+    [Parameter]
+    public EventCallback<Charge> SetChargeItem { get; set; }
+
+    private string highlightedCssClass;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        highlightedCssClass = "";
+        base.OnAfterRender(firstRender);
+    }
+
+    private void SetHighlightedCssClass()
+    {
+        highlightedCssClass = "highlighted";
+    }
+
+    private void ClearHighlightedCssClass()
+    {
+        highlightedCssClass = "";
+    }
+
+    private async Task OnSetChargeItem()
+    {
+        await SetChargeItem.InvokeAsync(Charge);
+    }
 }

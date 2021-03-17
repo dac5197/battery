@@ -1,26 +1,37 @@
 ﻿@page "/charges"
 
 @inject IChargeService ChargeService
-@inject DialogService DialogService
+@inject IJSRuntime jsRuntime
 
 <h3>Charge List</h3>
 
-<div>
-    <button data-toggle="modal" data-target="#chargeModal" class="btn btn-primary" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
-</div>
-
-
-
-@foreach (var charge in charges)
+@if (charges == null)
 {
-    <ChargeItem Charge="@charge"></ChargeItem>
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+    <div>
+        <button data-toggle="modal" data-target="#chargeModal" class="btn btn-primary" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
+    </div>
+
+
+
+    @foreach (var charge in charges)
+    {
+        <ChargeItem Charge="@charge" SetChargeItem="@SetChargObject"></ChargeItem>
+    }
+
+    <ChargeDetail Charge="@chargeObject" ParentStateChanged="@StateChanged"></ChargeDetail>
+
+    <ConfirmDeleteDialog Charge="@chargeObject" Delete="@DeleteCharge"></ConfirmDeleteDialog>
 }
 
-<ChargeDetail Charge="@newCharge" ParentStateChanged="@StateChanged"></ChargeDetail>
 
 @code {
     private List<Charge> charges = new();
-    private Charge newCharge = new Charge();
+    private Charge chargeObject = new Charge();
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,12 +40,25 @@
 
     private void InitializeChargeObject()
     {
-        newCharge = new Charge();
+        chargeObject = new Charge();
     }
 
     private async void StateChanged()
     {
         charges = await ChargeService.Get();
         StateHasChanged();
+    }
+
+    private void SetChargObject(Charge charge)
+    {
+        chargeObject = charge;
+    }
+
+    private async Task DeleteCharge()
+    {
+        await ChargeService.Delete(chargeObject.Id);
+        await jsRuntime.InvokeAsync<object>("CloseModal", "confirmDeleteModal");
+        StateChanged();
+        InitializeChargeObject();
     }
 }

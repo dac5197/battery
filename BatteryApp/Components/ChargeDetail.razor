@@ -43,7 +43,15 @@
 
     private async void HandleValidSubmit()
     {
-        await chargeService.Add(Charge);
+        if (Charge.Id == 0)
+        {
+            await chargeService.Add(Charge);
+        }
+        else
+        {
+            await chargeService.Update(Charge);
+        }
+
         await CloseModal();
         ParentStateChanged?.Invoke();
     }
