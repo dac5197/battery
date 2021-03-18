@@ -66,4 +66,4 @@ namespace BatteryApp.Models.StatusModel
     }
 }
 
-}
+

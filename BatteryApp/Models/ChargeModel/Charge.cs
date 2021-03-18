@@ -20,6 +20,8 @@ namespace BatteryApp.Models.ChargeModel
 
         public bool IsComplete { get; set; } = false;
 
-        public Status Status { get; set; }
+        [Required]
+        public int StatusId { get; set; }
+        public virtual Status Status { get; set; }
     }
 }

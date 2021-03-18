@@ -1,5 +1,6 @@
-﻿@inject IChargeService chargeService
-@inject IJSRuntime jsRuntime
+﻿@inject IChargeService _chargeService
+@inject IStatusService _statusService
+@inject IJSRuntime _jsRuntime
 
 <div class="modal fade" tabindex="-1" role="dialog" id="chargeModal">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -20,10 +21,14 @@
                         <label for="desc">Description</label>
                         <InputTextArea @bind-Value="@Charge.Description" id="desc" class="form-control">@Charge.Description</InputTextArea>
                     </div>
-                    <div class="form-check">
-                        <InputCheckbox @bind-Value="@Charge.IsComplete" id="is-complete" class="form-check-input" />
-                        <label class="form-check-label" for="is-complete">Complete</label>
-                    </div>
+
+                    <InputSelect @bind-Value="@Charge.StatusId" class="form-control">
+                        @foreach (var status in statuses)
+                        {
+                            <option Value="@status.Id"> @status.Name</option>
+                        }
+                    </InputSelect>
+                    <br />
                     <button type="submit" class="btn btn-primary">Submit</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 </EditForm>
@@ -41,15 +46,22 @@
     [Parameter]
     public Action ParentStateChanged { get; set; }
 
+    private List<Status> statuses = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        statuses = await _statusService.Get();
+    }
+
     private async void HandleValidSubmit()
     {
         if (Charge.Id == 0)
         {
-            await chargeService.Add(Charge);
+            await _chargeService.Add(Charge);
         }
         else
         {
-            await chargeService.Update(Charge);
+            await _chargeService.Update(Charge);
         }
 
         await CloseModal();
@@ -58,6 +70,6 @@
 
     public async Task CloseModal()
     {
-        await jsRuntime.InvokeAsync<object>("CloseModal", "chargeModal");
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "chargeModal");
     }
 }

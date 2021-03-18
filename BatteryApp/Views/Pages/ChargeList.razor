@@ -1,7 +1,7 @@
 ﻿@page "/charges"
 
-@inject IChargeService ChargeService
-@inject IJSRuntime jsRuntime
+@inject IChargeService _chargeService
+@inject IJSRuntime _jsRuntime
 
 <h3>Charge List</h3>
 
@@ -35,7 +35,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        charges = await ChargeService.Get();
+        charges = await _chargeService.Get();
     }
 
     private void InitializeChargeObject()
@@ -45,7 +45,7 @@ else
 
     private async void StateChanged()
     {
-        charges = await ChargeService.Get();
+        charges = await _chargeService.Get();
         StateHasChanged();
     }
 
@@ -56,8 +56,8 @@ else
 
     private async Task DeleteCharge()
     {
-        await ChargeService.Delete(chargeObject.Id);
-        await jsRuntime.InvokeAsync<object>("CloseModal", "confirmDeleteModal");
+        await _chargeService.Delete(chargeObject.Id);
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "confirmDeleteModal");
         StateChanged();
         InitializeChargeObject();
     }
