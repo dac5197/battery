@@ -1,41 +1,58 @@
 ﻿@page "/charges"
 
+@inject AuthenticationStateProvider _authStateProvider
 @inject IChargeService _chargeService
+@inject IStatusService _statusService
 @inject IJSRuntime _jsRuntime
 
-<h3>Charge List</h3>
 
-@if (charges == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
+<AuthorizeView>
+    <Authorized>
 
-    <div>
-        <button data-toggle="modal" data-target="#chargeModal" class="btn btn-primary" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
-    </div>
+        <h3>Charge List</h3>
+
+        @if (charges == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <p>Hello, @context.User.Identity.Name!</p>
+            <div>
+                <button data-toggle="modal" data-target="#chargeModal" class="btn btn-primary" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
+            </div>
 
 
+            @foreach (var status in statuses.OrderByDescending(x => x.Order))
+            {
+                <h4>@status.Name</h4>
+                @foreach (var charge in charges.Where(x => x.StatusId == status.Id))
+                {
+                    <ChargeItem Charge="@charge" SetChargeItem="@SetChargObject"></ChargeItem>
+                }
+            }
 
-    @foreach (var charge in charges)
-    {
-        <ChargeItem Charge="@charge" SetChargeItem="@SetChargObject"></ChargeItem>
-    }
 
-    <ChargeDetail Charge="@chargeObject" ParentStateChanged="@StateChanged"></ChargeDetail>
+            <ChargeDetail Charge="@chargeObject" ParentStateChanged="@StateChanged"></ChargeDetail>
 
-    <ConfirmDeleteDialog Charge="@chargeObject" Delete="@DeleteCharge"></ConfirmDeleteDialog>
-}
-
+            <ConfirmDeleteDialog Charge="@chargeObject" Delete="@DeleteCharge"></ConfirmDeleteDialog>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <a href="Identity/Account/Register">Register</a>
+        <a href="Identity/Account/Login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
-    private List<Charge> charges = new();
     private Charge chargeObject = new Charge();
+    private List<Charge> charges = new();
+    private List<Status> statuses = new();
 
     protected override async Task OnInitializedAsync()
     {
         charges = await _chargeService.Get();
+        statuses = await _statusService.Get();
     }
 
     private void InitializeChargeObject()

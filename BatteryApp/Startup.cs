@@ -2,6 +2,7 @@ using BatteryApp.Areas.Identity;
 using BatteryApp.Data;
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.StatusModel;
+using BatteryApp.Models.UserProfileModel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -51,6 +52,7 @@ namespace BatteryApp
             // Add Project Models CRUD Services
             services.AddTransient<IChargeService, ChargeService>();
             services.AddTransient<IStatusService, StatusService>();
+            services.AddTransient<IUserProfileService, UserProfileService>();
 
             // Radzen Services
             services.AddScoped<DialogService>();

@@ -1,6 +1,7 @@
 ﻿using BatteryApp.Models;
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.StatusModel;
+using BatteryApp.Models.UserProfileModel;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace BatteryApp.Data
 
         public DbSet<Charge> Charges { get; set; }
         public DbSet<Status> Statuses { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
