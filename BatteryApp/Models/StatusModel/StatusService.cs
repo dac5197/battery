@@ -1,56 +1,55 @@
 ﻿using BatteryApp.Data;
-using BatteryApp.Models.ChargeModel;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BatteryApp.Models
+namespace BatteryApp.Models.StatusModel
 {
-    public class BaseService
+    public class StatusService : IStatusService
     {
         private readonly IDbContextFactory<ChargeContext> _contextFactory;
 
-        public BaseService(IDbContextFactory<ChargeContext> contextFactory)
+        public StatusService(IDbContextFactory<ChargeContext> contextFactory)
         {
             _contextFactory = contextFactory;
         }
 
-        public async Task<List<Charge>> Get()
+        public async Task<List<Status>> Get()
         {
             using (var context = _contextFactory.CreateDbContext())
             {
-                return await context.Charges.ToListAsync();
+                return await context.Statuses.ToListAsync();
             }
         }
 
-        public async Task<Charge> Get(int id)
+        public async Task<Status> Get(int id)
         {
             using (var context = _contextFactory.CreateDbContext())
             {
-                var charge = await context.Charges.FindAsync(id);
-                return charge;
+                var status = await context.Statuses.FindAsync(id);
+                return status;
             }
         }
 
-        public async Task<Charge> Add(Charge charge)
+        public async Task<Status> Add(Status status)
         {
             using (var context = _contextFactory.CreateDbContext())
             {
-                context.Charges.Add(charge);
+                context.Statuses.Add(status);
                 await context.SaveChangesAsync();
-                return charge;
+                return status;
             }
         }
 
-        public async Task<Charge> Update(Charge charge)
+        public async Task<Status> Update(Status status)
         {
             using (var context = _contextFactory.CreateDbContext())
             {
-                context.Entry(charge).State = EntityState.Modified;
+                context.Entry(status).State = EntityState.Modified;
                 await context.SaveChangesAsync();
-                return charge;
+                return status;
             }
         }
 
@@ -58,8 +57,8 @@ namespace BatteryApp.Models
         {
             using (var context = _contextFactory.CreateDbContext())
             {
-                var charge = await context.Charges.FindAsync(id);
-                context.Charges.Remove(charge);
+                var status = await context.Statuses.FindAsync(id);
+                context.Statuses.Remove(status);
                 await context.SaveChangesAsync();
             }
         }
@@ -67,3 +66,4 @@ namespace BatteryApp.Models
     }
 }
 
+}
