@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BatteryApp.Models;
+using BatteryApp.Models.ChargeModel;
+using BatteryApp.Models.StatusModel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using BatteryApp.Models.StatusModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BatteryApp.Data
+namespace BatteryApp.Models.ChargeModel
 {
     public class Charge : BaseEntity
     {
@@ -18,7 +19,7 @@ namespace BatteryApp.Data
         public string Description { get; set; }
 
         public bool IsComplete { get; set; } = false;
-        
+
         public Status Status { get; set; }
     }
 }

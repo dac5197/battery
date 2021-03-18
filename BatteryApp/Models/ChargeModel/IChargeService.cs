@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BatteryApp.Data
+namespace BatteryApp.Models.ChargeModel
 {
     public interface IChargeService
     {

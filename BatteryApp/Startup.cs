@@ -1,5 +1,6 @@
 using BatteryApp.Areas.Identity;
 using BatteryApp.Data;
+using BatteryApp.Models.ChargeModel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;

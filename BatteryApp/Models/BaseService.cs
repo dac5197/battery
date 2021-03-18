@@ -1,16 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BatteryApp.Data;
+using BatteryApp.Models.ChargeModel;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BatteryApp.Data
+namespace BatteryApp.Models
 {
-    public class ChargeService : IChargeService
+    public class BaseService
     {
         private readonly IDbContextFactory<ChargeContext> _contextFactory;
 
-        public ChargeService(IDbContextFactory<ChargeContext> contextFactory)
+        public BaseService(IDbContextFactory<ChargeContext> contextFactory)
         {
             _contextFactory = contextFactory;
         }
@@ -63,4 +65,5 @@ namespace BatteryApp.Data
         }
 
     }
+}
 }
