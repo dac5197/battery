@@ -1,4 +1,5 @@
-﻿using BatteryApp.Models.StatusModel;
+﻿using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.StatusModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,10 +19,15 @@ namespace BatteryApp.Models.ChargeModel
 
         public string Description { get; set; }
 
-        public bool IsComplete { get; set; } = false;
-
         [Required]
         public int StatusId { get; set; }
         public virtual Status Status { get; set; }
+
+        [Required]
+        public int BatteryId { get; set; }
+        public virtual Battery Battery { get; set; }
+
+        [MaxLength(450)]
+        public string OwnerId { get; set; }
     }
 }

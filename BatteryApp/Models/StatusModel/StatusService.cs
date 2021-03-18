@@ -9,9 +9,9 @@ namespace BatteryApp.Models.StatusModel
 {
     public class StatusService : IStatusService
     {
-        private readonly IDbContextFactory<ChargeContext> _contextFactory;
+        private readonly IDbContextFactory<AppDbContextFactory> _contextFactory;
 
-        public StatusService(IDbContextFactory<ChargeContext> contextFactory)
+        public StatusService(IDbContextFactory<AppDbContextFactory> contextFactory)
         {
             _contextFactory = contextFactory;
         }

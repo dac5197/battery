@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Models;
+using BatteryApp.Models.BatteryModel;
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.StatusModel;
 using BatteryApp.Models.UserProfileModel;
@@ -11,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace BatteryApp.Data
 {
-    public class ChargeContext : DbContext
+    public class AppDbContextFactory : DbContext
     {
-        public ChargeContext(DbContextOptions<ChargeContext> options)
+        public AppDbContextFactory(DbContextOptions<AppDbContextFactory> options)
         : base(options)
         {
         }
@@ -21,6 +22,7 @@ namespace BatteryApp.Data
         public DbSet<Charge> Charges { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<Battery> Batteries { get; set; }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {

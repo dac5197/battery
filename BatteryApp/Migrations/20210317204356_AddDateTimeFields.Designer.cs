@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BatteryApp.Migrations
 {
-    [DbContext(typeof(ChargeContext))]
+    [DbContext(typeof(AppDbContextFactory))]
     [Migration("20210317204356_AddDateTimeFields")]
     partial class AddDateTimeFields
     {

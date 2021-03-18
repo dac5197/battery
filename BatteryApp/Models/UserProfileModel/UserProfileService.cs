@@ -9,9 +9,9 @@ namespace BatteryApp.Models.UserProfileModel
 {
     public class UserProfileService : IUserProfileService
     {
-        private readonly IDbContextFactory<ChargeContext> _contextFactory;
+        private readonly IDbContextFactory<AppDbContextFactory> _contextFactory;
 
-        public UserProfileService(IDbContextFactory<ChargeContext> contextFactory)
+        public UserProfileService(IDbContextFactory<AppDbContextFactory> contextFactory)
         {
             _contextFactory = contextFactory;
         }

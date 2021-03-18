@@ -10,9 +10,9 @@ namespace BatteryApp.Models
 {
     public class BaseService
     {
-        private readonly IDbContextFactory<ChargeContext> _contextFactory;
+        private readonly IDbContextFactory<AppDbContextFactory> _contextFactory;
 
-        public BaseService(IDbContextFactory<ChargeContext> contextFactory)
+        public BaseService(IDbContextFactory<AppDbContextFactory> contextFactory)
         {
             _contextFactory = contextFactory;
         }

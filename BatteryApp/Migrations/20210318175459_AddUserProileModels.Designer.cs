@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BatteryApp.Migrations
 {
-    [DbContext(typeof(ChargeContext))]
+    [DbContext(typeof(AppDbContextFactory))]
     [Migration("20210318175459_AddUserProileModels")]
     partial class AddUserProileModels
     {

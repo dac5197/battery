@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BatteryApp.Migrations
 {
-    [DbContext(typeof(ChargeContext))]
+    [DbContext(typeof(AppDbContextFactory))]
     [Migration("20210317212510_SetupFK")]
     partial class SetupFK
     {
