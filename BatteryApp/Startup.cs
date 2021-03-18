@@ -1,6 +1,7 @@
 using BatteryApp.Areas.Identity;
 using BatteryApp.Data;
 using BatteryApp.Models.ChargeModel;
+using BatteryApp.Models.StatusModel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -41,14 +42,15 @@ namespace BatteryApp
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddRazorPages();
+            services.AddRazorPages(options => options.RootDirectory = "/Views/Pages");
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
 
-            // Add Project Models
+            // Add Project Models CRUD Services
             services.AddTransient<IChargeService, ChargeService>();
+            services.AddTransient<IStatusService, StatusService>();
 
             // Radzen Services
             services.AddScoped<DialogService>();
