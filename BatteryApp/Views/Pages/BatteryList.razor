@@ -1,0 +1,35 @@
+﻿@page "/batteries"
+
+@inject AuthenticationStateProvider _authStateProvider
+@inject IBatteryService _batteryService
+
+<h3>Batteries</h3>
+<AuthorizeView>
+    <Authorized>
+        <div class="row row-cols-sm-2 row-cols-md-4">
+            @foreach (var battery in batteries)
+            {
+                <BatteryListItem Battery="@battery"></BatteryListItem>
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <a href="Identity/Account/Register">Register</a>
+        <a href="Identity/Account/Login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    public string userId;
+
+    public List<Battery> batteries = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        batteries = await _batteryService.Get(userId);
+    }
+}

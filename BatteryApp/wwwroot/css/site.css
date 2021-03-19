@@ -48,3 +48,20 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+/* Project CSS */
+.border-square {
+    border-radius: 0 !important;
+}
+
+.blazor-navlink-black {
+    color: black;
+}
+
+.blazor-navlink-black:hover {
+    color: black;
+    text-decoration: none;
+    -webkit-box-shadow: 0px -7px 25px 0px rgba(255, 202, 50, 0.86);
+    -moz-box-shadow: 0px -7px 25px 0px rgba(255, 202, 50, 0.86);
+    box-shadow: 0px -7px 25px 0px rgba(255, 202, 50, 0.86);
+}

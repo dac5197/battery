@@ -1,0 +1,30 @@
+﻿<NavLink href="@($"/battery/{Battery.Id}")" class="blazor-navlink-black">
+    <div class="card bg-dark shadow-sm pb-1 pt-2 pb-5 border-square">
+        <div class="card bg-light mx-2 mt-2 mb-4 p-2 border-square">
+            <div class="card-header">
+                <h4 class="card-title">@Battery.Id | @Battery.Name</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <h5>Charges: n</h5>
+                </div>
+                <div class="row">
+                    <button type="button" class="btn btn-info border-square">
+                        Queued <span class="badge badge-light">4</span>
+                    </button>
+                    <button type="button" class="btn btn-warning border-square">
+                        In Progress <span class="badge badge-light">2</span>
+                    </button>
+                    <button type="button" class="btn btn-success border-square">
+                        Complete <span class="badge badge-light">1</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</NavLink>
+
+@code {
+    [Parameter]
+    public Battery Battery { get; set; }
+}
