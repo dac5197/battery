@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Data;
+using BatteryApp.Models.BatteryModel;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,15 @@ namespace BatteryApp.Models.ChargeModel
             {
                 var charge = await context.Charges.FindAsync(id);
                 return charge;
+            }
+        }
+
+        public async Task<List<Charge>> Get(Battery battery)
+        {
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var charges = await context.Charges.ToListAsync();
+                return charges.Where(x => x.BatteryId == battery.Id).ToList();
             }
         }
 

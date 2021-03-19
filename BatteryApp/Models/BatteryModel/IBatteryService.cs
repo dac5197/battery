@@ -8,6 +8,7 @@ namespace BatteryApp.Models.BatteryModel
         Task<Battery> Add(Battery Battery);
         Task Delete(int id);
         Task<List<Battery>> Get();
+        Task<List<Battery>> Get(string userId);
         Task<Battery> Get(int id);
         Task<Battery> Update(Battery Battery);
     }
