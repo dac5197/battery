@@ -4,6 +4,7 @@ using BatteryApp.Models.BatteryModel;
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.StatusModel;
 using BatteryApp.Models.UserProfileModel;
+using BatteryApp.Views.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -55,6 +56,9 @@ namespace BatteryApp
             services.AddTransient<IChargeService, ChargeService>();
             services.AddTransient<IStatusService, StatusService>();
             services.AddTransient<IUserProfileService, UserProfileService>();
+
+            // Add Project View Utils
+            services.AddTransient<ICalculateTextareaRows, CalculateTextareaRows>();
 
             // Radzen Services
             services.AddScoped<DialogService>();

@@ -47,19 +47,22 @@
     [Parameter]
     public Action ParentStateChanged { get; set; }
 
-    private string descriptionText { get; set; }
     private int textareaRows;
     private List<Status> statuses = new();
 
     protected override async Task OnInitializedAsync()
     {
         statuses = await _statusService.Get();
-        descriptionText = Charge.Description;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        //textareaRows = _calcTextareaRows.CalculateRows(Charge.Description);
+        base.OnAfterRender(firstRender);
     }
 
     private async void HandleValidSubmit()
     {
-        Charge.Description = descriptionText;
         if (Charge.Id == 0)
         {
             await _chargeService.Add(Charge);
