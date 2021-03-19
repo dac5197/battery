@@ -1,15 +1,15 @@
-﻿@page "/charges"
+﻿@page "/battery/{id:int}"
 
 @inject AuthenticationStateProvider _authStateProvider
+@inject IBatteryService _batteryService
 @inject IChargeService _chargeService
 @inject IStatusService _statusService
 @inject IJSRuntime _jsRuntime
 
-
 <AuthorizeView>
     <Authorized>
 
-        <h3>Charge List</h3>
+        <h4><span class="oi oi-battery-full" aria-hidden="true"></span> @battery.Id | @battery.Name </h4>
 
         @if (charges == null)
         {
@@ -17,7 +17,6 @@
         }
         else
         {
-            <p>Hello, @context.User.Identity.Name!</p>
             <div>
                 <button data-toggle="modal" data-target="#chargeModal" class="btn btn-primary" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
             </div>
@@ -28,7 +27,7 @@
                 <h4>@status.Name</h4>
                 @foreach (var charge in charges.Where(x => x.StatusId == status.Id))
                 {
-                    <ChargeListItem Charge="@charge" SetChargeItem="@SetChargObject"></ChargeListItem>
+                    <ChargeListItem Battery="@battery" Charge="@charge" SetChargeItem="@SetChargObject"></ChargeListItem>
                 }
             }
 
@@ -45,19 +44,32 @@
 </AuthorizeView>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Battery battery = new();
     private Charge chargeObject = new Charge();
     private List<Charge> charges = new();
     private List<Status> statuses = new();
+    private string userId;
 
     protected override async Task OnInitializedAsync()
     {
-        charges = await _chargeService.Get();
+        battery = await _batteryService.Get(Id);
+        charges = await _chargeService.Get(battery);
         statuses = await _statusService.Get();
+
+        var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
     }
 
     private void InitializeChargeObject()
     {
         chargeObject = new Charge();
+        chargeObject.BatteryId = battery.Id;
+        chargeObject.OwnerId = userId;
+        chargeObject.StatusId = 2;
+
     }
 
     private async void StateChanged()

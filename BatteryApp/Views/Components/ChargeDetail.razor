@@ -1,4 +1,5 @@
-﻿@inject IChargeService _chargeService
+﻿@inject ICalculateTextareaRows _calcTextareaRows
+@inject IChargeService _chargeService
 @inject IStatusService _statusService
 @inject IJSRuntime _jsRuntime
 
@@ -6,7 +7,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Charge Detail</h5>
+                <h5 class="modal-title">Charge Detail - TARows: @textareaRows</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -19,7 +20,7 @@
                     </div>
                     <div class="form-group">
                         <label for="desc">Description</label>
-                        <InputTextArea @bind-Value="@Charge.Description" id="desc" class="form-control">@Charge.Description</InputTextArea>
+                        <InputTextArea @bind-Value="@Charge.Description" @oninput="@(e => resizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control">@Charge.Description</InputTextArea>
                     </div>
 
                     <InputSelect @bind-Value="@Charge.StatusId" class="form-control">
@@ -46,15 +47,19 @@
     [Parameter]
     public Action ParentStateChanged { get; set; }
 
+    private string descriptionText { get; set; }
+    private int textareaRows;
     private List<Status> statuses = new();
 
     protected override async Task OnInitializedAsync()
     {
         statuses = await _statusService.Get();
+        descriptionText = Charge.Description;
     }
 
     private async void HandleValidSubmit()
     {
+        Charge.Description = descriptionText;
         if (Charge.Id == 0)
         {
             await _chargeService.Add(Charge);
@@ -68,8 +73,14 @@
         ParentStateChanged?.Invoke();
     }
 
+    private void resizeTextarea(ChangeEventArgs e)
+    {
+        textareaRows = _calcTextareaRows.CalculateRows((string)e.Value);
+    }
+
     public async Task CloseModal()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "chargeModal");
     }
+
 }
