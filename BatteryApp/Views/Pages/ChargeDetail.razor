@@ -1,0 +1,19 @@
+﻿@page "/charge/{id:int}"
+
+@inject IChargeService _chargeService
+
+<h3>ChargeDetail</h3>
+
+<p>@charge.Title</p>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Charge charge = new Charge();
+
+    protected override async Task OnInitializedAsync()
+    {
+        charge = await _chargeService.Get(Id);
+    }
+}

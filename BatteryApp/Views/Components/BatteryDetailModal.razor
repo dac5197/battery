@@ -1,0 +1,65 @@
+﻿@inject ICalculateTextareaRows _calcTextareaRows
+@inject IBatteryService _batteryService
+@inject IJSRuntime _jsRuntime
+
+<div class="modal fade" tabindex="-1" role="dialog" id="batteryDetailModal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Battery Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="@battery" OnValidSubmit="@HandleValidSubmit">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <InputText @bind-Value="@battery.Name" id="title" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="desc">Description</label>
+                        <InputTextArea @bind-Value="@battery.Description" @oninput="@(e => resizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control">@battery.Description</InputTextArea>
+                    </div>
+                    <br />
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    private Battery battery = new();
+
+    private int textareaRows;
+
+    private async void HandleValidSubmit()
+    {
+        battery.OwnerId = UserId;
+        await _batteryService.Add(battery);
+
+        await CloseModal();
+
+        ParentStateChanged?.Invoke();
+    }
+
+    private void resizeTextarea(ChangeEventArgs e)
+    {
+        textareaRows = _calcTextareaRows.CalculateRows((string)e.Value);
+    }
+
+    public async Task CloseModal()
+    {
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "batteryDetailModal");
+    }
+
+}

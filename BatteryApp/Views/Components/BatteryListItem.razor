@@ -1,8 +1,9 @@
 ﻿@inject IChargeService _chargeService
 @inject IStatusService _statusService
 
+
 <NavLink href="@($"/battery/{Battery.Id}")" class="blazor-navlink-black">
-    <div class="card bg-dark shadow-sm pb-1 pt-2 pb-5 border-square">
+    <div class="card bg-dark shadow-sm pb-1 pt-2 pb-5 border-square m-3">
         <div class="card bg-light mx-2 mt-2 mb-4 p-2 border-square">
             <div class="card-header border-0">
                 <h4 class="card-title">@Battery.Id | @Battery.Name</h4>
@@ -15,8 +16,8 @@
                     <div class="card-group">
                         @foreach (var status in statuses)
                         {
-                            <div class="card border-square border-0 align-content-center justify-content-center pt-2 pb-1 px-2 charge-count-readout" 
-                                 style="background-color:@status.BgColor; color:@status.FontColor">
+                            <div class="card border-square border-0 align-content-center justify-content-center pt-2 pb-1 px-2 charge-count-readout"
+                                    style="background-color:@status.BgColor; color:@status.FontColor">
                                 <h6 class="text-center">
                                     @status.Name <span class="badge badge-light">@charges.Where(x => x.StatusId == status.Id).Count()</span>
                                 </h6>
@@ -33,7 +34,6 @@
     .charge-count-readout {
         min-width: 8rem;
     }
-
 </style>
 
 @code {
