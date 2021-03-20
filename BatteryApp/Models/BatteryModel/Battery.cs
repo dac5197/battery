@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BatteryApp.Models.ChargeModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -26,5 +27,6 @@ namespace BatteryApp.Models.BatteryModel
         [Required]
         [DisplayName("Active")]
         public bool IsActive { get; set; } = true;
+
     }
 }

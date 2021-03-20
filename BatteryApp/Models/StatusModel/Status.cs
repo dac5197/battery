@@ -21,5 +21,11 @@ namespace BatteryApp.Models.StatusModel
         public int Order { get; set; }
 
         public ICollection<Charge> Charges { get; set; }
+
+        [MaxLength(20)]
+        public string BgColor { get; set; }
+
+        [MaxLength(20)]
+        public string FontColor { get; set; }
     }
 }

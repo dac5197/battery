@@ -1,30 +1,52 @@
-﻿<NavLink href="@($"/battery/{Battery.Id}")" class="blazor-navlink-black">
+﻿@inject IChargeService _chargeService
+@inject IStatusService _statusService
+
+<NavLink href="@($"/battery/{Battery.Id}")" class="blazor-navlink-black">
     <div class="card bg-dark shadow-sm pb-1 pt-2 pb-5 border-square">
         <div class="card bg-light mx-2 mt-2 mb-4 p-2 border-square">
-            <div class="card-header">
+            <div class="card-header border-0">
                 <h4 class="card-title">@Battery.Id | @Battery.Name</h4>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <h5>Charges: n</h5>
+                <div class="row mb-3">
+                    <h5>Charges: @charges.Count</h5>
                 </div>
                 <div class="row">
-                    <button type="button" class="btn btn-info border-square">
-                        Queued <span class="badge badge-light">4</span>
-                    </button>
-                    <button type="button" class="btn btn-warning border-square">
-                        In Progress <span class="badge badge-light">2</span>
-                    </button>
-                    <button type="button" class="btn btn-success border-square">
-                        Complete <span class="badge badge-light">1</span>
-                    </button>
+                    <div class="card-group">
+                        @foreach (var status in statuses)
+                        {
+                            <div class="card border-square border-0 align-content-center justify-content-center pt-2 pb-1 px-2 charge-count-readout" 
+                                 style="background-color:@status.BgColor; color:@status.FontColor">
+                                <h6 class="text-center">
+                                    @status.Name <span class="badge badge-light">@charges.Where(x => x.StatusId == status.Id).Count()</span>
+                                </h6>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </NavLink>
 
+<style>
+    .charge-count-readout {
+        min-width: 8rem;
+    }
+
+</style>
+
 @code {
     [Parameter]
     public Battery Battery { get; set; }
+
+    private List<Charge> charges = new();
+    private List<Status> statuses = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        charges = await _chargeService.Get(Battery);
+        statuses = await _statusService.Get();
+
+    }
 }
