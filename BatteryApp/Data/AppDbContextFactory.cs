@@ -1,6 +1,8 @@
 ﻿using BatteryApp.Models;
 using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.ChargeModel;
+using BatteryApp.Models.PriorityModel;
 using BatteryApp.Models.StatusModel;
 using BatteryApp.Models.UserProfileModel;
 using Microsoft.EntityFrameworkCore;
@@ -19,10 +21,15 @@ namespace BatteryApp.Data
         {
         }
 
+        public DbSet<Battery> Batteries { get; set; }
         public DbSet<Charge> Charges { get; set; }
+
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Priority> Priorities { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
-        public DbSet<Battery> Batteries { get; set; }
+        
+        
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {

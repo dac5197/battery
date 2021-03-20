@@ -4,14 +4,16 @@ using BatteryApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BatteryApp.Migrations
 {
     [DbContext(typeof(AppDbContextFactory))]
-    partial class ChargeContextModelSnapshot : ModelSnapshot
+    [Migration("20210320215251_AddPriorityModel")]
+    partial class AddPriorityModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -146,9 +148,6 @@ namespace BatteryApp.Migrations
                     b.Property<string>("FontColor")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
