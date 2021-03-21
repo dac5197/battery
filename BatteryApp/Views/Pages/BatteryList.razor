@@ -2,6 +2,7 @@
 
 @inject AuthenticationStateProvider _authStateProvider
 @inject IBatteryService _batteryService
+@inject IBreadcrumbManager _breadcrumb
 
 <h3>Batteries</h3>
 <AuthorizeView>
@@ -37,6 +38,8 @@
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
         batteries = await _batteryService.Get(userId);
+
+        _breadcrumb.Hide();
     }
 
     private async void StateChanged()

@@ -1,0 +1,43 @@
+﻿@inject IBreadcrumbManager _breadcrumb
+@implements IDisposable
+
+@if (_breadcrumb.IsVisible)
+{
+    <nav class="border-bottom" aria-label="breadcrumb">
+        <ul class="breadcrumb mb-0">
+            @foreach (var link in _breadcrumb.Links)
+            {
+                @if (link == _breadcrumb.Links.Last())
+                {
+                    <li class="breadcrumb-item active">
+                        @link.Label
+                    </li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item">
+                        <a href="@link.Url" aria-current="page">@link.Label</a>
+                    </li>
+                }
+
+            }
+            @*<li class="breadcrumb-item">
+                    <a href="#">Battery</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Charge</li>*@
+        </ul>
+    </nav>
+}
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        _breadcrumb.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        _breadcrumb.OnChange -= StateHasChanged;
+    }
+}

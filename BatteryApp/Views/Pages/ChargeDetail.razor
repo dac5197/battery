@@ -1,10 +1,20 @@
 ﻿@page "/charge/{id:int}"
 
+@inject IBreadcrumbManager _breadcrumb
 @inject IChargeService _chargeService
 
-<h3>ChargeDetail</h3>
+<div class="container-fluid p-0">
 
-<p>@charge.Title</p>
+
+    <h3>ChargeDetail</h3>
+
+    <p>@charge.Title</p>
+
+
+
+
+
+</div>
 
 @code {
     [Parameter]
@@ -15,5 +25,16 @@
     protected override async Task OnInitializedAsync()
     {
         charge = await _chargeService.Get(Id);
+
+        List<BreadcrumbLink> breadcrumbLinks = new()
+        { 
+            new BreadcrumbLink { Url = $"/battery/{charge.BatteryId}", Label = $"Battery{charge.BatteryId}" },
+            new BreadcrumbLink { Url = "", Label = $"Charge{charge.Id}" }
+        };
+
+        _breadcrumb.ClearLinks();
+        _breadcrumb.SetLinks(breadcrumbLinks);
+        _breadcrumb.Show();
     }
+  
 }

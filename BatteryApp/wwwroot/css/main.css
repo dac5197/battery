@@ -1,0 +1,26 @@
+﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Project CSS */
+.border-square {
+    border-radius: 0 !important;
+}
+
+.blazor-navlink-black {
+    color: black;
+}
+
+.blazor-navlink-black:hover {
+    color: black;
+    text-decoration: none;
+    border: solid;
+    border-color: gold;
+    /*
+-webkit-box-shadow: 0px -7px 25px 0px rgba(255, 202, 50, 0.86);
+-moz-box-shadow: 0px -7px 25px 0px rgba(255, 202, 50, 0.86);
+box-shadow: 0px -7px 25px 0px rgba(255, 202, 50, 0.86);
+*/
+}
