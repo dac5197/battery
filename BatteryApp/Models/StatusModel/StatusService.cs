@@ -18,49 +18,39 @@ namespace BatteryApp.Models.StatusModel
 
         public async Task<List<Status>> Get()
         {
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                return await context.Statuses.ToListAsync();
-            }
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Statuses.ToListAsync();
         }
 
         public async Task<Status> Get(int id)
         {
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                var status = await context.Statuses.FindAsync(id);
-                return status;
-            }
+            using var context = _contextFactory.CreateDbContext();
+            var status = await context.Statuses.FindAsync(id);
+            return status;
         }
 
         public async Task<Status> Add(Status status)
         {
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                context.Statuses.Add(status);
-                await context.SaveChangesAsync();
-                return status;
-            }
+            using var context = _contextFactory.CreateDbContext();
+            context.Statuses.Add(status);
+            await context.SaveChangesAsync();
+            return status;
         }
 
         public async Task<Status> Update(Status status)
         {
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                context.Entry(status).State = EntityState.Modified;
-                await context.SaveChangesAsync();
-                return status;
-            }
+            using var context = _contextFactory.CreateDbContext();
+            context.Entry(status).State = EntityState.Modified;
+            await context.SaveChangesAsync();
+            return status;
         }
 
         public async Task Delete(int id)
         {
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                var status = await context.Statuses.FindAsync(id);
-                context.Statuses.Remove(status);
-                await context.SaveChangesAsync();
-            }
+            using var context = _contextFactory.CreateDbContext();
+            var status = await context.Statuses.FindAsync(id);
+            context.Statuses.Remove(status);
+            await context.SaveChangesAsync();
         }
 
     }
