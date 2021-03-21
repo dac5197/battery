@@ -1,7 +1,9 @@
 using BatteryApp.Areas.Identity;
 using BatteryApp.Data;
 using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.ChargeModel;
+using BatteryApp.Models.PriorityModel;
 using BatteryApp.Models.StatusModel;
 using BatteryApp.Models.UserProfileModel;
 using BatteryApp.Views.Utils;
@@ -53,7 +55,9 @@ namespace BatteryApp
 
             // Add Project Models CRUD Services
             services.AddTransient<IBatteryService, BatteryService>();
+            services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<IChargeService, ChargeService>();
+            services.AddTransient<IPriorityService, PriorityService>();
             services.AddTransient<IStatusService, StatusService>();
             services.AddTransient<IUserProfileService, UserProfileService>();
 
