@@ -34,10 +34,10 @@ namespace BatteryApp.Models.ChargeModel
 
         [Required]
         public int CategoryId { get; set; }
-        public virtual Category Categories { get; set; }
+        public virtual Category Category { get; set; }
 
         [Required]
         public int PriorityId { get; set; }
-        public virtual Priority Priorities { get; set; }
+        public virtual Priority Priority { get; set; }
     }
 }

@@ -4,27 +4,29 @@
 @inject IBatteryService _batteryService
 @inject IBreadcrumbManager _breadcrumb
 
-<h3>Batteries</h3>
-<AuthorizeView>
-    <Authorized>
-        <div>
-            <button data-toggle="modal" data-target="#batteryDetailModal" class="btn btn-warning" value="Add Battery">Add Battery</button>
-        </div>
-        <br />
-        <div class="row row-cols-sm-2 row-cols-md-4">
-            @foreach (var battery in batteries)
-            {
-                <BatteryListItem Battery="@battery"></BatteryListItem>
-            }
-        </div>
+<div class="container-fluid pt-4 px-4">
+    <h3>Batteries</h3>
+    <AuthorizeView>
+        <Authorized>
+            <div>
+                <button data-toggle="modal" data-target="#batteryDetailModal" class="btn btn-warning" value="Add Battery">Add Battery</button>
+            </div>
+            <br />
+            <div class="row row-cols-sm-2 row-cols-md-4">
+                @foreach (var battery in batteries)
+                {
+                    <BatteryListItem Battery="@battery"></BatteryListItem>
+                }
+            </div>
 
-        <BatteryDetailModal ParentStateChanged="@StateChanged" UserId="@userId"></BatteryDetailModal>
-    </Authorized>
-    <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Log in</a>
-    </NotAuthorized>
-</AuthorizeView>
+            <BatteryDetailModal ParentStateChanged="@StateChanged" UserId="@userId"></BatteryDetailModal>
+        </Authorized>
+        <NotAuthorized>
+            <a href="Identity/Account/Register">Register</a>
+            <a href="Identity/Account/Login">Log in</a>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
 
 @code {
 

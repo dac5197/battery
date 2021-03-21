@@ -1,39 +1,75 @@
 ﻿@page "/charge/{id:int}"
 
 @inject IBreadcrumbManager _breadcrumb
+@inject ICategoryService _categoryService
 @inject IChargeService _chargeService
 
-<div class="container-fluid p-0">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">@charge.Title</h4>
-                </div>
-                <div class="card-body">
 
-                </div>
+<div class="container-fluid px-0">
+    <div class="card border-bottom-0 border-square">
+        <div class="card-header px-4 cat-border">
+            <div class="row px-4">
+                <h6 class="card-title">
+                    <span class="oi @category.Icon cat-icon"></span>
+                    @charge.Id
+                </h6>
             </div>
-
+            <div class="row px-4">
+                <h4>@charge.Title</h4>
+            </div>
         </div>
+        <div class="row mt-4 mx-0 px-4">
+            <div class="col-md-8">
+                <div class="card border-square">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            Description
+                        </h4>
+                    </div>
+                    <div class="card-body">
 
+                    </div>
+                </div>
 
+            </div>
+            <div class="col-md-4">
+                <div class="card border-square">
+                    <div class="card-header">
+                        <h4 class="card-title">Tasks</h4>
+                    </div>
+                    <div class="card-body">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
-
 </div>
+
+<style>
+    .cat-icon {
+        color: @category.IconColor;
+    }
+    .cat-border {
+        box-shadow: 15px 0 @category.IconColor inset;
+    }
+</style>
 
 @code {
     [Parameter]
     public int Id { get; set; }
 
+    private Category category = new();
     private Charge charge = new Charge();
 
     protected override async Task OnInitializedAsync()
     {
         charge = await _chargeService.Get(Id);
+        category = await _categoryService.Get(charge.CategoryId);
 
         List<BreadcrumbLink> breadcrumbLinks = new()
-        { 
+        {
             new BreadcrumbLink { Url = $"/battery/{charge.BatteryId}", Label = $"Battery{charge.BatteryId}" },
             new BreadcrumbLink { Url = "", Label = $"Charge{charge.Id}" }
         };
@@ -42,5 +78,5 @@
         _breadcrumb.SetLinks(breadcrumbLinks);
         _breadcrumb.Show();
     }
-  
+
 }

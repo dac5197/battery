@@ -7,43 +7,44 @@
 @inject IStatusService _statusService
 @inject IJSRuntime _jsRuntime
 
-<AuthorizeView>
-    <Authorized>
+<div class="container-fluid pt-4 px-4">
+    <AuthorizeView>
+        <Authorized>
 
-        <h4><span class="oi oi-battery-full" aria-hidden="true"></span> @battery.Id | @battery.Name </h4>
+            <h4><span class="oi oi-battery-full" aria-hidden="true"></span> @battery.Id | @battery.Name </h4>
 
-        @if (charges == null)
-        {
-            <p><em>Loading...</em></p>
-        }
-        else
-        {
-            <div>
-                <button data-toggle="modal" data-target="#chargeModal" class="btn btn-primary" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
-            </div>
-
-
-            @foreach (var status in statuses.OrderByDescending(x => x.Order))
+            @if (charges == null)
             {
-                <h4>@status.Name</h4>
-                @foreach (var charge in charges.Where(x => x.StatusId == status.Id))
-                {
-                    <ChargeListItem Battery="@battery" Charge="@charge" SetChargeItem="@SetChargObject"></ChargeListItem>
-                }
+                <p><em>Loading...</em></p>
             }
+            else
+            {
+                <div>
+                    <button data-toggle="modal" data-target="#chargeModal" class="btn btn-primary" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
+                </div>
 
 
-            <ChargeDetailModal Charge="@chargeObject" ParentStateChanged="@StateChanged"></ChargeDetailModal>
+                @foreach (var status in statuses.OrderByDescending(x => x.Order))
+                {
+                    <h4>@status.Name</h4>
+                    @foreach (var charge in charges.Where(x => x.StatusId == status.Id))
+                    {
+                        <ChargeListItem Battery="@battery" Charge="@charge" SetChargeItem="@SetChargObject"></ChargeListItem>
+                    }
+                }
 
-            <ConfirmDeleteDialog Charge="@chargeObject" Delete="@DeleteCharge"></ConfirmDeleteDialog>
-        }
-    </Authorized>
-    <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Log in</a>
-    </NotAuthorized>
-</AuthorizeView>
 
+                <ChargeDetailModal Charge="@chargeObject" ParentStateChanged="@StateChanged"></ChargeDetailModal>
+
+                <ConfirmDeleteDialog Charge="@chargeObject" Delete="@DeleteCharge"></ConfirmDeleteDialog>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <a href="Identity/Account/Register">Register</a>
+            <a href="Identity/Account/Login">Log in</a>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
 @code {
     [Parameter]
     public int Id { get; set; }
