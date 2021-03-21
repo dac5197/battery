@@ -4,14 +4,16 @@ using BatteryApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BatteryApp.Migrations
 {
     [DbContext(typeof(AppDbContextFactory))]
-    partial class ChargeContextModelSnapshot : ModelSnapshot
+    [Migration("20210321175844_AddCatPriorIdCols")]
+    partial class AddCatPriorIdCols
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -129,10 +131,6 @@ namespace BatteryApp.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BatteryId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("PriorityId");
 
                     b.HasIndex("StatusId");
 
@@ -252,18 +250,6 @@ namespace BatteryApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BatteryApp.Models.CategoryModel.Category", "Categories")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BatteryApp.Models.PriorityModel.Priority", "Priorities")
-                        .WithMany()
-                        .HasForeignKey("PriorityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BatteryApp.Models.StatusModel.Status", "Status")
                         .WithMany("Charges")
                         .HasForeignKey("StatusId")
@@ -271,10 +257,6 @@ namespace BatteryApp.Migrations
                         .IsRequired();
 
                     b.Navigation("Battery");
-
-                    b.Navigation("Categories");
-
-                    b.Navigation("Priorities");
 
                     b.Navigation("Status");
                 });

@@ -1,4 +1,6 @@
 ﻿using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.CategoryModel;
+using BatteryApp.Models.PriorityModel;
 using BatteryApp.Models.StatusModel;
 using System;
 using System.Collections.Generic;
@@ -29,5 +31,13 @@ namespace BatteryApp.Models.ChargeModel
 
         [MaxLength(450)]
         public string OwnerId { get; set; }
+
+        [Required]
+        public int CategoryId { get; set; }
+        public virtual Category Categories { get; set; }
+
+        [Required]
+        public int PriorityId { get; set; }
+        public virtual Priority Priorities { get; set; }
     }
 }
