@@ -39,5 +39,7 @@ namespace BatteryApp.Models.ChargeModel
         [Required]
         public int PriorityId { get; set; }
         public virtual Priority Priority { get; set; }
+
+        public int? ParentId { get; set; }
     }
 }

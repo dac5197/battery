@@ -1,50 +1,101 @@
 ﻿@page "/charge/{id:int}"
 
 @inject IBreadcrumbManager _breadcrumb
+@inject ICalculateTextareaRows _calcTextareaRows
 @inject ICategoryService _categoryService
 @inject IChargeService _chargeService
+@inject IPriorityService _priorityService
+@inject IStatusService _statusService
 
 
 <div class="container-fluid px-0">
-    <div class="card border-bottom-0 border-square">
-        <div class="card-header px-4 cat-border">
-            <div class="row px-4">
-                <h6 class="card-title">
-                    <span class="oi @category.Icon cat-icon"></span>
-                    @charge.Id
-                </h6>
-            </div>
-            <div class="row px-4">
-                <h4>@charge.Title</h4>
-            </div>
-        </div>
-        <div class="row mt-4 mx-0 px-4">
-            <div class="col-md-8">
-                <div class="card border-square">
-                    <div class="card-header">
-                        <h4 class="card-title">
-                            Description
-                        </h4>
+    <EditForm Model="charge" OnValidSubmit="@HandleValidSubmit">
+        <div class="card border-bottom-0 border-square">
+            <div class="card-header px-4 cat-border">
+                <div class="row pl-4">
+                    <div class="col-md-10 p-0">
+                        <h6 class="card-title">
+                            <span class="oi @category.Icon cat-icon"></span>
+                            @charge.Id
+                        </h6>
                     </div>
-                    <div class="card-body">
-
+                    <div class="col-md-2 p-0 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Save</button>
+                    </div>
+                    <div class="row pl-4">
+                        <InputText @bind-Value="@charge.Title" id="title-input" class="form-control transparent-input strong-input-text" />
                     </div>
                 </div>
-
             </div>
-            <div class="col-md-4">
-                <div class="card border-square">
-                    <div class="card-header">
-                        <h4 class="card-title">Tasks</h4>
-                    </div>
-                    <div class="card-body">
+            <div class="card-header px-4 cat-border">
+                <div class="row px-4">
+                    <div class="col-md-6">
+                        <div class="form-group row mb-2">
+                            <label class="col-form-label col-form-label-sm align-items-center" for="status-input">Status: </label>
+                            <div class="col">
 
+                                <InputSelect @bind-Value="@charge.StatusId" class="form-control form-control-sm" id="status-input">
+                                    @foreach (var status in statuses)
+                                    {
+                                        <option Value="@status.Id"> @status.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <label class="col-form-label col-form-label-sm align-items-center" for="created-input">Created: </label>
+                            <div class="col">
+
+                                <input type="text" value="@charge.Created" class="form-control form-control-sm" id="created-input" readonly />
+                            </div>
+                        </div>
+                        <div class="form-group row mb-0">
+                            <label class="col-form-label col-form-label-sm align-items-center" for="priority-input">Priority</label>
+                            <div class="col">
+                                <InputSelect @bind-Value="@charge.PriorityId" class="form-control form-control-sm" id="priority-input">
+                                    @foreach (var priority in priorities)
+                                    {
+                                        <option Value="@priority.Id"> @priority.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <label class="col-form-label col-form-label-sm align-items-center" for="updated-input">Updated</label>
+                            <div class="col">
+                                <input type="text" value="@charge.Updated" class="form-control form-control-sm" id="updated-input" readonly />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Tags</h6>
                     </div>
                 </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8 pr-0 border-0">
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <h6><label for="desc">Description</label></h6>
+                                <InputTextArea @bind-Value="@charge.Description" @oninput="@(e => ResizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control">@charge.Description</InputTextArea>
+                            </div>
+                        </div>
+                    </div>
 
+                </div>
+                <div class="col-md-4 pl-0">
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <h6>Sparks</h6>
+                            <hr />
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
-    </div>
+    </EditForm>
+    @foreach (var link in _breadcrumb.Links)
+    {
+        <p>@link.Label</p>
+    }
 </div>
 
 <style>
@@ -52,7 +103,16 @@
         color: @category.IconColor;
     }
     .cat-border {
-        box-shadow: 15px 0 @category.IconColor inset;
+        box-shadow: 20px 0 @category.IconColor inset;
+    }
+    .transparent-input {
+        border: 0;
+        background: none;
+    }
+
+    .strong-input-text {
+        color: black;
+        font-size: 1.5rem;
     }
 </style>
 
@@ -62,11 +122,21 @@
 
     private Category category = new();
     private Charge charge = new Charge();
+    private List<Priority> priorities = new();
+    private List<Status> statuses = new();
+
+    private int minTextareaRows = 5;
+    private int maxTextareaRows = 15;
+    private int textareaRows;
 
     protected override async Task OnInitializedAsync()
     {
         charge = await _chargeService.Get(Id);
         category = await _categoryService.Get(charge.CategoryId);
+        priorities = await _priorityService.Get(charge.OwnerId);
+        statuses = await _statusService.Get();
+
+        textareaRows = _calcTextareaRows.CalculateRows(charge.Description);
 
         List<BreadcrumbLink> breadcrumbLinks = new()
         {
@@ -74,9 +144,22 @@
             new BreadcrumbLink { Url = "", Label = $"Charge{charge.Id}" }
         };
 
-        _breadcrumb.ClearLinks();
-        _breadcrumb.SetLinks(breadcrumbLinks);
+        //_breadcrumb.ClearLinks();
+        //_breadcrumb.SetLinks(breadcrumbLinks);
+
+        _breadcrumb.Initialize(charge);
         _breadcrumb.Show();
+
+
     }
 
+    private async void HandleValidSubmit()
+    {
+        await _chargeService.Update(charge);
+    }
+
+    private void ResizeTextarea(ChangeEventArgs e)
+    {
+        textareaRows = _calcTextareaRows.CalculateRows((string)e.Value, minTextareaRows, maxTextareaRows);
+    }
 }

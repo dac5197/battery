@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.ChargeModel;
+using System;
 using System.Collections.Generic;
 
 namespace BatteryApp.Views.Utils
@@ -10,10 +12,12 @@ namespace BatteryApp.Views.Utils
 
         event Action OnChange;
 
-        void AddLink(BreadcrumbLink link);
+        void AddBatteryLink(int id);
+        void AddChargeLink(Charge charge);
+        void AddLink(string url, string label);
         void ClearLinks();
         void Hide();
-        void SetLinks(List<BreadcrumbLink> links);
+        void Initialize(Charge charge);
         void Show();
     }
 }
