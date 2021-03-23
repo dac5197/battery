@@ -1,5 +1,6 @@
 using BatteryApp.Areas.Identity;
 using BatteryApp.Data;
+using BatteryApp.Internals;
 using BatteryApp.Models.BatteryModel;
 using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.ChargeModel;
@@ -60,6 +61,9 @@ namespace BatteryApp
             services.AddTransient<IPriorityService, PriorityService>();
             services.AddTransient<IStatusService, StatusService>();
             services.AddTransient<IUserProfileService, UserProfileService>();
+
+            // Add Project Internals
+            services.AddTransient<IInitializeChargeChildToParent, InitializeChargeChildToParent>();
 
             // Add Project View Utils
             services.AddTransient<ICalculateTextareaRows, CalculateTextareaRows>();

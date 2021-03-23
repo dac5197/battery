@@ -4,11 +4,12 @@
 @inject ICalculateTextareaRows _calcTextareaRows
 @inject ICategoryService _categoryService
 @inject IChargeService _chargeService
+@inject IInitializeChargeChildToParent _chargeRelationship
 @inject IPriorityService _priorityService
 @inject IStatusService _statusService
 @inject IUserProfileService _userProfileService 
 
-<div class="container-fluid px-0">
+<div class="container-fluid px-0 small">
     <EditForm Model="charge" OnValidSubmit="@HandleValidSubmit">
         <DataAnnotationsValidator />
         <div class="card border-bottom-0 border-square">
@@ -80,30 +81,63 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-8 pr-0 border-0">
+                <div class="col-md-6 pr-0 border-0">
                     <div class="card border-0">
                         <div class="card-body">
                             <div class="form-group">
                                 <h6><label for="desc">Description</label></h6>
-                                <InputTextArea @bind-Value="@charge.Description" @oninput="@(e => ResizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control">@charge.Description</InputTextArea>
+                                <InputTextArea @bind-Value="@charge.Description" @oninput="@(e => ResizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control form-control-sm">@charge.Description</InputTextArea>
                                 <ValidationMessage For="@(() => charge.Description)" />
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 pl-0">
+                <div class="col-md-3 pl-0">
                     <div class="card border-0">
                         <div class="card-body">
-                            <h6>Related Items</h6>
+                            <div class="d-flex">
+                                <div><h6>Related Items</h6></div>
+                                <div class="ml-auto pr-3">
+                                    <a class="new-item" data-toggle="modal" data-target="#chargeModal" @onclick="@InitializeSpark">
+                                        <span class="oi oi-plus"></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <hr />
+                            <ul class="list-group list-group-flush">
+
+                                @if (charge.ParentId is not null)
+                                {
+                                    <li>Parent</li>
+                                    <ChargeDetail_RelatedListItem Charge="parent"></ChargeDetail_RelatedListItem>
+                                }
+
+                                @if (children.Count > 0)
+                                {
+                                    <li>Children</li>
+                                    @foreach (var child in children)
+                                    {
+
+                                        <ChargeDetail_RelatedListItem Charge="child"></ChargeDetail_RelatedListItem>
+                                    }
+                                }
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 pl-0">
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <h6>Work Hours</h6>
                             <hr />
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </EditForm>
-    <div class="col-md-8 pr-0 border-0">
+    <div class="col-md-6 pr-0 border-0">
         <div class="card border-0">
             <div class="card-body">
                 <div class="form-group">
@@ -113,6 +147,8 @@
         </div>
     </div>
 </div>
+
+<ChargeDetailModal Charge="@spark" ParentStateChanged="@StateChanged"></ChargeDetailModal>
 
 <style>
     .cat-icon {
@@ -130,6 +166,16 @@
         color: black;
         font-size: 1.5rem;
     }
+
+    .new-item{
+        color: forestgreen;
+    }
+
+    .new-item:hover {
+        color: forestgreen;
+        border-bottom: solid;
+        border-bottom-color: forestgreen;
+    }
 </style>
 
 @code {
@@ -138,8 +184,11 @@
 
     private Category category = new();
     private Charge charge = new Charge();
+    private List<Charge> children = new();
+    private Charge parent = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
+    private Charge spark = new();
     private UserProfile userProfile = new();
 
     private int minTextareaRows = 5;
@@ -148,10 +197,16 @@
 
     protected override async Task OnInitializedAsync()
     {
+
         charge = await _chargeService.Get(Id);
+
+        children = await _chargeService.GetChildren(charge);
+        parent = await _chargeService.GetParent(charge);
+
         category = await _categoryService.Get(charge.CategoryId);
         priorities = await _priorityService.Get(charge.OwnerId);
         statuses = await _statusService.Get();
+
         userProfile = await _userProfileService.Get(charge.OwnerId);
 
         textareaRows = _calcTextareaRows.CalculateRows(charge.Description);
@@ -166,9 +221,19 @@
         await _chargeService.Update(charge);
     }
 
+    private async void InitializeSpark()
+    {
+        spark = new Charge();
+        spark = await _chargeRelationship.SetRelationshipAsync(charge, spark);
+    }
+
     private void ResizeTextarea(ChangeEventArgs e)
     {
         textareaRows = _calcTextareaRows.CalculateRows((string)e.Value, minTextareaRows, maxTextareaRows);
     }
 
+    private void StateChanged()
+    {
+        StateHasChanged();
+    }
 }

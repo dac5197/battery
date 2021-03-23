@@ -7,7 +7,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Charge Detail - TARows: @textareaRows</h5>
+                <h5 class="modal-title">Charge Detail</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -30,6 +30,8 @@
                         }
                     </InputSelect>
                     <br />
+                    <p>parent @Charge.ParentId</p>
+                    <p>cat @Charge.CategoryId</p>
                     <button type="submit" class="btn btn-primary">Submit</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 </EditForm>
@@ -43,6 +45,9 @@
 @code {
     [Parameter]
     public Charge Charge { get; set; }
+
+    [Parameter]
+    public Charge ParentCharge { get; set; }
 
     [Parameter]
     public Action ParentStateChanged { get; set; }
@@ -84,6 +89,11 @@
     public async Task CloseModal()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "chargeModal");
+    }
+
+    private void AssociateChildToParent()
+    {
+
     }
 
 }

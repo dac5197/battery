@@ -1,0 +1,35 @@
+﻿@inject NavigationManager _navManager;
+
+@inject ICategoryService _categoryService
+
+<li class="list-group-item border-0">
+    <NavLink href="@($"/charge/{Charge.Id}")" class="blazor-navlink-black" @onclick="HandleClick">
+        <span class="oi @category.Icon cat-child-icon-@Charge.Id"></span>
+        @Charge.Id |
+        @Charge.Title
+    </NavLink>
+</li>
+
+<style>
+    .cat-child-icon-@Charge.Id {
+        color: @category.IconColor;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Charge Charge { get; set; }
+
+    private Category category = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        category = await _categoryService.Get(Charge.CategoryId);
+    }
+
+    private void HandleClick()
+    {
+        _navManager.NavigateTo($"/charge/{Charge.Id}", true);
+    }
+}

@@ -37,6 +37,14 @@ namespace BatteryApp.Models.CategoryModel
             return category;
         }
 
+        public async Task<Category> GetByName(string name)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var categories = await context.Categories.ToListAsync();
+            var category = categories.Where(x => x.Name.ToLower() == name.ToLower()).FirstOrDefault();
+            return category;
+        }
+
         public async Task<Category> Add(Category category)
         {
             using var context = _contextFactory.CreateDbContext();

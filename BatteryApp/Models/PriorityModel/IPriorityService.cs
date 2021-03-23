@@ -10,6 +10,7 @@ namespace BatteryApp.Models.PriorityModel
         Task<List<Priority>> Get();
         Task<Priority> Get(int id);
         Task<List<Priority>> Get(string userId);
+        Task<Priority> GetDefault(string userId);
         Task<Priority> Update(Priority priority);
     }
 }

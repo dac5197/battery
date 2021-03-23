@@ -36,6 +36,14 @@ namespace BatteryApp.Models.PriorityModel
             return priority;
         }
 
+        public async Task<Priority> GetDefault(string userId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var priorities = await context.Priorities.ToListAsync();
+            var priority = priorities.Where(x => x.OwnerId == userId && x.IsDefault == true).FirstOrDefault();
+            return priority;
+        }
+
         public async Task<Priority> Add(Priority priority)
         {
             using var context = _contextFactory.CreateDbContext();

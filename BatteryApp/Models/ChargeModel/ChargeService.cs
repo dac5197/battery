@@ -37,6 +37,21 @@ namespace BatteryApp.Models.ChargeModel
             return charges.Where(x => x.BatteryId == battery.Id).ToList();
         }
 
+        public async Task<List<Charge>> GetChildren(Charge charge)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var charges = await context.Charges.ToListAsync();
+            var children = charges.Where(x => x.ParentId == charge.Id).ToList();
+            return children;
+        }
+
+        public async Task<Charge> GetParent(Charge charge)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var parent = await context.Charges.FindAsync(charge.ParentId);
+            return parent;
+        }
+
         public async Task<Charge> Add(Charge charge)
         {
             using var context = _contextFactory.CreateDbContext();
