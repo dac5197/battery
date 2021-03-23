@@ -6,24 +6,28 @@
 @inject IChargeService _chargeService
 @inject IPriorityService _priorityService
 @inject IStatusService _statusService
-
+@inject IUserProfileService _userProfileService 
 
 <div class="container-fluid px-0">
     <EditForm Model="charge" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
         <div class="card border-bottom-0 border-square">
             <div class="card-header px-4 cat-border">
                 <div class="row pl-4">
                     <div class="col-md-10 p-0">
-                        <h6 class="card-title">
+                        <h6 class="card-title align-items-center">
                             <span class="oi @category.Icon cat-icon"></span>
                             @charge.Id
                         </h6>
                     </div>
                     <div class="col-md-2 p-0 d-flex justify-content-end">
-                        <button type="submit" class="btn btn-sm btn-outline-secondary">Save</button>
+                        <button type="submit" class="btn btn-sm btn-primary px-4">Save</button>
                     </div>
-                    <div class="row pl-4">
+                </div>
+                <div class="row pl-0">
+                    <div class="col-md-10">
                         <InputText @bind-Value="@charge.Title" id="title-input" class="form-control transparent-input strong-input-text" />
+                        <ValidationMessage For="@(() => charge.Title)" />
                     </div>
                 </div>
             </div>
@@ -40,6 +44,7 @@
                                         <option Value="@status.Id"> @status.Name</option>
                                     }
                                 </InputSelect>
+                                <ValidationMessage For="@(() => charge.StatusId)" />
                             </div>
                             <label class="col-form-label col-form-label-sm align-items-center" for="created-input">Created: </label>
                             <div class="col">
@@ -56,6 +61,7 @@
                                         <option Value="@priority.Id"> @priority.Name</option>
                                     }
                                 </InputSelect>
+                                <ValidationMessage For="@(() => charge.PriorityId)" />
                             </div>
                             <label class="col-form-label col-form-label-sm align-items-center" for="updated-input">Updated</label>
                             <div class="col">
@@ -63,8 +69,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <h6>Tags</h6>
+                    <div class="col-md-3">
+                        <h6>Owner</h6>
+                        <p>@userProfile.FirstName @userProfile.LastName</p>
+                    </div>
+                    <div class="col-md-3 align-items-center">
+                        <h6>Collaborators</h6>
+                        <p>TBD</p>
                     </div>
                 </div>
             </div>
@@ -75,15 +86,15 @@
                             <div class="form-group">
                                 <h6><label for="desc">Description</label></h6>
                                 <InputTextArea @bind-Value="@charge.Description" @oninput="@(e => ResizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control">@charge.Description</InputTextArea>
+                                <ValidationMessage For="@(() => charge.Description)" />
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="col-md-4 pl-0">
                     <div class="card border-0">
                         <div class="card-body">
-                            <h6>Sparks</h6>
+                            <h6>Related Items</h6>
                             <hr />
                         </div>
                     </div>
@@ -92,10 +103,15 @@
             </div>
         </div>
     </EditForm>
-    @foreach (var link in _breadcrumb.Links)
-    {
-        <p>@link.Label</p>
-    }
+    <div class="col-md-8 pr-0 border-0">
+        <div class="card border-0">
+            <div class="card-body">
+                <div class="form-group">
+                    <h6>Notes</h6>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -124,6 +140,7 @@
     private Charge charge = new Charge();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
+    private UserProfile userProfile = new();
 
     private int minTextareaRows = 5;
     private int maxTextareaRows = 15;
@@ -135,21 +152,12 @@
         category = await _categoryService.Get(charge.CategoryId);
         priorities = await _priorityService.Get(charge.OwnerId);
         statuses = await _statusService.Get();
+        userProfile = await _userProfileService.Get(charge.OwnerId);
 
         textareaRows = _calcTextareaRows.CalculateRows(charge.Description);
 
-        List<BreadcrumbLink> breadcrumbLinks = new()
-        {
-            new BreadcrumbLink { Url = $"/battery/{charge.BatteryId}", Label = $"Battery{charge.BatteryId}" },
-            new BreadcrumbLink { Url = "", Label = $"Charge{charge.Id}" }
-        };
-
-        //_breadcrumb.ClearLinks();
-        //_breadcrumb.SetLinks(breadcrumbLinks);
-
         _breadcrumb.Initialize(charge);
         _breadcrumb.Show();
-
 
     }
 
@@ -162,4 +170,5 @@
     {
         textareaRows = _calcTextareaRows.CalculateRows((string)e.Value, minTextareaRows, maxTextareaRows);
     }
+
 }
