@@ -2,6 +2,7 @@
 using BatteryApp.Models.ChargeModel;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BatteryApp.Views.Utils
 {
@@ -13,11 +14,11 @@ namespace BatteryApp.Views.Utils
         event Action OnChange;
 
         void AddBatteryLink(int id);
-        void AddChargeLink(Charge charge);
+        Task AddChargeLink(Charge charge);
         void AddLink(string url, string label);
         void ClearLinks();
         void Hide();
-        void Initialize(Charge charge);
+        Task Initialize(Charge charge);
         void Show();
     }
 }

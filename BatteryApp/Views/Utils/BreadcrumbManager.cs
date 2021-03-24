@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.ChargeModel;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,13 @@ namespace BatteryApp.Views.Utils
     {
         private readonly IBatteryService _batteryService;
         private readonly IChargeService _chargeService;
+        private readonly ICategoryService _categoryService;
 
-        public BreadcrumbManager(IBatteryService batteryService, IChargeService chargeService)
+        public BreadcrumbManager(IBatteryService batteryService, IChargeService chargeService, ICategoryService categoryService)
         {
             _batteryService = batteryService;
             _chargeService = chargeService;
+            _categoryService = categoryService;
         }
 
         public bool IsVisible { get; set; } = false;
@@ -34,26 +37,28 @@ namespace BatteryApp.Views.Utils
             Links.Add(link);
         }
 
-        public void Initialize(Charge charge)
+        public async Task Initialize(Charge charge)
         {
             ClearLinks();
-            AddChargeLink(charge);
+            await AddChargeLink(charge);
             AddBatteryLink(charge.BatteryId);
 
             Links.Reverse();
         }
 
-        public async void AddChargeLink(Charge charge)
+        public async Task AddChargeLink(Charge charge)
         {
+            Category category = await _categoryService.Get(charge.CategoryId);
+
             string url = $"/charge/{charge.Id}";
-            string label = $"Charge{charge.Id}";
+            string label = $"{category.Name}{charge.Id}";
 
             AddLink(url, label);
 
             if (charge.ParentId is not null)
             {
                 Charge parent = await _chargeService.Get((int)charge.ParentId);
-                AddChargeLink(parent);
+                await AddChargeLink(parent);
             }
         }
 

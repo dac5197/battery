@@ -1,6 +1,7 @@
 ﻿@page "/charge/{id:int}"
 
 @inject IBreadcrumbManager _breadcrumb
+@inject IBatteryService _batteryService 
 @inject ICalculateTextareaRows _calcTextareaRows
 @inject ICategoryService _categoryService
 @inject IChargeService _chargeService
@@ -104,25 +105,48 @@
                                 </div>
                             </div>
                             <hr />
-                            <ul class="list-group list-group-flush">
-
-                                @if (charge.ParentId is not null)
-                                {
-                                    <li>Parent</li>
-                                    <ChargeDetail_RelatedListItem Charge="parent"></ChargeDetail_RelatedListItem>
-                                }
-
-                                @if (children.Count > 0)
-                                {
-                                    <li>Children</li>
-                                    @foreach (var child in children)
-                                    {
-
-                                        <ChargeDetail_RelatedListItem Charge="child"></ChargeDetail_RelatedListItem>
-                                    }
-                                }
-
-                            </ul>
+                            <div class="card border-0">
+                                <div class="card-body">
+                                    <p>Battery</p>
+                                    <hr />
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item border-0">
+                                            <NavLink href="@($"/battery/{battery.Id}")" class="blazor-navlink-black">
+                                                <span class="oi oi-battery-full" style="color: steelblue"></span>
+                                                @battery.Id |
+                                                @battery.Name
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            @if (charge.ParentId is not null)
+                            {
+                                <div class="card border-0">
+                                    <div class="card-body">
+                                        <p>Parent</p>
+                                        <hr />
+                                        <ul class="list-group list-group-flush">
+                                            <ChargeDetail_RelatedListItem Charge="parent"></ChargeDetail_RelatedListItem>
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
+                            @if (children.Count > 0)
+                            {
+                                <div class="card border-0">
+                                    <div class="card-body">
+                                        <p>Children</p>
+                                        <hr />
+                                        <ul class="list-group list-group-flush">
+                                            @foreach (var child in children)
+                                            {
+                                                <ChargeDetail_RelatedListItem Charge="child"></ChargeDetail_RelatedListItem>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -131,6 +155,7 @@
                         <div class="card-body">
                             <h6>Work Hours</h6>
                             <hr />
+                            <h3>TBD</h3>
                         </div>
                     </div>
                 </div>
@@ -176,20 +201,29 @@
         border-bottom: solid;
         border-bottom-color: forestgreen;
     }
+
+    .border-bottom-only {
+        border-right: none;
+        border-left: none;
+        border-top: none;
+        border-bottom: solid;
+    }
 </style>
 
 @code {
     [Parameter]
     public int Id { get; set; }
 
+    private Battery battery = new();
     private Category category = new();
     private Charge charge = new Charge();
-    private List<Charge> children = new();
     private Charge parent = new();
-    private List<Priority> priorities = new();
-    private List<Status> statuses = new();
     private Charge spark = new();
     private UserProfile userProfile = new();
+
+    private List<Charge> children = new();
+    private List<Priority> priorities = new();
+    private List<Status> statuses = new();
 
     private int minTextareaRows = 5;
     private int maxTextareaRows = 15;
@@ -200,6 +234,7 @@
 
         charge = await _chargeService.Get(Id);
 
+        battery = await _batteryService.Get(charge.BatteryId);
         children = await _chargeService.GetChildren(charge);
         parent = await _chargeService.GetParent(charge);
 
@@ -211,7 +246,7 @@
 
         textareaRows = _calcTextareaRows.CalculateRows(charge.Description);
 
-        _breadcrumb.Initialize(charge);
+        await _breadcrumb.Initialize(charge);
         _breadcrumb.Show();
 
     }
