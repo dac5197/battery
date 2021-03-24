@@ -1,18 +1,34 @@
 ﻿@inject NavigationManager _navManager;
 
 @inject ICategoryService _categoryService
+@inject IChargeLifecycle _chargeLifecycle
 
 <li class="list-group-item border-0">
-    <NavLink href="@($"/charge/{Charge.Id}")" class="blazor-navlink-black" @onclick="HandleClick">
-        <span class="oi @category.Icon cat-child-icon-@Charge.Id"></span>
-        @Charge.Id |
-        @Charge.Title
-    </NavLink>
+    <div class="d-flex d-inline">
+        <InputCheckbox @bind-Value="@isCompleted" class="form-check-input" />
+        <NavLink href="@($"/charge/{Charge.Id}")" class="blazor-navlink-black" @onclick="HandleClick">
+            <span class="oi @category.Icon cat-child-icon-@Charge.Id"></span>
+            @if (isCompleted)
+            {
+                <div class="completed">
+                    @Charge.Id | @Charge.Title
+                </div>
+            }
+            else
+            {
+                <div>@Charge.Id | @Charge.Title</div>
+            }
+        </NavLink>
+    </div>
 </li>
 
 <style>
     .cat-child-icon-@Charge.Id {
         color: @category.IconColor;
+    }
+    .completed{
+        text-decoration: line-through;
+        color: gray;
     }
 </style>
 
@@ -22,9 +38,11 @@
 
     private Category category = new();
 
+    private bool isCompleted = false;
+
     protected override async Task OnInitializedAsync()
     {
-
+        isCompleted = _chargeLifecycle.IsCompleted(Charge);
         category = await _categoryService.Get(Charge.CategoryId);
     }
 

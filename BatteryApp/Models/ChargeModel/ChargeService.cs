@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Data;
+using BatteryApp.Internals;
 using BatteryApp.Models.BatteryModel;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,10 +12,12 @@ namespace BatteryApp.Models.ChargeModel
     public class ChargeService : IChargeService
     {
         private readonly IDbContextFactory<AppDbContextFactory> _contextFactory;
+        private readonly IChargeLifecycle _chargeLifecycle;
 
-        public ChargeService(IDbContextFactory<AppDbContextFactory> contextFactory)
+        public ChargeService(IDbContextFactory<AppDbContextFactory> contextFactory, IChargeLifecycle chargeLifecycle)
         {
             _contextFactory = contextFactory;
+            _chargeLifecycle = chargeLifecycle;
         }
 
         public async Task<List<Charge>> Get()
@@ -54,17 +57,23 @@ namespace BatteryApp.Models.ChargeModel
 
         public async Task<Charge> Add(Charge charge)
         {
+            charge.Completed = await _chargeLifecycle.SetCompletedAsync(charge);
+
             using var context = _contextFactory.CreateDbContext();
             context.Charges.Add(charge);
             await context.SaveChangesAsync();
+         
             return charge;
         }
 
         public async Task<Charge> Update(Charge charge)
         {
+            charge.Completed = await _chargeLifecycle.SetCompletedAsync(charge);
+
             using var context = _contextFactory.CreateDbContext();
             context.Entry(charge).State = EntityState.Modified;
             await context.SaveChangesAsync();
+
             return charge;
         }
 

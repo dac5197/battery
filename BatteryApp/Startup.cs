@@ -63,6 +63,7 @@ namespace BatteryApp
             services.AddTransient<IUserProfileService, UserProfileService>();
 
             // Add Project Internals
+            services.AddTransient<IChargeLifecycle, ChargeLifecycle>();
             services.AddTransient<IInitializeChargeChildToParent, InitializeChargeChildToParent>();
 
             // Add Project View Utils
