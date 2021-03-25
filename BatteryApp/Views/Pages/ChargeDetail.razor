@@ -106,6 +106,15 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6 pr-0 border-0">
+                        <div class="card border-0">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <h6>Notes</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-3 pl-0">
                     <div class="card border-0">
@@ -125,11 +134,11 @@
                                     <hr />
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item border-0">
-                                            <NavLink href="@($"/battery/{battery.Id}")" class="blazor-navlink-black">
+                                            <a href="@($"/battery/{battery.Id}")" class="link-black">
                                                 <span class="oi oi-battery-full" style="color: steelblue"></span>
                                                 @battery.Id |
                                                 @battery.Name
-                                            </NavLink>
+                                            </a>
                                         </li>
                                     </ul>
                                 </div>
@@ -176,15 +185,7 @@
             </div>
         </div>
     </EditForm>
-    <div class="col-md-6 pr-0 border-0">
-        <div class="card border-0">
-            <div class="card-body">
-                <div class="form-group">
-                    <h6>Notes</h6>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 </div>
 
 <ChargeDetailModal Charge="@spark" ParentStateChanged="@StateChanged"></ChargeDetailModal>
@@ -206,8 +207,9 @@
         font-size: 1.5rem;
     }
 
-    .new-item{
-        color: forestgreen;
+    .new-item {
+        color: forestgreen !important;
+        border-bottom: solid transparent;
     }
 
     .new-item:hover {

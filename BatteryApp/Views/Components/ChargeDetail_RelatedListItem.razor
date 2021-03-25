@@ -10,7 +10,7 @@
     {
         <input @onchange="@(() => SetStatus())" type="checkbox" checked="@isCompleted" class="form-check-input" />
     }
-    <NavLink href="@($"/charge/{Charge.Id}")" class="blazor-navlink-black" @onclick="HandleClick">
+    <a href="@($"/charge/{Charge.Id}")" class="link-black" @onclick="HandleClick">
         <div class="d-inline">
             <span class="oi @category.Icon cat-child-icon-@Charge.Id"></span>
         </div>
@@ -24,17 +24,14 @@
         {
             <div class="d-inline">@Charge.Id | @Charge.Title</div>
         }
-    </NavLink>
+    </a>
 </li>
 
 <style>
     .cat-child-icon-@Charge.Id {
         color: @category.IconColor;
     }
-    .completed{
-        text-decoration: line-through;
-        color: gray;
-    }
+    
 </style>
 
 @code {
