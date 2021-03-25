@@ -3,6 +3,7 @@
 @inject AuthenticationStateProvider _authStateProvider
 @inject IBatteryService _batteryService
 @inject IBreadcrumbManager _breadcrumb
+@inject IChargeLifecycle _chargeLifecycle
 @inject IChargeService _chargeService
 @inject IStatusService _statusService
 @inject IJSRuntime _jsRuntime
@@ -67,14 +68,10 @@
         _breadcrumb.Hide();
     }
 
-    private void InitializeChargeObject()
+    private async void InitializeChargeObject()
     {
         chargeObject = new Charge();
-        chargeObject.BatteryId = battery.Id;
-        chargeObject.OwnerId = userId;
-        chargeObject.CategoryId = 2;
-        chargeObject.PriorityId = 3;
-        chargeObject.StatusId = 2;
+        chargeObject = await _chargeLifecycle.SetDefaultValuesAsync(battery, chargeObject);
 
     }
 
