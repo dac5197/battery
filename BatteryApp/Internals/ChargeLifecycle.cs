@@ -29,7 +29,7 @@ namespace BatteryApp.Internals
 
             if (charge.StatusId == completedStatus.Id)
             {
-                return DateTime.Now;
+                return DateTime.UtcNow;
             }
 
             return null;

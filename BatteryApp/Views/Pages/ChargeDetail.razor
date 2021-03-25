@@ -67,19 +67,19 @@
                                 <div class="form-group row mb-2">
                                     <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="created-input">Created: </label>
                                     <div class="col">
-                                        <input type="text" value="@charge.Created" class="form-control form-control-sm" id="created-input" readonly />
+                                        <input type="text" value="@charge.Created.ToLocalTime().ToString(dateTimeFormat)" class="form-control form-control-sm" id="created-input" readonly />
                                     </div>
                                 </div>
                                 <div class="form-group row mb-2">
                                     <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="updated-input">Updated:</label>
                                     <div class="col">
-                                        <input type="text" value="@charge.Updated" class="form-control form-control-sm" id="updated-input" readonly />
+                                        <input type="text" value="@charge.Updated.ToLocalTime().ToString(dateTimeFormat)" class="form-control form-control-sm" id="updated-input" readonly />
                                     </div>
                                 </div>
                                 <div class="form-group row mb-2">
                                     <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="completed-input">Completed:</label>
                                     <div class="col">
-                                        <input type="text" value="@charge.Completed" class="form-control form-control-sm" id="completed-input" readonly />
+                                        <input type="text" value="@charge.Completed?.ToLocalTime().ToString(dateTimeFormat)" class="form-control form-control-sm" id="completed-input" readonly />
                                     </div>
                                 </div>
                             </div>
@@ -230,8 +230,8 @@
 </style>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
+        [Parameter]
+        public int Id { get; set; }
 
     private Battery battery = new();
     private Category category = new();
@@ -247,6 +247,8 @@
     private int minTextareaRows = 5;
     private int maxTextareaRows = 15;
     private int textareaRows;
+
+    private string dateTimeFormat = "MM/dd/yyyy HH:mm:ss";
 
     protected override async Task OnInitializedAsync()
     {
@@ -267,7 +269,6 @@
 
         await _breadcrumb.Initialize(charge);
         _breadcrumb.Show();
-
     }
 
     private async void HandleValidSubmit()
@@ -282,8 +283,6 @@
         var initialStatus = await _statusService.GetInitialStatus();
         spark.StatusId = initialStatus.Id;
         spark = await _chargeRelationship.SetRelationshipAsync(charge, spark);
-
-
     }
 
     private void ResizeTextarea(ChangeEventArgs e)
@@ -297,3 +296,4 @@
         StateHasChanged();
     }
 }
+
