@@ -10,24 +10,24 @@
 @inject IStatusService _statusService
 @inject IUserProfileService _userProfileService 
 
-<div class="container-fluid px-0 small">
+<div class="small mt-5">
     <EditForm Model="charge" OnValidSubmit="@HandleValidSubmit">
         <DataAnnotationsValidator />
-        <div class="card border-bottom-0 border-square">
+        <div class="card border-0 border-square">
             <div class="card-header px-4 cat-border">
                 <div class="row pl-4">
-                    <div class="col-md-10 p-0">
+                    <div class="col-lg-10 p-0">
                         <h6 class="card-title align-items-center">
                             <span class="oi @category.Icon cat-icon"></span>
                             @charge.Id
                         </h6>
                     </div>
-                    <div class="col-md-2 p-0 d-flex justify-content-end">
+                    <div class="col-lg-2 p-0 d-flex justify-content-end">
                         <button type="submit" class="btn btn-sm btn-primary px-4">Save</button>
                     </div>
                 </div>
                 <div class="row pl-0">
-                    <div class="col-md-10">
+                    <div class="col-lg-10">
                         <InputText @bind-Value="@charge.Title" id="title-input" class="form-control transparent-input strong-input-text" />
                         <ValidationMessage For="@(() => charge.Title)" />
                     </div>
@@ -35,7 +35,7 @@
             </div>
             <div class="card-header px-4 cat-border">
                 <div class="row px-4">
-                    <div class="col-md-6">
+                    <div class="col-lg-6">
                         <div class="row mb-0">
                             <div class="col">
                                 <div class="form-group row mb-2">
@@ -85,18 +85,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-lg-3">
                         <h6>Owner</h6>
                         <p>@userProfile.FirstName @userProfile.LastName</p>
                     </div>
-                    <div class="col-md-3 align-items-center">
+                    <div class="col-lg-3 align-items-center">
                         <h6>Collaborators</h6>
                         <p>TBD</p>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6 pr-0 border-0">
+                <div class="col-lg-6 pr-0 border-0">
                     <div class="card border-0">
                         <div class="card-body">
                             <div class="form-group">
@@ -106,7 +106,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 pr-0 border-0">
+                    <div class="col-lg-6 pr-0 border-0">
                         <div class="card border-0">
                             <div class="card-body">
                                 <div class="form-group">
@@ -116,7 +116,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 pl-0">
+                <div class="col-lg-3 pl-0">
                     <div class="card border-0">
                         <div class="card-body">
                             <div class="d-flex">
@@ -173,7 +173,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 pl-0">
+                <div class="col-lg-3 pl-0">
                     <div class="card border-0">
                         <div class="card-body">
                             <h6>Work Hours</h6>
