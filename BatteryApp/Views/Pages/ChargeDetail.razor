@@ -83,48 +83,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            @*<label class="col-form-label col-form-label-sm align-items-center" for="status-input">Status: </label>
-                            <div class="col">
-
-                                <InputSelect @bind-Value="@charge.StatusId" class="form-control form-control-sm" id="status-input">
-                                    @foreach (var status in statuses)
-                                    {
-                                        <option Value="@status.Id"> @status.Name</option>
-                                    }
-                                </InputSelect>
-                                <ValidationMessage For="@(() => charge.StatusId)" />
-                            </div>
-                            <label class="col-form-label col-form-label-sm align-items-center" for="created-input">Created: </label>
-                            <div class="col">
-
-                                <input type="text" value="@charge.Created" class="form-control form-control-sm" id="created-input" readonly />
-                            </div>
-                        </div>
-                        <div class="form-group row mb-2">
-                            <label class="col-form-label col-form-label-sm align-items-center" for="priority-input">Priority</label>
-                            <div class="col">
-                                <InputSelect @bind-Value="@charge.PriorityId" class="form-control form-control-sm" id="priority-input">
-                                    @foreach (var priority in priorities)
-                                    {
-                                        <option Value="@priority.Id"> @priority.Name</option>
-                                    }
-                                </InputSelect>
-                                <ValidationMessage For="@(() => charge.PriorityId)" />
-                            </div>
-                            <label class="col-form-label col-form-label-sm align-items-center" for="updated-input">Updated</label>
-                            <div class="col">
-                                <input type="text" value="@charge.Updated" class="form-control form-control-sm" id="updated-input" readonly />
-                            </div>
-                        </div>
-                        <div class="form-group row mb-0">
-                            <div class="col">
-                                <input type="text" value="" class="form-control form-control-sm" id="hidden-input" hidden />
-                            </div>
-                            <label class="col-form-label col-form-label-sm align-items-center" for="completed-input">Completed</label>
-                            <div class="col">
-                                <input type="text" value="" class="form-control form-control-sm" id="completed-input" readonly />
-                            </div>*@
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -155,7 +113,7 @@
                             <div class="d-flex">
                                 <div><h6>Related Items</h6></div>
                                 <div class="ml-auto pr-3">
-                                    <a class="new-item" data-toggle="modal" data-target="#chargeModal" @onclick="@InitializeSpark">
+                                    <a class="new-item" data-toggle="modal" data-target="#chargeModal" @onclick="(() => InitializeSpark())">
                                         <span class="oi oi-plus"></span>
                                     </a>
                                 </div>
@@ -183,7 +141,7 @@
                                         <p>Parent</p>
                                         <hr />
                                         <ul class="list-group list-group-flush">
-                                            <ChargeDetail_RelatedListItem Charge="parent"></ChargeDetail_RelatedListItem>
+                                            <ChargeDetail_RelatedListItem Charge="parent" IsParent="true"></ChargeDetail_RelatedListItem>
                                         </ul>
                                     </div>
                                 </div>
@@ -197,7 +155,7 @@
                                         <ul class="list-group list-group-flush">
                                             @foreach (var child in children)
                                             {
-                                                <ChargeDetail_RelatedListItem Charge="child"></ChargeDetail_RelatedListItem>
+                                                <ChargeDetail_RelatedListItem Charge="child" IsParent="false"></ChargeDetail_RelatedListItem>
                                             }
                                         </ul>
                                     </div>
@@ -319,7 +277,11 @@
     private async void InitializeSpark()
     {
         spark = new Charge();
+        var initialStatus = await _statusService.GetInitialStatus();
+        spark.StatusId = initialStatus.Id;
         spark = await _chargeRelationship.SetRelationshipAsync(charge, spark);
+
+
     }
 
     private void ResizeTextarea(ChangeEventArgs e)
@@ -327,8 +289,9 @@
         textareaRows = _calcTextareaRows.CalculateRows((string)e.Value, minTextareaRows, maxTextareaRows);
     }
 
-    private void StateChanged()
+    private async void StateChanged()
     {
+        children = await _chargeService.GetChildren(charge);
         StateHasChanged();
     }
 }

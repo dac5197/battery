@@ -9,6 +9,8 @@ namespace BatteryApp.Models.StatusModel
         Task Delete(int id);
         Task<List<Status>> Get();
         Task<Status> Get(int id);
+        Task<Status> GetCompletedStatus();
+        Task<Status> GetInitialStatus();
         Task<Status> Update(Status status);
     }
 }

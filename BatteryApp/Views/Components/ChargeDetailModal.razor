@@ -30,8 +30,6 @@
                         }
                     </InputSelect>
                     <br />
-                    <p>parent @Charge.ParentId</p>
-                    <p>cat @Charge.CategoryId</p>
                     <button type="submit" class="btn btn-primary">Submit</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 </EditForm>
@@ -45,9 +43,6 @@
 @code {
     [Parameter]
     public Charge Charge { get; set; }
-
-    [Parameter]
-    public Charge ParentCharge { get; set; }
 
     [Parameter]
     public Action ParentStateChanged { get; set; }
@@ -90,10 +85,4 @@
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "chargeModal");
     }
-
-    private void AssociateChildToParent()
-    {
-
-    }
-
 }

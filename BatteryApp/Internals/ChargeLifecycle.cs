@@ -16,10 +16,9 @@ namespace BatteryApp.Internals
             _statusService = statusService;
         }
 
-        public async Task<DateTime?> SetCompletedAsync(Charge charge)
+        public async Task<DateTime?> GetCompletedAsync(Charge charge)
         {
-            var statuses = await _statusService.Get();
-            var completedStatus = statuses.OrderByDescending(x => x.Order).FirstOrDefault();
+            var completedStatus = await _statusService.GetCompletedStatus();
 
             if (charge.StatusId == completedStatus.Id)
             {
@@ -38,5 +37,7 @@ namespace BatteryApp.Internals
 
             return false;
         }
+
+       
     }
 }

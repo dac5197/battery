@@ -1,25 +1,30 @@
-﻿@inject NavigationManager _navManager;
+﻿@inject NavigationManager _navManager
 
 @inject ICategoryService _categoryService
+@inject IChargeChildController _chargeChildController
 @inject IChargeLifecycle _chargeLifecycle
+@inject IChargeService _chargeService
 
 <li class="list-group-item border-0">
-    <div class="d-flex d-inline">
-        <InputCheckbox @bind-Value="@isCompleted" class="form-check-input" />
-        <NavLink href="@($"/charge/{Charge.Id}")" class="blazor-navlink-black" @onclick="HandleClick">
+    @if (IsParent is false)
+    {
+        <input @onchange="@(() => SetStatus())" type="checkbox" checked="@isCompleted" class="form-check-input" />
+    }
+    <NavLink href="@($"/charge/{Charge.Id}")" class="blazor-navlink-black" @onclick="HandleClick">
+        <div class="d-inline">
             <span class="oi @category.Icon cat-child-icon-@Charge.Id"></span>
-            @if (isCompleted)
-            {
-                <div class="completed">
-                    @Charge.Id | @Charge.Title
-                </div>
-            }
-            else
-            {
-                <div>@Charge.Id | @Charge.Title</div>
-            }
-        </NavLink>
-    </div>
+        </div>
+        @if (isCompleted)
+        {
+            <div class="completed d-inline">
+                @Charge.Id | @Charge.Title
+            </div>
+        }
+        else
+        {
+            <div class="d-inline">@Charge.Id | @Charge.Title</div>
+        }
+    </NavLink>
 </li>
 
 <style>
@@ -36,6 +41,9 @@
     [Parameter]
     public Charge Charge { get; set; }
 
+    [Parameter]
+    public bool IsParent { get; set; }
+
     private Category category = new();
 
     private bool isCompleted = false;
@@ -49,5 +57,12 @@
     private void HandleClick()
     {
         _navManager.NavigateTo($"/charge/{Charge.Id}", true);
+    }
+
+    private async void SetStatus()
+    {
+        isCompleted = !isCompleted;
+        await _chargeChildController.ToggleCompletedStatusAsync(Charge, isCompleted);
+        StateHasChanged();
     }
 }

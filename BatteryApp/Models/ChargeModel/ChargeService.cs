@@ -57,7 +57,7 @@ namespace BatteryApp.Models.ChargeModel
 
         public async Task<Charge> Add(Charge charge)
         {
-            charge.Completed = await _chargeLifecycle.SetCompletedAsync(charge);
+            charge.Completed = await _chargeLifecycle.GetCompletedAsync(charge);
 
             using var context = _contextFactory.CreateDbContext();
             context.Charges.Add(charge);
@@ -68,7 +68,7 @@ namespace BatteryApp.Models.ChargeModel
 
         public async Task<Charge> Update(Charge charge)
         {
-            charge.Completed = await _chargeLifecycle.SetCompletedAsync(charge);
+            charge.Completed = await _chargeLifecycle.GetCompletedAsync(charge);
 
             using var context = _contextFactory.CreateDbContext();
             context.Entry(charge).State = EntityState.Modified;

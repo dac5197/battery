@@ -6,7 +6,7 @@ namespace BatteryApp.Internals
 {
     public interface IChargeLifecycle
     {
-        Task<DateTime?> SetCompletedAsync(Charge charge);
+        Task<DateTime?> GetCompletedAsync(Charge charge);
         bool IsCompleted(Charge charge);
     }
 }

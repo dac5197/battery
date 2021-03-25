@@ -29,6 +29,22 @@ namespace BatteryApp.Models.StatusModel
             return status;
         }
 
+        public async Task<Status> GetCompletedStatus()
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var statuses = await context.Statuses.ToListAsync();
+            var completedStatus = statuses.OrderByDescending(x => x.Order).FirstOrDefault();
+            return completedStatus;
+        }
+
+        public async Task<Status> GetInitialStatus()
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var statuses = await context.Statuses.ToListAsync();
+            var initialStatus = statuses.OrderBy(x => x.Order).FirstOrDefault();
+            return initialStatus;
+        }
+
         public async Task<Status> Add(Status status)
         {
             using var context = _contextFactory.CreateDbContext();
