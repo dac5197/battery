@@ -1,11 +1,14 @@
 ﻿<div class="card border-square p-1 mx-1 justify-content-center">
     <p class="m-0 text-center">
         <span class="oi @Category.Icon" style="color: @Category.IconColor"></span>
-        <strong>| #</strong>
+        <strong>@Count</strong>
     </p>
 </div>
 
 @code {
     [Parameter]
     public Category Category { get; set; }
+
+    [Parameter]
+    public int Count { get; set; }
 }
