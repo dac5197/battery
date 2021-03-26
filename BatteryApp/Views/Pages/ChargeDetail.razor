@@ -15,22 +15,24 @@
         <DataAnnotationsValidator />
         <div class="row">
             <div class="col-lg-12">
-                <div class="card border-square shadow-sm p-2 my-2">
-                    <div class="row pl-4">
-                        <div class="col-lg-10 p-0">
-                            <h6 class="card-title align-items-center">
-                                <span class="oi @category.Icon cat-icon"></span>
-                                @charge.Id
-                            </h6>
+                <div class="card border-square shadow-sm p-2 my-2 ">
+                    <div class="cat-border pl-4">
+                        <div class="row pl-4">
+                            <div class="col-lg-10 p-0">
+                                <h6 class="card-title align-items-center">
+                                    <span class="oi @category.Icon cat-icon"></span>
+                                    @charge.Id
+                                </h6>
+                            </div>
+                            <div class="col-lg-2 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-sm btn-primary px-4 border-square"><strong>Save</strong></button>
+                            </div>
                         </div>
-                        <div class="col-lg-2 d-flex justify-content-end">
-                            <button type="submit" class="btn btn-sm btn-primary px-4 border-square"><strong>Save</strong></button>
-                        </div>
-                    </div>
-                    <div class="row pl-0">
-                        <div class="col-lg-10">
-                            <InputText @bind-Value="@charge.Title" id="title-input" class="form-control transparent-input strong-input-text" />
-                            <ValidationMessage For="@(() => charge.Title)" />
+                        <div class="row pl-0">
+                            <div class="col-lg-10">
+                                <InputText @bind-Value="@charge.Title" id="title-input" class="form-control transparent-input strong-input-text" />
+                                <ValidationMessage For="@(() => charge.Title)" />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,25 +1,28 @@
 ﻿@inject IChargeService chargeService
 
-<div class="card bg-light shadow-sm my-2 pb-1 pt-2 px-2 @highlightedCssClass" @onmouseover="@SetHighlightedCssClass" @onmouseleave="@ClearHighlightedCssClass">
-    <div class="row">
-        <div class="col-11">
-            <!--
-                <a data-toggle="modal" data-target="#chargeModal" @onclick="@OnSetChargeItem"><h4 class="charge-detail">@Charge.Title @Charge.Status</h4></a>
-            -->
-            <a href="@($"/charge/{Charge.Id}")"><h4 class="charge-detail">@Charge.Title @Charge.Status</h4></a>
-        </div>
-        <div class="col-1 align-items-end">
-            <button type="button" class="close" data-toggle="modal" data-target="#confirmDeleteModal" @onclick="@OnSetChargeItem">
-                <span class="oi oi-x" aria-hidden="true"></span>
-            </button>
+<div class="card bg-light shadow-sm my-2 pb-1 pt-2 px-2 border-square border-transparent charge-max-height @highlightedCssClass" @onmouseover="@SetHighlightedCssClass" @onmouseleave="@ClearHighlightedCssClass">
+    <div class="cat-border-cli-@Charge.BatteryId-@Charge.Id pl-4 h-100">
+        <div class="row">
+            <div class="col">
+                <a href="@($"/charge/{Charge.Id}")">
+                    <p class="charge-detail">
+                        <span class="oi @Category.Icon" style="color: @Category.IconColor"></span>
+                        @Charge.Title @Charge.Status
+                    </p>
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    .highlighted {
+    .charge-max-height {
+        max-height: 120px;
+    }
+
+    .highlighted-@Charge.BatteryId-@Charge.Id {
         border: solid;
-        border-color: deepskyblue;
+        border-color: @Category.IconColor;
     }
 
     .charge-detail {
@@ -29,11 +32,15 @@
     .charge-detail:hover {
         text-decoration: underline;
     }
+
+    .cat-border-cli-@Charge.BatteryId-@Charge.Id {
+        box-shadow: 10px 0 @Category.IconColor inset;
+    }
 </style>
 
 @code {
     [Parameter]
-    public Battery Battery { get; set; }
+    public Category Category { get; set; }
 
     [Parameter]
     public Charge Charge { get; set; }
@@ -51,7 +58,7 @@
 
     private void SetHighlightedCssClass()
     {
-        highlightedCssClass = "highlighted";
+        highlightedCssClass = $"highlighted-{Charge.BatteryId}-{Charge.Id}";
     }
 
     private void ClearHighlightedCssClass()

@@ -128,7 +128,7 @@
                                     <h5 class="text-center">@status.Name</h5>
                                     @foreach (var charge in charges.Where(x => x.StatusId == status.Id))
                                     {
-                                        <ChargeListItem Battery="@battery" Charge="@charge" SetChargeItem="@SetChargObject"></ChargeListItem>
+                                        <ChargeListItem Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()" Charge="@charge" SetChargeItem="@SetChargObject"></ChargeListItem>
                                     }
                                 </div>
                             }
