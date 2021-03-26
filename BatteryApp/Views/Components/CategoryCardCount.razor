@@ -1,0 +1,11 @@
+﻿<div class="card border-square p-1 mx-1 justify-content-center">
+    <p class="m-0 text-center">
+        <span class="oi @Category.Icon" style="color: @Category.IconColor"></span>
+        <strong>| #</strong>
+    </p>
+</div>
+
+@code {
+    [Parameter]
+    public Category Category { get; set; }
+}

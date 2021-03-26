@@ -3,67 +3,185 @@
 @inject AuthenticationStateProvider _authStateProvider
 @inject IBatteryService _batteryService
 @inject IBreadcrumbManager _breadcrumb
+@inject ICalculateTextareaRows _calcTextareaRows
+@inject ICategoryService _categoryService
 @inject IChargeLifecycle _chargeLifecycle
 @inject IChargeService _chargeService
+@inject IPriorityService _priorityService
 @inject IStatusService _statusService
 @inject IJSRuntime _jsRuntime
 
-<div class="container-fluid pt-4 px-4">
-    <AuthorizeView>
-        <Authorized>
-
-            <h4><span class="oi oi-battery-full" aria-hidden="true"></span> @battery.Id | @battery.Name </h4>
-
-            @if (charges == null)
-            {
-                <p><em>Loading...</em></p>
-            }
-            else
-            {
-                <div>
-                    <button data-toggle="modal" data-target="#chargeModal" class="btn btn-primary" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
+<AuthorizeView Context="authContext">
+    <Authorized>
+        <div class="small mt-4">
+            <EditForm Context="formContext" Model="battery" OnValidSubmit="@HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card border-square shadow-sm p-2 my-2">
+                            <div class="row">
+                                <div class="col-lg-10">
+                                    <div class="form-group row px-4">
+                                        <label for="battery-name-input" class="col-sm-1 col-form-label pr-0" style="font-size: 1.5rem">
+                                            <span class="oi oi-battery-full" style="color: steelblue"></span>
+                                            @battery.Id
+                                        </label>
+                                        <div class="col-sm-11 p-0">
+                                            <InputText @bind-Value="@battery.Name" id="battery-name-input" class="form-control transparent-input strong-input-text" />
+                                            <ValidationMessage For="@(() => battery.Name)" />
+                                        </div>
+                                    </div>
+                                    <div class="row px-4">
+                                        <div class="col-sm-8">
+                                            <InputTextArea @bind-Value="@battery.Description" @oninput="@(e => ResizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control form-control-sm">@battery.Description</InputTextArea>
+                                            <ValidationMessage For="@(() => battery.Description)" />
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group row mb-2">
+                                                <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="created-input">Created: </label>
+                                                <div class="col">
+                                                    <input type="text" value="@battery.Created.ToLocalTime().ToString(dateTimeFormat)" class="form-control form-control-sm" id="created-input" readonly />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-2">
+                                                <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="updated-input">Updated:</label>
+                                                <div class="col">
+                                                    <input type="text" value="@battery.Updated.ToLocalTime().ToString(dateTimeFormat)" class="form-control form-control-sm" id="updated-input" readonly />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-2">
+                                                <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="battery-actvie-input">Active:</label>
+                                                <div class="col">
+                                                    <InputCheckbox @bind-Value="@battery.IsActive" class="form-control form-control-sm form-check-inline" />
+                                                    <ValidationMessage For="@(() => battery.IsActive)" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <button type="submit" class="btn btn-block btn-primary px-4 border-square"><strong>Save</strong></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </EditForm>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card border-square shadow-sm p-2 my-2 h-100">
+                        @foreach (var status in statuses.OrderBy(x => x.Order))
+                        {
+                            <div class="row mb-2">
+                                <div class="col-lg-2 pl-4">
+                                    <p class= "align-self-center">@status.Name</p>
+                                </div>
+                                <div class="col-lg-10">
+                                    <div class="card-deck px-2">
+                                        @foreach (var category in categories)
+                                        {
+                                            <CategoryCardCount Category="@category"></CategoryCardCount>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        }
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-square shadow-sm px-2 pt-2 pb-0 my-2 h-100">
+                        @foreach (var priority in priorities.OrderBy(x => x.Severity))
+                        {
+                            <div class="row mb-2">
+                                <div class="col-lg-2 pl-4">
+                                    <p class="align-self-center">@priority.DisplayName</p>
+                                </div>
+                                <div class="col-lg-10">
+                                    <div class="card-deck px-2">
+                                        @foreach (var category in categories)
+                                        {
+                                            <CategoryCardCount Category="@category"></CategoryCardCount>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        }
+                    </div>
+                </div>
+            </div>
 
 
-                @foreach (var status in statuses.OrderByDescending(x => x.Order))
+        </div>
+
+        <br />
+        <br />
+        <br />
+        <h4><span class="oi oi-battery-full" aria-hidden="true"></span> @battery.Id | @battery.Name </h4>
+
+        @if (charges == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <div>
+                <button data-toggle="modal" data-target="#chargeModal" class="btn btn-primary" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
+            </div>
+
+
+            @foreach (var status in statuses.OrderByDescending(x => x.Order))
+            {
+                <h4>@status.Name</h4>
+                @foreach (var charge in charges.Where(x => x.StatusId == status.Id))
                 {
-                    <h4>@status.Name</h4>
-                    @foreach (var charge in charges.Where(x => x.StatusId == status.Id))
-                    {
-                        <ChargeListItem Battery="@battery" Charge="@charge" SetChargeItem="@SetChargObject"></ChargeListItem>
-                    }
+                    <ChargeListItem Battery="@battery" Charge="@charge" SetChargeItem="@SetChargObject"></ChargeListItem>
                 }
-
-
-                <ChargeDetailModal Charge="@chargeObject" ParentStateChanged="@StateChanged"></ChargeDetailModal>
-
-                <ConfirmDeleteDialog Charge="@chargeObject" Delete="@DeleteCharge"></ConfirmDeleteDialog>
             }
-        </Authorized>
-        <NotAuthorized>
-            <a href="Identity/Account/Register">Register</a>
-            <a href="Identity/Account/Login">Log in</a>
-        </NotAuthorized>
-    </AuthorizeView>
-</div>
+
+
+            <ChargeDetailModal Charge="@chargeObject" ParentStateChanged="@StateChanged"></ChargeDetailModal>
+
+            <ConfirmDeleteDialog Charge="@chargeObject" Delete="@DeleteCharge"></ConfirmDeleteDialog>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <a href="Identity/Account/Register">Register</a>
+        <a href="Identity/Account/Login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
 @code {
     [Parameter]
     public int Id { get; set; }
 
     private Battery battery = new();
     private Charge chargeObject = new Charge();
+    private List<Category> categories = new();
     private List<Charge> charges = new();
+    private List<Priority> priorities = new();
     private List<Status> statuses = new();
+
+    private int minTextareaRows = 4;
+    private int maxTextareaRows = 8;
+    private int textareaRows;
+
+    private string dateTimeFormat = "MM/dd/yyyy HH:mm:ss";
     private string userId;
 
     protected override async Task OnInitializedAsync()
     {
-        battery = await _batteryService.Get(Id);
-        charges = await _chargeService.Get(battery);
-        statuses = await _statusService.Get();
-
         var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        battery = await _batteryService.Get(Id);
+        categories = await _categoryService.Get(userId);
+        charges = await _chargeService.Get(battery);
+        priorities = await _priorityService.Get(userId);
+        statuses = await _statusService.Get();
+
+        textareaRows = _calcTextareaRows.CalculateRows(battery.Description, minTextareaRows, maxTextareaRows);
 
         _breadcrumb.Hide();
     }
@@ -92,5 +210,16 @@
         await _jsRuntime.InvokeAsync<object>("CloseModal", "confirmDeleteModal");
         StateChanged();
         InitializeChargeObject();
+    }
+
+    private void ResizeTextarea(ChangeEventArgs e)
+    {
+        textareaRows = _calcTextareaRows.CalculateRows((string)e.Value, minTextareaRows, maxTextareaRows);
+    }
+
+    private async void HandleValidSubmit()
+    {
+        await _batteryService.Update(battery);
+        StateHasChanged();
     }
 }

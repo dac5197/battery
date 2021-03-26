@@ -30,5 +30,13 @@ namespace BatteryApp.Models.PriorityModel
 
         [MaxLength(20)]
         public string FontColor { get; set; }
+
+        public string DisplayName
+        {
+            get
+            {
+                return $"{Severity} - {Name}";
+            }
+        }
     }
 }
