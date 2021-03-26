@@ -69,6 +69,18 @@
                                             <ValidationMessage For="@(() => charge.PriorityId)" />
                                         </div>
                                     </div>
+                                    <div class="form-group row mb-2">
+                                        <label class="col-form-label col-form-label-sm align-items-center" for="priority-input">Priority</label>
+                                        <div class="col">
+                                            <InputSelect @bind-Value="@charge.CategoryId" class="form-control form-control-sm" id="priority-input">
+                                                @foreach (var category in categories.OrderBy(x => x.Name))
+                                                {
+                                                    <option Value="@category.Id"> @category.Name</option>
+                                                }
+                                            </InputSelect>
+                                            <ValidationMessage For="@(() => charge.CategoryId)" />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col">
                                     <div class="form-group row mb-2">
@@ -212,8 +224,8 @@
 </style>
 
 @code {
-        [Parameter]
-        public int Id { get; set; }
+    [Parameter]
+    public int Id { get; set; }
 
     private Battery battery = new();
     private Category category = new();
@@ -222,6 +234,7 @@
     private Charge spark = new();
     private UserProfile userProfile = new();
 
+    private List<Category> categories = new();
     private List<Charge> children = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
@@ -241,7 +254,8 @@
         children = await _chargeService.GetChildren(charge);
         parent = await _chargeService.GetParent(charge);
 
-        category = await _categoryService.Get(charge.CategoryId);
+        categories = await _categoryService.Get();
+        category = categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault();
         priorities = await _priorityService.Get(charge.OwnerId);
         statuses = await _statusService.Get();
 
@@ -256,6 +270,8 @@
     private async void HandleValidSubmit()
     {
         await _chargeService.Update(charge);
+        charge = await _chargeService.Get(Id);
+        category = await _categoryService.Get(charge.CategoryId);
         StateHasChanged();
     }
 
