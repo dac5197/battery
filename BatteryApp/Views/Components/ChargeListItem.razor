@@ -1,12 +1,12 @@
-﻿@inject IChargeService chargeService
+﻿@inject IChargeService _chargeService
 
-<div class="card bg-light shadow-sm my-2 pb-1 pt-2 px-2 border-square border-transparent charge-max-height @highlightedCssClass" @onmouseover="@SetHighlightedCssClass" @onmouseleave="@ClearHighlightedCssClass">
+<div class="card bg-light shadow-sm my-2 pb-1 pt-2 px-2 border-square border-transparent highlighted-@Charge.BatteryId-@Charge.Id">
     <div class="cat-border-cli-@Charge.BatteryId-@Charge.Id pl-4 h-100">
         <div class="row">
             <div class="col">
                 <a href="@($"/charge/{Charge.Id}")">
                     <p class="charge-detail">
-                        <span class="oi @Category.Icon" style="color: @Category.IconColor"></span>
+                        <span class="oi @category.Icon" style="color: @category.IconColor"></span>
                         @Charge.Title @Charge.Status
                     </p>
                 </a>
@@ -20,20 +20,38 @@
         </div>
         <div class="row">
             <div class="col">
-                <p>Sparks Placeholder</p>
+                @foreach (var cat in Categories)
+                {
+                    @if (children.Where(x => x.CategoryId == cat.Id).Count() > 0)
+                    {
+                        <button type="button" class="btn btn-sm border-square mx-1 py-0 px-1" style="background-color: @cat.IconColor" @onclick="@ToggleShowChildren">
+                            <span class="oi @cat.Icon" style="color: white"></span>
+                            <span class="badge badge-light border-square">@children.Where(x => x.StatusId == CompleteStatus.Id && x.CategoryId == cat.Id).Count()/@children.Where(x => x.CategoryId == cat.Id).Count()</span>
+                            <span class="sr-only">@cat.Name Count</span>
+                        </button>
+                    }
+                }
             </div>
         </div>
+        @if (showChildren)
+        {
+            <ul class="list-group list-group-flush mt-2">
+                @foreach (var child in children)
+                {
+                    <ChargeDetail_RelatedListItem Charge="child" IsParent="false"></ChargeDetail_RelatedListItem>
+                }
+            </ul>
+        }
+
     </div>
 </div>
 
 <style>
-    .charge-max-height {
-        max-height: 120px;
-    }
+    
 
-    .highlighted-@Charge.BatteryId-@Charge.Id {
-        border: solid;
-        border-color: @Category.IconColor;
+    .highlighted-@Charge.BatteryId-@Charge.Id:hover {
+        outline: solid;
+        outline-color: @category.IconColor;
     }
 
     .charge-detail {
@@ -45,21 +63,36 @@
     }
 
     .cat-border-cli-@Charge.BatteryId-@Charge.Id {
-        box-shadow: 10px 0 @Category.IconColor inset;
+        box-shadow: 10px 0 @category.IconColor inset;
     }
 </style>
 
 @code {
     [Parameter]
-    public Category Category { get; set; }
+    public List<Category> Categories { get; set; }
 
     [Parameter]
     public Charge Charge { get; set; }
 
     [Parameter]
+    public Status CompleteStatus { get; set; }
+
+    [Parameter]
     public EventCallback<Charge> SetChargeItem { get; set; }
 
+    private Category category = new();
+
+    private List<Charge> children = new();
+
+    private bool showChildren = false;
     private string highlightedCssClass;
+
+    protected override async Task OnInitializedAsync()
+    {
+        children = await _chargeService.GetChildren(Charge);
+
+        category = Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault();
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -80,5 +113,10 @@
     private async Task OnSetChargeItem()
     {
         await SetChargeItem.InvokeAsync(Charge);
+    }
+
+    private void ToggleShowChildren()
+    {
+        showChildren = !showChildren;
     }
 }

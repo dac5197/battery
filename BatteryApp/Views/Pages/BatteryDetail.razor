@@ -22,9 +22,9 @@
             <div class="small mt-4">
                 <EditForm Context="formContext" Model="battery" OnValidSubmit="@HandleValidSubmit">
                     <DataAnnotationsValidator />
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-lg-12">
-                            <div class="card border-square shadow-sm p-2 my-2">
+                            <div class="card border-square shadow-sm p-2">
                                 <div class="row">
                                     <div class="col-lg-10">
                                         <div class="form-group row px-4">
@@ -74,9 +74,9 @@
                         </div>
                     </div>
                 </EditForm>
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-lg-6">
-                        <div class="card border-square shadow-sm px-2 pt-2 pb-0 my-2 h-100">
+                        <div class="card border-square shadow-sm px-2 pt-2 pb-0 h-100">
                             @foreach (var status in statuses.OrderBy(x => x.Order))
                             {
                                 <div class="row mb-2">
@@ -97,7 +97,7 @@
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <div class="card border-square shadow-sm px-2 pt-2 pb-0 my-2 h-100">
+                        <div class="card border-square shadow-sm px-2 pt-2 pb-0 h-100">
                             @foreach (var priority in priorities.OrderBy(x => x.Severity))
                             {
                                 <div class="row mb-2">
@@ -118,21 +118,22 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card-deck mt-3">
-                            @foreach (var status in statuses.OrderBy(x => x.Order))
-                            {
-                                <div class="card border-square shadow-sm px-2 pt-2 pb-0 my-2">
-                                    <h5 class="text-center">@status.Name</h5>
-                                    @foreach (var charge in charges.Where(x => x.StatusId == status.Id))
-                                    {
-                                        <ChargeListItem Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()" Charge="@charge" SetChargeItem="@SetChargObject"></ChargeListItem>
-                                    }
-                                </div>
-                            }
+                <div class="row mb-3">
+                    @foreach (var status in statuses.OrderBy(x => x.Order))
+                    {
+                        <div class="col">
+                            <div class="card border-square shadow-sm px-2 pt-2 pb-0 h-100">
+                                <h5 class="text-center">@status.Name</h5>
+                                @foreach (var charge in charges.Where(x => x.ParentId is null).Where(x => x.StatusId == status.Id))
+                                {
+                                    <ChargeListItem Categories="@categories"
+                                                    Charge="@charge"
+                                                    CompleteStatus="@statuses.OrderBy(x => x.Order).Last()"
+                                                    SetChargeItem="@SetChargObject"></ChargeListItem>
+                                }
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
 
