@@ -62,7 +62,7 @@
         textareaRows = _calcTextareaRows.CalculateRows((string)e.Value);
     }
 
-    public async Task CloseModal()
+    private async Task CloseModal()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "chargeModal");
     }

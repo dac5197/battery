@@ -13,13 +13,16 @@
             </div>
             <div class="modal-body">
                 <EditForm Model="@battery" OnValidSubmit="@HandleValidSubmit">
+                    <DataAnnotationsValidator />
                     <div class="form-group">
                         <label for="title">Title</label>
                         <InputText @bind-Value="@battery.Name" id="title" class="form-control" />
+                        <ValidationMessage For="@(() => battery.Name)" />
                     </div>
                     <div class="form-group">
                         <label for="desc">Description</label>
                         <InputTextArea @bind-Value="@battery.Description" @oninput="@(e => resizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control">@battery.Description</InputTextArea>
+                        <ValidationMessage For="@(() => battery.Description)" />
                     </div>
                     <br />
                     <button type="submit" class="btn btn-primary">Submit</button>

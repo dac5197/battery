@@ -4,6 +4,7 @@ using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.PriorityModel;
 using BatteryApp.Models.StatusModel;
+using BatteryApp.Models.TagModel;
 using BatteryApp.Models.UserProfileModel;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -27,6 +28,8 @@ namespace BatteryApp.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Priority> Priorities { get; set; }
         public DbSet<Status> Statuses { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<ChargeTagRelation> ChargeTagRelations { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         
         

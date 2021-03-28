@@ -1,14 +1,16 @@
 ﻿@page "/charge/{id:int}"
 
 @inject IBreadcrumbManager _breadcrumb
-@inject IBatteryService _batteryService 
+@inject IBatteryService _batteryService
 @inject ICalculateTextareaRows _calcTextareaRows
 @inject ICategoryService _categoryService
 @inject IChargeService _chargeService
 @inject IInitializeChargeChildToParent _chargeRelationship
+@inject IJSRuntime _jsRuntime
 @inject IPriorityService _priorityService
 @inject IStatusService _statusService
-@inject IUserProfileService _userProfileService 
+@inject ITagController _tagController
+@inject IUserProfileService _userProfileService
 
 <div class="small mt-4">
     <EditForm Model="charge" OnValidSubmit="@HandleValidSubmit">
@@ -38,6 +40,34 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card border-square shadow-sm p-2 my-2">
+                    <div class="row px-4">
+                        <div class="col px-0">
+                            <div>
+                                Tags
+                                <a class="new-item mx-1" data-toggle="modal" data-target="#addTagModal">
+                                    <span class="oi oi-plus"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @if (tags.Count > 0)
+                    {
+                        <div class="row pl-4 mt-1 mb-2">
+                            <div class="col-lg-12 px-0">
+                                @foreach (var tag in tags)
+                                {
+                                    <TagListItem Charge="@charge" Tag="@tag" ParentStateChanged="@TagStateChanged" SetTagToDelete="@SetTagToDelete" SetTagToEdit="@SetTagToEdit" ShowRemove="true"></TagListItem>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-lg-12">
                 <div class="card border-square shadow-sm p-2 my-2">
@@ -125,7 +155,7 @@
                         <ValidationMessage For="@(() => charge.Description)" />
                     </div>
                 </div>
-                <div class="card border-square shadow-sm p-2 my-3">
+                <div class="card border-square shadow-sm p-2 my-2">
                     <div class="form-group">
                         <h6>Notes</h6>
                         <textarea rows="3" id="notes" class="form-control form-control-sm"></textarea>
@@ -133,7 +163,7 @@
                 </div>
             </div>
             <div class="col-lg-3 px-2">
-                <div class="card border-square shadow-sm p-2 my-2">
+                <div class="card border-square shadow-sm p-2 my-2 h-100">
                     <div class="d-flex">
                         <div><h6>Related Items</h6></div>
                         <div class="ml-auto pr-3">
@@ -162,7 +192,7 @@
                             <p>Parent</p>
                             <hr />
                             <ul class="list-group list-group-flush">
-                                <ChargeDetail_RelatedListItem Charge="parent" IsParent="true"></ChargeDetail_RelatedListItem>
+                                <ChargeDetail_RelatedListItem Charge="@parent" IsParent="true"></ChargeDetail_RelatedListItem>
                             </ul>
                         </div>
                     }
@@ -174,7 +204,7 @@
                             <ul class="list-group list-group-flush">
                                 @foreach (var child in children)
                                 {
-                                    <ChargeDetail_RelatedListItem Charge="child" IsParent="false"></ChargeDetail_RelatedListItem>
+                                    <ChargeDetail_RelatedListItem Charge="@child" IsParent="false"></ChargeDetail_RelatedListItem>
                                 }
                             </ul>
                         </div>
@@ -182,7 +212,7 @@
                 </div>
             </div>
             <div class="col-lg-3 pl-2">
-                <div class="card border-square shadow-sm p-2 my-2">
+                <div class="card border-square shadow-sm p-2 my-2 h-100">
                     <h6>Work Hours</h6>
                     <hr />
                     <h3>TBD</h3>
@@ -192,7 +222,10 @@
     </EditForm>
 </div>
 
-<ChargeDetailModal Charge="@spark" ParentStateChanged="@StateChanged"></ChargeDetailModal>
+<ChargeDetailModal Charge="@spark" ParentStateChanged="@ChildrenStateChanged"></ChargeDetailModal>
+<AddTagModal Battery="@battery" Charge="@charge" ParentStateChanged="@TagStateChanged" Tags="batteryTags"></AddTagModal>
+<EditTagModal Tag="@tagToEdit" ParentStateChanged="@TagStateChanged"></EditTagModal>
+<DeteteTagModal Delete="@DeleteTag"></DeteteTagModal>
 
 <style>
     .cat-icon {
@@ -201,7 +234,7 @@
     .cat-border {
         box-shadow: 20px 0 @category.IconColor inset;
     }
-    
+
 
     .new-item {
         color: forestgreen !important;
@@ -214,13 +247,24 @@
         border-bottom-color: forestgreen;
     }
 
+    .remove-item {
+        color: darkred !important;
+        border-bottom: solid transparent;
+    }
+
+        .remove-item:hover {
+            color: darkred;
+            border-bottom: solid;
+            border-bottom-color: darkred;
+        }
+
     .border-bottom-only {
         border-right: none;
         border-left: none;
         border-top: none;
         border-bottom: solid;
     }
-    
+
 </style>
 
 @code {
@@ -232,12 +276,16 @@
     private Charge charge = new Charge();
     private Charge parent = new();
     private Charge spark = new();
+    private Tag tagToDelete = new();
+    private Tag tagToEdit = new();
     private UserProfile userProfile = new();
 
     private List<Category> categories = new();
     private List<Charge> children = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
+    private List<Tag> batteryTags = new();
+    private List<Tag> tags = new();
 
     private int minTextareaRows = 5;
     private int maxTextareaRows = 15;
@@ -258,6 +306,8 @@
         category = categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault();
         priorities = await _priorityService.Get(charge.OwnerId);
         statuses = await _statusService.Get();
+        tags = await _tagController.GetAllTagsForChargeAsync(charge.Id);
+        batteryTags = await _tagController.GetAllTagsForBatteryAsync(battery);
 
         userProfile = await _userProfileService.Get(charge.OwnerId);
 
@@ -288,10 +338,34 @@
         textareaRows = _calcTextareaRows.CalculateRows((string)e.Value, minTextareaRows, maxTextareaRows);
     }
 
-    private async void StateChanged()
+    private async void ChildrenStateChanged()
     {
         children = await _chargeService.GetChildren(charge);
         StateHasChanged();
+    }
+
+    private async void TagStateChanged()
+    {
+        tags = await _tagController.GetAllTagsForChargeAsync(charge.Id);
+        batteryTags = await _tagController.GetAllTagsForBatteryAsync(battery);
+        StateHasChanged();
+    }
+
+    private void SetTagToEdit(Tag tagFromChild)
+    {
+        tagToEdit = tagFromChild;
+    }
+
+    private void SetTagToDelete(Tag tagFromChild)
+    {
+        tagToDelete = tagFromChild;
+    }
+
+    private async void DeleteTag()
+    {
+        await _tagController.DeleteTagAndAllRelationshipsAsync(tagToDelete.Id);
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "deleteTagModal");
+        TagStateChanged();
     }
 }
 

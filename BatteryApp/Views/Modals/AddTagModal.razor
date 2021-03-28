@@ -1,0 +1,81 @@
+﻿@inject IJSRuntime _jsRuntime
+@inject ITagController _tagController 
+
+<div class="modal fade" tabindex="-1" role="dialog" id="addTagModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">Add Tag</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="@tag" OnValidSubmit="@HandleValidSubmit" class="form-inline">
+                    <DataAnnotationsValidator />
+                    <label for="tag-name mx-1">Tag Name</label>
+                    <InputText @bind-Value="@tag.Name" @oninput="@(e => FilterTags(e))" id="tag-name" class="form-control mx-1" />
+                    <ValidationMessage For="@(() => tag.Name)" />
+                    <button type="submit" class="btn btn-primary mx-1">Submit</button>
+                </EditForm>
+                @if (nameInput is not null)
+                {
+                    <div class="list-group px-5 mt-3 small ">
+                        @foreach (var filteredTag in filteredTags)
+                        {
+                            <a class="list-group-item list-group-item-action border-square py-1 px-2" href="" @onclick="@(() => AddExistingTag(filteredTag))" @onclick:preventDefault="true">
+                                @filteredTag.Name
+                            </a>
+                        }
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Battery Battery { get; set; }
+
+    [Parameter]
+    public Charge Charge { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    [Parameter]
+    public List<Tag> Tags { get; set; }
+
+    private Tag tag = new();
+    private List<Tag> filteredTags = new();
+
+    private string nameInput;
+
+    private async void HandleValidSubmit()
+    {
+        tag = _tagController.SetDefaults(Charge, tag);
+        await _tagController.AddTagFromChargeAsync(Charge.Id, tag);
+        await CloseModal();
+    }
+
+    private async void AddExistingTag(Tag existingTag)
+    {
+        await _tagController.AddRelationshipAsync(Charge.Id, existingTag.Id);
+        await CloseModal();
+    }
+
+    private async Task CloseModal()
+    {
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "addTagModal");
+        ParentStateChanged?.Invoke();
+    }
+
+    private void FilterTags(ChangeEventArgs e)
+    {
+        nameInput = e.Value.ToString();
+        filteredTags = Tags.Where(x => x.Name.ToLower().Contains(nameInput.ToLower())).ToList();
+
+    }
+}

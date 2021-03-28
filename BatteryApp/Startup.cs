@@ -6,6 +6,7 @@ using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.PriorityModel;
 using BatteryApp.Models.StatusModel;
+using BatteryApp.Models.TagModel;
 using BatteryApp.Models.UserProfileModel;
 using BatteryApp.Views.Utils;
 using Microsoft.AspNetCore.Builder;
@@ -58,14 +59,17 @@ namespace BatteryApp
             services.AddTransient<IBatteryService, BatteryService>();
             services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<IChargeService, ChargeService>();
+            services.AddTransient<IChargeTagRelationService, ChargeTagRelationService>();
             services.AddTransient<IPriorityService, PriorityService>();
             services.AddTransient<IStatusService, StatusService>();
+            services.AddTransient<ITagService, TagService>();
             services.AddTransient<IUserProfileService, UserProfileService>();
 
             // Add Project Internals
             services.AddTransient<IChargeChildController, ChargeChildController>();
             services.AddTransient<IChargeLifecycle, ChargeLifecycle>();
             services.AddTransient<IInitializeChargeChildToParent, InitializeChargeChildToParent>();
+            services.AddTransient<ITagController, TagController>();
 
             // Add Project View Utils
             services.AddTransient<ICalculateTextareaRows, CalculateTextareaRows>();

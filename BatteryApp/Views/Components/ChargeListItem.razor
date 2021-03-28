@@ -1,8 +1,9 @@
 ﻿@inject IChargeService _chargeService
+@inject ITagController _tagController
 
 <div class="card bg-light shadow-sm my-2 pb-1 pt-2 px-2 border-square border-transparent highlighted-@Charge.BatteryId-@Charge.Id">
     <div class="cat-border-cli-@Charge.BatteryId-@Charge.Id pl-4 h-100">
-        <div class="row">
+        <div class="row mb-2">
             <div class="col">
                 <a href="@($"/charge/{Charge.Id}")">
                     <p class="charge-detail">
@@ -13,22 +14,34 @@
                 <hr />
             </div>
         </div>
-        <div class="row">
+        <div class="row mb-2">
             <div class="col">
-                <p>TAGS Placeholder</p>
+                @if (tags.Count() > 0)
+                {
+                    <p class="small mb-1">Tags (@tags.Count())</p>
+                    @foreach (var tag in tags)
+                    {
+                        <TagListItem Charge="@Charge" Tag="@tag" IsReadonly="true"></TagListItem>
+                    }
+                }
             </div>
         </div>
-        <div class="row">
+        <div class="row mb-2">
+            
             <div class="col">
-                @foreach (var cat in Categories)
+                @if (children.Count() > 0)
                 {
-                    @if (children.Where(x => x.CategoryId == cat.Id).Count() > 0)
+                    <p class="small mb-1">Related Items</p>
+                    @foreach (var cat in Categories)
                     {
-                        <button type="button" class="btn btn-sm border-square mx-1 py-0 px-1" style="background-color: @cat.IconColor" @onclick="@ToggleShowChildren">
-                            <span class="oi @cat.Icon" style="color: white"></span>
-                            <span class="badge badge-light border-square">@children.Where(x => x.StatusId == CompleteStatus.Id && x.CategoryId == cat.Id).Count()/@children.Where(x => x.CategoryId == cat.Id).Count()</span>
-                            <span class="sr-only">@cat.Name Count</span>
-                        </button>
+                        @if (children.Where(x => x.CategoryId == cat.Id).Count() > 0)
+                        {
+                            <button type="button" class="btn btn-sm border-square mx-1 py-0 px-1" style="background-color: @cat.IconColor" @onclick="@ToggleShowChildren">
+                                <span class="oi @cat.Icon" style="color: white"></span>
+                                <span class="badge badge-light border-square">@children.Where(x => x.StatusId == CompleteStatus.Id && x.CategoryId == cat.Id).Count()/@children.Where(x => x.CategoryId == cat.Id).Count()</span>
+                                <span class="sr-only">@cat.Name Count</span>
+                            </button>
+                        }
                     }
                 }
             </div>
@@ -83,6 +96,7 @@
     private Category category = new();
 
     private List<Charge> children = new();
+    private List<Tag> tags = new();
 
     private bool showChildren = false;
     private string highlightedCssClass;
@@ -90,6 +104,7 @@
     protected override async Task OnInitializedAsync()
     {
         children = await _chargeService.GetChildren(Charge);
+        tags = await _tagController.GetAllTagsForChargeAsync(Charge.Id);
 
         category = Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault();
     }

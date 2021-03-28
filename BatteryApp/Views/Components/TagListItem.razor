@@ -1,0 +1,60 @@
+﻿@inject ITagController _tagController
+
+<div class="badge tag-badge border-square mx-1">
+    @Tag.Name
+    @if (IsReadonly == false)
+    {
+        <a id="tagOptions" role="button" class="dopdown-toggle small" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            | <span class="oi oi-caret-bottom"></span>
+        </a>
+
+        <div class="dropdown-menu dropdown-menu-right border-square" aria-labelledby="tagOptions">
+            <a class="dropdown-item small" data-toggle="modal" data-target="#editTagModal" @onclick="@(() => SetTagToEdit.InvokeAsync(Tag))">Edit</a>
+            @if (ShowRemove)
+            {
+                <a class="dropdown-item small" href="" @onclick="@RemoveTag" @onclick:preventDefault="true">Remove</a>
+            }
+            <a class="dropdown-item small" data-toggle="modal" data-target="#deleteTagModal" @onclick="@(() => SetTagToDelete.InvokeAsync(Tag))">Delete</a>
+        </div>
+    }
+</div>
+
+
+<style>
+    .tag-badge {
+        color: black;
+        background-color: #cce4ff;
+        font-weight: normal;
+        font-size: small;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Charge Charge { get; set; }
+
+    [Parameter]
+    public Tag Tag { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<Tag> SetTagToDelete { get; set; }
+
+    [Parameter]
+    public EventCallback<Tag> SetTagToEdit { get; set; }
+
+    [Parameter]
+    public bool ShowRemove { get; set; } = false;
+
+    [Parameter]
+    public bool IsReadonly { get; set; } = false;
+
+    private async void RemoveTag()
+    {
+        await _tagController.RemoveTagFromChargeAsync(Charge.Id, Tag.Id);
+        ParentStateChanged?.Invoke();
+    }
+
+}
