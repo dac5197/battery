@@ -6,12 +6,48 @@
         <div class="row mb-2">
             <div class="col">
                 <a href="@($"/charge/{Charge.Id}")">
-                    <p class="charge-detail">
+                    <h6 class="charge-detail">
                         <span class="oi @category.Icon" style="color: @category.IconColor"></span>
                         @Charge.Title @Charge.Status
-                    </p>
+                    </h6>
                 </a>
                 <hr />
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="d-flex d-inline">
+                <div class="col">
+                    <label class="small" for="priority-input">Priority</label>
+                    <select class="form-control form-control-sm border-square p-1" id="priority-input">
+                        @foreach (var priority in Priorities)
+                        {
+                            @if (priority.Id == Charge.PriorityId)
+                            {
+                                <option Value="@priority.Id" selected>@priority.DisplayName</option>
+                            }
+                            else
+                            {
+                                <option Value="@priority.Id"> @priority.DisplayName</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col">
+                    <label class="small" for="priority-input">Status</label>
+                    <select class="form-control form-control-sm border-square transparent-input p-1" id="priority-input">
+                        @foreach (var status in Statuses.OrderBy(x => x.Order))
+                        {
+                            @if (status.Id == Charge.StatusId)
+                            {
+                                <option Value="@status.Id" selected> @status.Name</option>
+                            }
+                            else
+                            {
+                                <option Value="@status.Id"> @status.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
             </div>
         </div>
         <div class="row mb-2">
@@ -27,7 +63,7 @@
             </div>
         </div>
         <div class="row mb-2">
-            
+
             <div class="col">
                 @if (children.Count() > 0)
                 {
@@ -89,6 +125,12 @@
 
     [Parameter]
     public Status CompleteStatus { get; set; }
+
+    [Parameter]
+    public List<Priority> Priorities { get; set; }
+
+    [Parameter]
+    public List<Status> Statuses { get; set; }
 
     [Parameter]
     public EventCallback<Charge> SetChargeItem { get; set; }

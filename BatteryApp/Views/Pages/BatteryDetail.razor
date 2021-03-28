@@ -129,6 +129,8 @@
                                     <ChargeListItem Categories="@categories"
                                                     Charge="@charge"
                                                     CompleteStatus="@statuses.OrderBy(x => x.Order).Last()"
+                                                    Priorities="@priorities"
+                                                    Statuses="statuses"
                                                     SetChargeItem="@SetChargObject"></ChargeListItem>
                                 }
                             </div>
