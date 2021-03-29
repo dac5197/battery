@@ -68,6 +68,7 @@ namespace BatteryApp
             // Add Project Internals
             services.AddTransient<IChargeChildController, ChargeChildController>();
             services.AddTransient<IChargeLifecycle, ChargeLifecycle>();
+            services.AddTransient<IDeleteChargeController, DeleteChargeController>();
             services.AddTransient<IInitializeChargeChildToParent, InitializeChargeChildToParent>();
             services.AddTransient<ITagController, TagController>();
 

@@ -1,0 +1,55 @@
+﻿@inject NavigationManager _navManager
+@inject IJSRuntime _jsRuntime
+@inject IDeleteChargeController _deleteChargeController
+
+<div class="modal fade" tabindex="-1" role="dialog" id="deleteChargeModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6>Do you want to delete this Charge?</h6>
+                <br />
+                <p>Item to be deleted:</p>
+                <ul class="list-group border-0 px-2">
+                    <li class="list-group-item list-group-item-danger border-square">@Charge.Id | @Charge.Title </li>
+                </ul>
+                @if (Children.Count > 0)
+                {
+                    <br />
+                    <p>Related Items to be deleted (@Children.Count):</p>
+                    <ul class="list-groupborder-0 px-4">
+                        @foreach (var child in Children)
+                        {
+                            <li class="list-group-item list-group-item-warning border-square">@child.Id | @child.Title </li>
+                        }
+
+                    </ul>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" @onclick="Delete">Delete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Charge Charge { get; set; }
+
+    [Parameter]
+    public List<Charge> Children { get; set; }
+
+    private async void Delete()
+    {
+        await _deleteChargeController.DeleteChargeAndAllRelatedItemsAsync(Charge);
+        _navManager.NavigateTo($"/battery/{Charge.BatteryId}", true);
+    }
+
+}
