@@ -26,6 +26,18 @@ namespace BatteryApp.Models.UserProfileModel
         [DisplayName("Last Name")]
         public string LastName { get; set; }
 
-        
+        [MaxLength(20)]
+        public string BgColor { get; set; }
+
+        [MaxLength(20)]
+        public string FontColor { get; set; }
+
+        public string Initials 
+        {
+            get
+            {
+                return $"{FirstName?.Substring(0, 1).ToUpper()}{LastName?.Substring(0, 1).ToUpper()}";
+            }
+        }
     }
 }
