@@ -28,7 +28,7 @@
                 <h4>@status.Name</h4>
                 @foreach (var charge in charges.Where(x => x.StatusId == status.Id))
                 {
-                    <ChargeListItem Charge="@charge" SetChargeItem="@SetChargObject"></ChargeListItem>
+                    <ChargeListItem Charge="@charge"></ChargeListItem>
                 }
             }
 

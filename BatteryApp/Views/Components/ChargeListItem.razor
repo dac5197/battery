@@ -141,9 +141,6 @@
     [Parameter]
     public Action ParentStateChanged { get; set; }
 
-    [Parameter]
-    public EventCallback<Charge> SetChargeItem { get; set; }
-
     private Category category = new();
     private Priority priority = new();
     private Status status = new();
@@ -152,7 +149,6 @@
     private List<Tag> tags = new();
 
     private bool showChildren = false;
-    private string highlightedCssClass;
 
     protected override async Task OnInitializedAsync()
     {
@@ -177,27 +173,6 @@
         Charge.StatusId = statusId;
         await _chargeService.Update(Charge);
         ParentStateChanged?.Invoke();
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        highlightedCssClass = "";
-        base.OnAfterRender(firstRender);
-    }
-
-    private void SetHighlightedCssClass()
-    {
-        highlightedCssClass = $"highlighted-{Charge.BatteryId}-{Charge.Id}";
-    }
-
-    private void ClearHighlightedCssClass()
-    {
-        highlightedCssClass = "";
-    }
-
-    private async Task OnSetChargeItem()
-    {
-        await SetChargeItem.InvokeAsync(Charge);
     }
 
     private void ToggleShowChildren()

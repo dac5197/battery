@@ -131,7 +131,6 @@
                                                     CompleteStatus="@statuses.OrderBy(x => x.Order).Last()"
                                                     Priorities="@priorities"
                                                     Statuses="statuses"
-                                                    SetChargeItem="@SetChargObject"
                                                     ParentStateChanged="@StateChanged"></ChargeListItem>
                                 }
                             </div>
@@ -201,14 +200,6 @@
     private void SetChargObject(Charge charge)
     {
         chargeObject = charge;
-    }
-
-    private async Task DeleteCharge()
-    {
-        await _chargeService.Delete(chargeObject.Id);
-        await _jsRuntime.InvokeAsync<object>("CloseModal", "confirmDeleteModal");
-        StateChanged();
-        InitializeChargeObject();
     }
 
     private void ResizeTextarea(ChangeEventArgs e)
