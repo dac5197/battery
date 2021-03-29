@@ -7,48 +7,54 @@
             <div class="col">
                 <a href="@($"/charge/{Charge.Id}")">
                     <h6 class="charge-detail">
-                        <span class="oi @category.Icon" style="color: @category.IconColor"></span>
-                        @Charge.Title @Charge.Status
+                        <span class="oi @category.Icon" style="color: @category.IconColor;"></span>
+                        @Charge.Id | @Charge.Title
                     </h6>
                 </a>
                 <hr />
             </div>
         </div>
         <div class="row mb-2">
-            <div class="d-flex d-inline">
                 <div class="col">
-                    <label class="small" for="priority-input">Priority</label>
-                    <select class="form-control form-control-sm border-square p-1" id="priority-input">
-                        @foreach (var priority in Priorities)
+                    <p class="small mb-1">Priority</p>
+                    <button id="priorityCharge-@Charge.Id" type="button" class="btn btn-sm border-square dopdown-toggle small mx-1 py-0 px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                       style="color: @priority.FontColor; background-color: @priority.BgColor">
+                        @priority.DisplayName
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="priorityCharge-@Charge.Id">
+                        @foreach (var p in Priorities.OrderBy(x => x.Severity))
                         {
-                            @if (priority.Id == Charge.PriorityId)
+                            @if (p.Id == Charge.PriorityId)
                             {
-                                <option Value="@priority.Id" selected>@priority.DisplayName</option>
+                                <a class="dropdown-item small bg-info"> @p.DisplayName</a>
                             }
                             else
                             {
-                                <option Value="@priority.Id"> @priority.DisplayName</option>
+                                <a class="dropdown-item small" href="" @onclick="@(() => ChangeChargePriority(p.Id))" @onclick:preventDefault="true"> @p.DisplayName</a>
                             }
                         }
-                    </select>
+                    </div>
                 </div>
                 <div class="col">
-                    <label class="small" for="priority-input">Status</label>
-                    <select class="form-control form-control-sm border-square transparent-input p-1" id="priority-input">
-                        @foreach (var status in Statuses.OrderBy(x => x.Order))
+                    <p class="small mb-1">Status</p>
+                    <button id="statusCharge-@Charge.Id" type="button" class="btn btn-sm border-square dopdown-toggle mx-1 py-0 px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                       style="color: @status.FontColor; background-color: @status.BgColor">
+                        @status.Name
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="statusCharge-@Charge.Id">
+                        @foreach (var s in Statuses.OrderBy(x => x.Order))
                         {
-                            @if (status.Id == Charge.StatusId)
+                            @if (s.Id == Charge.StatusId)
                             {
-                                <option Value="@status.Id" selected> @status.Name</option>
+                                <a class="dropdown-item small bg-info"> @s.Name</a>
                             }
                             else
                             {
-                                <option Value="@status.Id"> @status.Name</option>
+                                <a class="dropdown-item small" href="" @onclick="@(() => ChangeChargeStatus(s.Id))" @onclick:preventDefault="true"> @s.Name</a>
                             }
                         }
-                    </select>
+                    </div>
                 </div>
-            </div>
         </div>
         <div class="row mb-2">
             <div class="col">
@@ -133,9 +139,14 @@
     public List<Status> Statuses { get; set; }
 
     [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    [Parameter]
     public EventCallback<Charge> SetChargeItem { get; set; }
 
     private Category category = new();
+    private Priority priority = new();
+    private Status status = new();
 
     private List<Charge> children = new();
     private List<Tag> tags = new();
@@ -149,6 +160,23 @@
         tags = await _tagController.GetAllTagsForChargeAsync(Charge.Id);
 
         category = Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault();
+        priority = Priorities.Where(x => x.Id == Charge.PriorityId).FirstOrDefault();
+        status = Statuses.Where(x => x.Id == Charge.StatusId).FirstOrDefault();
+    }
+
+    private async void ChangeChargePriority(int priorityId)
+    {
+        Charge.PriorityId = priorityId;
+        await _chargeService.Update(Charge);
+        priority = Priorities.Where(x => x.Id == priorityId).FirstOrDefault();
+        ParentStateChanged?.Invoke();
+    }
+
+    private async void ChangeChargeStatus(int statusId)
+    {
+        Charge.StatusId = statusId;
+        await _chargeService.Update(Charge);
+        ParentStateChanged?.Invoke();
     }
 
     protected override void OnAfterRender(bool firstRender)

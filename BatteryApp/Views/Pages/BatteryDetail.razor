@@ -131,7 +131,8 @@
                                                     CompleteStatus="@statuses.OrderBy(x => x.Order).Last()"
                                                     Priorities="@priorities"
                                                     Statuses="statuses"
-                                                    SetChargeItem="@SetChargObject"></ChargeListItem>
+                                                    SetChargeItem="@SetChargObject"
+                                                    ParentStateChanged="@StateChanged"></ChargeListItem>
                                 }
                             </div>
                         </div>
@@ -193,7 +194,7 @@
 
     private async void StateChanged()
     {
-        charges = await _chargeService.Get();
+        charges = await _chargeService.Get(battery);
         StateHasChanged();
     }
 
