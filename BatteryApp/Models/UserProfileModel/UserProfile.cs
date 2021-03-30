@@ -32,6 +32,8 @@ namespace BatteryApp.Models.UserProfileModel
         [MaxLength(20)]
         public string FontColor { get; set; }
 
+        public int PaginationCount { get; set; }
+
         public string Initials 
         {
             get

@@ -40,6 +40,20 @@ namespace BatteryApp.Models.ChargeModel
             return charges.Where(x => x.BatteryId == battery.Id).ToList();
         }
 
+        public async Task<List<Charge>> GetActive()
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var charges = await context.Charges.ToListAsync();
+            return charges.Where(x => x.Completed is null || x.Completed >= DateTime.UtcNow.AddDays(-3)).ToList();
+        }
+
+        public async Task<List<Charge>> GetActive(Battery battery)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var charges = await context.Charges.ToListAsync();
+            return charges.Where(x => x.BatteryId == battery.Id && (x.Completed is null || x.Completed >= DateTime.UtcNow.AddDays(-3))).ToList();
+        }
+
         public async Task<List<Charge>> GetChildren(Charge charge)
         {
             using var context = _contextFactory.CreateDbContext();

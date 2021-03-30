@@ -1,0 +1,65 @@
+﻿
+<div class="tooltip-wrapper">
+    <span class="tooltip-text">@Text</span>
+    <div class="m-1 question-mark-icon">
+        <strong>?</strong>
+    </div>
+</div>
+
+<style>
+    .question-mark-icon {
+        color: steelblue;
+        border: 1.75px solid steelblue;
+        border-radius: 50%;
+        height: 1.1rem;
+        width: 1.1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 0.8rem
+    }
+    .question-mark-icon:hover {
+        color: white;
+        background-color: steelblue;
+    }
+    .tooltip-wrapper {
+        position: relative;
+        display: inline-block;
+        cursor: help;
+    }
+
+    .tooltip-text {
+        visibility: hidden;
+        position: absolute;
+        width: 175px;
+        bottom: 100%;
+        left: 50%;
+        margin-left: -60px;
+        background-color: #363636;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 0px;
+        z-index: 1;
+    }
+
+    .tooltip-text::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 34%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+    }
+
+    .tooltip-wrapper:hover .tooltip-text {
+        visibility: visible;
+    }
+</style>
+
+@code {
+    [Parameter] public string Text { get; set; }
+}
