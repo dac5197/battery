@@ -5,7 +5,7 @@
     </p>
 </div>*@
 
-<button type="button" class="btn btn-sm border-square mx-1" style="background-color: @Category.IconColor">
+<button type="button" class="btn btn-sm border-square mx-1" style="background-color: @Category.IconColor" @onclick="@(() => FilterCharges.InvokeAsync(FilterId))">
     <span class="oi @Category.Icon" style="color: white"></span>
     <span class="badge badge-light border-square">@Count</span>
     <span class="sr-only">@Category.Name Count</span>
@@ -17,4 +17,10 @@
 
     [Parameter]
     public int Count { get; set; }
+
+    [Parameter]
+    public int FilterId { get; set; }
+
+    [Parameter]
+    public EventCallback<int> FilterCharges { get; set; }
 }

@@ -22,6 +22,7 @@
             <div class="small mt-4">
                 <EditForm Context="formContext" Model="battery" OnValidSubmit="@HandleValidSubmit">
                     <DataAnnotationsValidator />
+                    <!-- Battery Details -->
                     <div class="row mb-3">
                         <div class="col-lg-12">
                             <div class="card border-square shadow-sm p-2">
@@ -74,65 +75,150 @@
                         </div>
                     </div>
                 </EditForm>
-                <div class="row mb-3">
+                <!-- Status and Priority Score Cards -->
+                @*<div class="row mb-3">
                     <div class="col-lg-6">
-                        <div class="card border-square shadow-sm px-2 pt-2 pb-0 h-100">
-                            @foreach (var status in statuses.OrderBy(x => x.Order))
-                            {
-                                <div class="row mb-2">
-                                    <div class="col-lg-3 pl-4 d-flex align-items-center">
-                                        <p class="text-center">@status.Name</p>
-                                    </div>
-                                    <div class="col-lg-9">
-                                        <div class="card-deck px-2">
-                                            @foreach (var category in categories)
+                        <div class="card border-square shadow-sm px-2 pt-2 pb-0">
+                            <div class="row mb-2">
+                                <div class="col-lg-12">
+                                    <a class="link-black" role="button" href="" @onclick="@ToggleStatusScoreCard" @onclick:preventDefault="true">
+                                        <h6>
+                                            @if (showStatusScoreCard)
                                             {
-                                                <CategoryCardCount Category="@category"
-                                                                   Count="charges.Where(x => x.CategoryId == category.Id && x.StatusId == status.Id).Count()"></CategoryCardCount>
+                                                <span class="oi oi-caret-bottom"></span>
+
                                             }
+                                            else
+                                            {
+                                                <span class="oi oi-caret-right"></span>
+                                            }
+                                            Status
+                                        </h6>
+                                    </a>
+                                </div>
+                            </div>
+                            @if (showStatusScoreCard)
+                            {
+                                @foreach (var status in statuses.OrderBy(x => x.Order))
+                                {
+                                    <div class="row mb-2">
+                                        <div class="col-lg-3 pl-4 d-flex align-items-center">
+                                            <p class="text-center">@status.Name</p>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <div class="card-deck px-2">
+                                                @foreach (var category in categories)
+                                                {
+                                                    <CategoryCardCount Category="@category"
+                                                                       Count="charges.Where(x => x.CategoryId == category.Id && x.StatusId == status.Id).Count()"
+                                                                       FilterCharges="FilterChargesByStatus"
+                                                                       FilterId="@status.Id"></CategoryCardCount>
+                                                }
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                }
                             }
+
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <div class="card border-square shadow-sm px-2 pt-2 pb-0 h-100">
-                            @foreach (var priority in priorities.OrderBy(x => x.Severity))
-                            {
-                                <div class="row mb-2">
-                                    <div class="col-lg-3 pl-4">
-                                        <p class="align-self-center">@priority.DisplayName</p>
-                                    </div>
-                                    <div class="col-lg-9">
-                                        <div class="card-deck px-2">
-                                            @foreach (var category in categories)
+                        <div class="card border-square shadow-sm px-2 pt-2 pb-0">
+                            <div class="row mb-2">
+                                <div class="col-lg-12">
+                                    <a class="link-black" role="button" href="" @onclick="@TogglePriorityScoreCard" @onclick:preventDefault="true">
+                                        <h6>
+                                            @if (showPriorityScoreCard)
                                             {
-                                                <CategoryCardCount Category="@category"
-                                                                   Count="charges.Where(x => x.CategoryId == category.Id && x.PriorityId == priority.Id).Count()"></CategoryCardCount>
+                                                <span class="oi oi-caret-bottom"></span>
+
                                             }
+                                            else
+                                            {
+                                                <span class="oi oi-caret-right"></span>
+                                            }
+                                            Priority
+                                        </h6>
+                                    </a>
+                                </div>
+                            </div>
+                            @if (showPriorityScoreCard)
+                            {
+                                @foreach (var priority in priorities.OrderBy(x => x.Severity))
+                                {
+                                    <div class="row mb-2">
+                                        <div class="col-lg-3 pl-4">
+                                            <p class="align-self-center">@priority.DisplayName</p>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <div class="card-deck px-2">
+                                                @foreach (var category in categories)
+                                                {
+                                                    <CategoryCardCount Category="@category"
+                                                                       Count="charges.Where(x => x.CategoryId == category.Id && x.PriorityId == priority.Id).Count()"></CategoryCardCount>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>*@
+                <!-- Search -->
+                <div class="row mb-3">
+                    <div class="col-lg-12">
+                        <div class="card border-square shadow-sm p-2">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-6">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text border-0 bg-transparent mr-n5">
+                                                <span class="oi oi-magnifying-glass"></span>
+                                            </div>
+                                        </div>
+                                        <input type="search" class="form-control py-2 border-square bg-transparent pl-5" id="searchChargesInput" placeholder="Search">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-info border-square">Clear</button>
                                         </div>
                                     </div>
                                 </div>
-                            }
+                            </div>
                         </div>
                     </div>
                 </div>
+                <!-- Charge Item List by Status -->
                 <div class="row mb-3">
                     @foreach (var status in statuses.OrderBy(x => x.Order))
                     {
                         <div class="col">
                             <div class="card border-square shadow-sm px-2 pt-2 pb-0 h-100">
                                 <h5 class="text-center">@status.Name</h5>
-                                @foreach (var charge in charges.Where(x => x.ParentId is null).Where(x => x.StatusId == status.Id))
+                                @if (showFilteredCharges)
                                 {
-                                    <ChargeListItem Categories="@categories"
-                                                    Charge="@charge"
-                                                    CompleteStatus="@statuses.OrderBy(x => x.Order).Last()"
-                                                    Priorities="@priorities"
-                                                    Statuses="statuses"
-                                                    ParentStateChanged="@StateChanged"></ChargeListItem>
+                                    @foreach (var charge in filteredCharges?.Where(x => x.ParentId is null).Where(x => x.StatusId == status.Id))
+                                    {
+                                        <ChargeListItem Categories="@categories"
+                                                        Charge="@charge"
+                                                        CompleteStatus="@statuses.OrderBy(x => x.Order).Last()"
+                                                        Priorities="@priorities"
+                                                        Statuses="statuses"
+                                                        ParentStateChanged="@StateChanged"></ChargeListItem>
+                                    }
                                 }
+                                else
+                                {
+                                    @foreach (var charge in charges.Where(x => x.ParentId is null).Where(x => x.StatusId == status.Id))
+                                    {
+                                        <ChargeListItem Categories="@categories"
+                                                        Charge="@charge"
+                                                        CompleteStatus="@statuses.OrderBy(x => x.Order).Last()"
+                                                        Priorities="@priorities"
+                                                        Statuses="statuses"
+                                                        ParentStateChanged="@StateChanged"></ChargeListItem>
+                                    }
+                                }
+
                             </div>
                         </div>
                     }
@@ -158,8 +244,13 @@
     private Charge chargeObject = new Charge();
     private List<Category> categories = new();
     private List<Charge> charges = new();
+    private List<Charge> filteredCharges = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
+
+    private bool showFilteredCharges = false;
+    private bool showPriorityScoreCard = false;
+    private bool showStatusScoreCard = false;
 
     private int minTextareaRows = 4;
     private int maxTextareaRows = 8;
@@ -210,6 +301,23 @@
     private async void HandleValidSubmit()
     {
         await _batteryService.Update(battery);
+        StateHasChanged();
+    }
+
+    private void TogglePriorityScoreCard()
+    {
+        showPriorityScoreCard = !showPriorityScoreCard;
+    }
+
+    private void ToggleStatusScoreCard()
+    {
+        showStatusScoreCard = !showStatusScoreCard;
+    }
+
+    private void FilterChargesByStatus(int statusId)
+    {
+        filteredCharges = charges.Where(x => x.StatusId == statusId).ToList();
+        showFilteredCharges = true;
         StateHasChanged();
     }
 }
