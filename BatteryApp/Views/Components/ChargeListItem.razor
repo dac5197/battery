@@ -88,10 +88,10 @@
                 }
             </div>
         </div>
-        @if (showChildren)
+        @if (ShowChildren)
         {
             <ul class="list-group list-group-flush mt-2">
-                @foreach (var child in children)
+                @foreach (var child in children.Where(x => x.Title.ToLower().Contains(SearchChildTitle.ToLower())).ToList())
                 {
                     <ChargeDetail_RelatedListItem Charge="child" IsParent="false"></ChargeDetail_RelatedListItem>
                 }
@@ -139,6 +139,12 @@
     public List<Status> Statuses { get; set; }
 
     [Parameter]
+    public string SearchChildTitle { get; set; }
+
+    [Parameter]
+    public bool ShowChildren { get; set; }
+
+    [Parameter]
     public Action ParentStateChanged { get; set; }
 
     private Category category = new();
@@ -147,8 +153,6 @@
 
     private List<Charge> children = new();
     private List<Tag> tags = new();
-
-    private bool showChildren = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -177,6 +181,6 @@
 
     private void ToggleShowChildren()
     {
-        showChildren = !showChildren;
+        ShowChildren = !ShowChildren;
     }
 }
