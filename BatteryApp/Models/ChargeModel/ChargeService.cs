@@ -1,6 +1,7 @@
 ﻿using BatteryApp.Data;
 using BatteryApp.Internals;
 using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.NoteModel;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,11 +14,13 @@ namespace BatteryApp.Models.ChargeModel
     {
         private readonly IDbContextFactory<AppDbContextFactory> _contextFactory;
         private readonly IChargeLifecycle _chargeLifecycle;
+        private readonly INoteService _noteService;
 
-        public ChargeService(IDbContextFactory<AppDbContextFactory> contextFactory, IChargeLifecycle chargeLifecycle)
+        public ChargeService(IDbContextFactory<AppDbContextFactory> contextFactory, IChargeLifecycle chargeLifecycle, INoteService noteService)
         {
             _contextFactory = contextFactory;
             _chargeLifecycle = chargeLifecycle;
+            _noteService = noteService;
         }
 
         public async Task<List<Charge>> Get()
@@ -74,6 +77,11 @@ namespace BatteryApp.Models.ChargeModel
             charge.Completed = await _chargeLifecycle.GetCompletedAsync(charge);
 
             using var context = _contextFactory.CreateDbContext();
+            var oldValues = context.Entry(charge).GetDatabaseValues();
+            var newValues = context.Entry(charge).CurrentValues;
+            
+            await _noteService.AddHistoryNote(oldValues, newValues);
+
             context.Charges.Add(charge);
             await context.SaveChangesAsync();
          
@@ -86,6 +94,12 @@ namespace BatteryApp.Models.ChargeModel
 
             using var context = _contextFactory.CreateDbContext();
             context.Entry(charge).State = EntityState.Modified;
+
+            var oldValues = context.Entry(charge).GetDatabaseValues();
+            var newValues = context.Entry(charge).CurrentValues;
+
+            await _noteService.AddHistoryNote(oldValues, newValues);
+
             await context.SaveChangesAsync();
 
             return charge;

@@ -4,14 +4,16 @@ using BatteryApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BatteryApp.Migrations
 {
     [DbContext(typeof(AppDbContextFactory))]
-    partial class ChargeContextModelSnapshot : ModelSnapshot
+    [Migration("20210330215713_AddNoteModel")]
+    partial class AddNoteModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,9 +154,6 @@ namespace BatteryApp.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ChargeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -169,8 +168,6 @@ namespace BatteryApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ChargeId");
 
                     b.ToTable("Notes");
                 });
@@ -372,17 +369,6 @@ namespace BatteryApp.Migrations
                     b.Navigation("Priority");
 
                     b.Navigation("Status");
-                });
-
-            modelBuilder.Entity("BatteryApp.Models.NoteModel.Note", b =>
-                {
-                    b.HasOne("BatteryApp.Models.ChargeModel.Charge", "Charge")
-                        .WithMany()
-                        .HasForeignKey("ChargeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Charge");
                 });
 
             modelBuilder.Entity("BatteryApp.Models.TagModel.ChargeTagRelation", b =>

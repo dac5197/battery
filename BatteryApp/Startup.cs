@@ -4,6 +4,7 @@ using BatteryApp.Internals;
 using BatteryApp.Models.BatteryModel;
 using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.ChargeModel;
+using BatteryApp.Models.NoteModel;
 using BatteryApp.Models.PriorityModel;
 using BatteryApp.Models.StatusModel;
 using BatteryApp.Models.TagModel;
@@ -60,6 +61,7 @@ namespace BatteryApp
             services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<IChargeService, ChargeService>();
             services.AddTransient<IChargeTagRelationService, ChargeTagRelationService>();
+            services.AddTransient<INoteService, NoteService>();
             services.AddTransient<IPriorityService, PriorityService>();
             services.AddTransient<IStatusService, StatusService>();
             services.AddTransient<ITagService, TagService>();
