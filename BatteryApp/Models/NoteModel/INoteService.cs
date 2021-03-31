@@ -11,7 +11,7 @@ namespace BatteryApp.Models.NoteModel
         Task Delete(int id);
         Task<List<Note>> Get();
         Task<Note> Get(int id);
-        Task<List<Note>> GetAllNotesForCharge(int chargeId)
+        Task<List<Note>> GetAllNotesForCharge(int chargeId);
         Task<Note> Update(Note note);
     }
 }

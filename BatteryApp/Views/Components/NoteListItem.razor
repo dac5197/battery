@@ -1,0 +1,71 @@
+﻿<div class="card border-square shadow-sm px-2 pt-4 pb-2 my-1 bg-light">
+    <div class="row">
+        <div class="col">
+            <p><UserInitialsIcon UserProfile="@Profile"></UserInitialsIcon> @Profile.FirstName @Profile.LastName</p>
+        </div>
+        <div class="col">
+            <p class="text-right">@Note.Timestamp.ToLocalTime().ToString(DateTimeFormat)</p>
+        </div>
+    </div>
+    <!-- Display history field changes -->
+    <div class="row mb-2">
+        <div class="col">
+            <ul class="list-group list-group-flush">
+                @foreach (var history in historyList.Where(x => !(x.FieldName == "Description" || x.FieldName == "Title")))
+                {
+                    <li class="list-group-item border-0 py-1 bg-light">
+                        <HistoryListItem HistoryItem="@history"></HistoryListItem>
+                    </li>
+                }
+            </ul>
+
+        </div>
+    </div>
+    <!-- Display history text changes -->
+    @foreach (var history in historyList.Where(x => x.FieldName == "Description" || x.FieldName == "Title"))
+    {
+        <div class="row">
+            <div class="col px-4">
+                <p>@history.FieldName</p>
+                <div>
+                    <p class="new-value">@history.NewValue</p>
+                </div>
+                <div>
+                    <p class="old-value">@history.OldValue</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .old-value {
+        color: dimgray;
+        background-color: lightgray;
+        text-decoration: line-through;
+    }
+
+    .new-value {
+        color: forestgreen;
+        background-color: palegreen;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string DateTimeFormat { get; set; }
+
+    [Parameter]
+    public Note Note { get; set; }
+
+    [Parameter]
+    public UserProfile Profile { get; set; }
+
+    private List<HistoryJson> historyList = new();
+
+    protected override Task OnInitializedAsync()
+    {
+        historyList = Note.History.ToList();
+        return base.OnInitializedAsync();
+    }
+}
