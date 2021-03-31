@@ -1,5 +1,6 @@
 ﻿using BatteryApp.Models.BatteryModel;
 using BatteryApp.Models.ChargeModel;
+using BatteryApp.Models.NoteModel;
 using BatteryApp.Models.TagModel;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,13 @@ namespace BatteryApp.Internals
     public class TagController : ITagController
     {
         private readonly IChargeTagRelationService _chargeTagRelationService;
+        private readonly INoteService _noteService;
         private readonly ITagService _tagService;
 
-        public TagController(IChargeTagRelationService chargeTagRelationService, ITagService tagService)
+        public TagController(IChargeTagRelationService chargeTagRelationService, INoteService noteService, ITagService tagService)
         {
             _chargeTagRelationService = chargeTagRelationService;
+            _noteService = noteService;
             _tagService = tagService;
         }
 
@@ -38,21 +41,25 @@ namespace BatteryApp.Internals
         {
             var newTag = await _tagService.Add(tag);
             await _chargeTagRelationService.Add(chargeId, newTag.Id);
+            await _noteService.AddTagHistoryNote(chargeId, tag);
         }
 
-        public async Task AddRelationshipAsync(int chargeId, int tagId)
+        public async Task AddRelationshipAsync(int chargeId, Tag tag)
         {
-            var relation = await _chargeTagRelationService.Get(chargeId, tagId);
+            var relation = await _chargeTagRelationService.Get(chargeId, tag.Id);
 
             if (relation is null)
             {
-                await _chargeTagRelationService.Add(chargeId, tagId);
+                await _chargeTagRelationService.Add(chargeId, tag.Id);
+                await _noteService.AddTagHistoryNote(chargeId, tag);
             }
         }
 
-        public async Task RemoveTagFromChargeAsync(int chargeId, int tagId)
+        public async Task RemoveTagFromChargeAsync(int chargeId, Tag tag)
         {
-            await _chargeTagRelationService.Delete(chargeId, tagId);
+            await _chargeTagRelationService.Delete(chargeId, tag.Id);
+            await _noteService.RemoveTagHistoryNote(chargeId, tag);
+
         }
 
         public async Task DeleteTagAndAllRelationshipsAsync(int tagId)

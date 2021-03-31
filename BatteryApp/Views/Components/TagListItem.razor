@@ -53,7 +53,7 @@
 
     private async void RemoveTag()
     {
-        await _tagController.RemoveTagFromChargeAsync(Charge.Id, Tag.Id);
+        await _tagController.RemoveTagFromChargeAsync(Charge.Id, Tag);
         ParentStateChanged?.Invoke();
     }
 

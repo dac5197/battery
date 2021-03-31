@@ -106,6 +106,12 @@ namespace BatteryApp.Data
                         (c1, c2) => c1.SequenceEqual(c2),
                         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                         c => (IList<HistoryJson>)c.ToList()));
+
+            // Set Unique constraint on Tag+BatteryId
+            // https://entityframeworkcore.com/knowledge-base/41246614/entity-framework-core-add-unique-constraint-code-first
+            modelBuilder.Entity<Tag>()
+            .HasIndex(p => new { p.Name, p.BatteryId })
+            .IsUnique(true);
         }      
     }
 }

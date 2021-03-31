@@ -181,7 +181,8 @@
                         <CascadingValue Value="@categories">
                             <CascadingValue Value="priorities">
                                 <CascadingValue Value="statuses">
-                                        <NoteListItem DateTimeFormat="@dateTimeFormat" 
+                                        <NoteListItem @key="@note"
+                                                      DateTimeFormat="@dateTimeFormat" 
                                                       Note="@note" 
                                                       Profile="userProfile"></NoteListItem>
                                 </CascadingValue>
@@ -339,7 +340,7 @@
         category = categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault();
         priorities = await _priorityService.Get(charge.OwnerId);
         statuses = await _statusService.Get();
-        
+
         tags = await _tagController.GetAllTagsForChargeAsync(charge.Id);
         batteryTags = await _tagController.GetAllTagsForBatteryAsync(battery);
 
@@ -358,6 +359,7 @@
         await _chargeService.Update(charge);
         charge = await _chargeService.Get(Id);
         category = await _categoryService.Get(charge.CategoryId);
+        notes = await _noteService.GetAllNotesForCharge(charge.Id);
         StateHasChanged();
     }
 
@@ -384,6 +386,7 @@
     {
         tags = await _tagController.GetAllTagsForChargeAsync(charge.Id);
         batteryTags = await _tagController.GetAllTagsForBatteryAsync(battery);
+        notes = await _noteService.GetAllNotesForCharge(charge.Id);
         StateHasChanged();
     }
 

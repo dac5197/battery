@@ -4,12 +4,18 @@
     <div style="min-width: 10ch">
         @fieldName
     </div>
-    <div class="new-value px-1 mx-1">
-        @newValue
-    </div>
-    <div class="old-value px-1 mx-1">
-        @oldValue
-    </div>
+    @if (!string.IsNullOrWhiteSpace(newValue))
+    {
+        <div class="new-value px-1 mx-1">
+            @newValue
+        </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(oldValue))
+    {
+        <div class="old-value px-1 mx-1">
+            @oldValue
+        </div>
+    }
 </div>
 
 @code {
@@ -47,20 +53,20 @@
         {
             case "CategoryId":
                 fieldName = "Category";
-                newValue = Categories?.Where(x => x.Id.ToString() == HistoryItem.NewValue).FirstOrDefault().Name;
-                oldValue = Categories?.Where(x => x.Id.ToString() == HistoryItem.OldValue).FirstOrDefault().Name;
+                newValue = Categories?.Where(x => x.Id.ToString() == HistoryItem.NewValue).FirstOrDefault()?.Name;
+                oldValue = Categories?.Where(x => x.Id.ToString() == HistoryItem.OldValue).FirstOrDefault()?.Name;
                 break;
 
             case "PriorityId":
                 fieldName = "Priority";
-                newValue = Priorities?.Where(x => x.Id.ToString() == HistoryItem.NewValue).FirstOrDefault().DisplayName;
-                oldValue = Priorities?.Where(x => x.Id.ToString() == HistoryItem.OldValue).FirstOrDefault().DisplayName;
+                newValue = Priorities?.Where(x => x.Id.ToString() == HistoryItem.NewValue).FirstOrDefault()?.DisplayName;
+                oldValue = Priorities?.Where(x => x.Id.ToString() == HistoryItem.OldValue).FirstOrDefault()?.DisplayName;
                 break;
 
             case "StatusId":
                 fieldName = "Status";
-                newValue = Statuses?.Where(x => x.Id.ToString() == HistoryItem.NewValue).FirstOrDefault().Name;
-                oldValue = Statuses?.Where(x => x.Id.ToString() == HistoryItem.OldValue).FirstOrDefault().Name;
+                newValue = Statuses?.Where(x => x.Id.ToString() == HistoryItem.NewValue).FirstOrDefault()?.Name;
+                oldValue = Statuses?.Where(x => x.Id.ToString() == HistoryItem.OldValue).FirstOrDefault()?.Name;
                 break;
 
             default:

@@ -77,13 +77,14 @@ namespace BatteryApp.Models.ChargeModel
             charge.Completed = await _chargeLifecycle.GetCompletedAsync(charge);
 
             using var context = _contextFactory.CreateDbContext();
+
             var oldValues = context.Entry(charge).GetDatabaseValues();
             var newValues = context.Entry(charge).CurrentValues;
-            
-            await _noteService.AddHistoryNote(oldValues, newValues);
 
             context.Charges.Add(charge);
             await context.SaveChangesAsync();
+            
+            await _noteService.AddEntityHistoryNote(oldValues, newValues);
          
             return charge;
         }
@@ -98,7 +99,7 @@ namespace BatteryApp.Models.ChargeModel
             var oldValues = context.Entry(charge).GetDatabaseValues();
             var newValues = context.Entry(charge).CurrentValues;
 
-            await _noteService.AddHistoryNote(oldValues, newValues);
+            await _noteService.AddEntityHistoryNote(oldValues, newValues);
 
             await context.SaveChangesAsync();
 

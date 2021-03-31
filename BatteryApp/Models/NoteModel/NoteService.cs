@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Data;
+using BatteryApp.Models.TagModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -45,30 +46,85 @@ namespace BatteryApp.Models.NoteModel
             return note;
         }
 
-        public async Task<Note> AddHistoryNote(PropertyValues oldValues, PropertyValues newValues)
+        public async Task<Note> AddEntityHistoryNote(PropertyValues oldValues, PropertyValues newValues)
         {
-            Note note = new();
-
-            note.ChargeId = newValues.GetValue<int>("Id");
-            note.OwnerId = newValues.GetValue<string>("OwnerId");
-            //note.OwnerId = "bca141ab-8848-4ce6-a77c-2d5e4412f4ba";
-            note.Timestamp = DateTime.UtcNow;
-
             List<HistoryJson> historyJsonList = new();
 
-            foreach (var property in oldValues.Properties)
-            {
-                string oldPropValue = oldValues[property]?.ToString(); //== null ? "" : oldValues[property].ToString();
-                string newPropValue = newValues[property]?.ToString(); //== null ? "" : newValues[property].ToString();
+            List<string> IgnoreFieldList = new() { "Created", "Updated" };
 
-                if (oldPropValue != newPropValue)
+            foreach (var property in newValues.Properties)
+            {
+                if (!IgnoreFieldList.Contains(property.Name))
                 {
-                    HistoryJson record = new(property.Name, oldPropValue, newPropValue);
-                    historyJsonList.Add(record);
+                    string oldPropValue;
+
+                    if (oldValues is not null)
+                    {
+                        oldPropValue = oldValues[property]?.ToString();
+                    }
+                    else
+                    {
+                        oldPropValue = null;
+                    }
+
+                    string newPropValue = newValues[property]?.ToString(); //== null ? "" : newValues[property].ToString();
+
+                    if (oldPropValue != newPropValue)
+                    {
+                        HistoryJson record = new(property.Name, oldPropValue, newPropValue);
+                        historyJsonList.Add(record);
+                    }
                 }
+                
             }
 
-            note.History = historyJsonList;
+            Note note = new()
+            {
+                ChargeId = newValues.GetValue<int>("Id"),
+                History = historyJsonList,
+                OwnerId = newValues.GetValue<string>("OwnerId"),
+                Timestamp = DateTime.UtcNow
+            };
+
+            note = await Add(note);
+
+            return note;
+        }
+
+        public async Task<Note> AddTagHistoryNote(int chargeId, Tag tag)
+        {
+            
+
+            List<HistoryJson> historyJsonList = new();
+            HistoryJson record = new("Tag", null, tag.Name);
+            historyJsonList.Add(record);
+
+            Note note = new()
+            {
+                ChargeId = chargeId,
+                History = historyJsonList,
+                OwnerId = tag.OwnerId,
+                Timestamp = DateTime.UtcNow
+            };
+
+            note = await Add(note);
+
+            return note;
+        }
+
+        public async Task<Note> RemoveTagHistoryNote(int chargeId, Tag tag)
+        {
+            List<HistoryJson> historyJsonList = new();
+            HistoryJson record = new("Tag", tag.Name, null);
+            historyJsonList.Add(record);
+
+            Note note = new()
+            {
+                ChargeId = chargeId,
+                History = historyJsonList,
+                OwnerId = tag.OwnerId,
+                Timestamp = DateTime.UtcNow
+            };
 
             note = await Add(note);
 
