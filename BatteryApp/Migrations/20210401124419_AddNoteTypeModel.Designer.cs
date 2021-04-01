@@ -4,14 +4,16 @@ using BatteryApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BatteryApp.Migrations
 {
     [DbContext(typeof(AppDbContextFactory))]
-    partial class ChargeContextModelSnapshot : ModelSnapshot
+    [Migration("20210401124419_AddNoteTypeModel")]
+    partial class AddNoteTypeModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,8 +176,6 @@ namespace BatteryApp.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ChargeId");
-
-                    b.HasIndex("NoteTypeId");
 
                     b.ToTable("Notes");
                 });
@@ -415,15 +415,7 @@ namespace BatteryApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BatteryApp.Models.NoteModel.NoteType", "NoteType")
-                        .WithMany()
-                        .HasForeignKey("NoteTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Charge");
-
-                    b.Navigation("NoteType");
                 });
 
             modelBuilder.Entity("BatteryApp.Models.TagModel.ChargeTagRelation", b =>

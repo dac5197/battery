@@ -21,6 +21,10 @@ namespace BatteryApp.Models.NoteModel
         public int ChargeId { get; set; }
         public virtual Charge Charge { get; set; }
 
+        [Required]
+        public int NoteTypeId { get; set; }
+        public virtual NoteType NoteType { get; set; }
+
         public string Description { get; set; }
 
         public IList<HistoryJson> History { get; set; }

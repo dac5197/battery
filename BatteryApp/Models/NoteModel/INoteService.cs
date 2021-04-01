@@ -1,4 +1,5 @@
-﻿using BatteryApp.Models.TagModel;
+﻿using BatteryApp.Models.ChargeModel;
+using BatteryApp.Models.TagModel;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace BatteryApp.Models.NoteModel
     {
         Task<Note> Add(Note note);
         Task<Note> AddEntityHistoryNote(PropertyValues oldValues, PropertyValues newValues);
+        Task<Note> AddNoteFromCharge(Charge charge, string noteText);
         Task<Note> AddTagHistoryNote(int chargeId, Tag tag);
         Task Delete(int id);
         Task<List<Note>> Get();

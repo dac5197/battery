@@ -35,6 +35,7 @@ namespace BatteryApp.Data
         public DbSet<ChargeTagRelation> ChargeTagRelations { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Note> Notes { get; set; }
+        public DbSet<NoteType> NoteTypes { get; set; }
 
 
 

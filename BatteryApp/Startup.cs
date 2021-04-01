@@ -62,6 +62,7 @@ namespace BatteryApp
             services.AddTransient<IChargeService, ChargeService>();
             services.AddTransient<IChargeTagRelationService, ChargeTagRelationService>();
             services.AddTransient<INoteService, NoteService>();
+            services.AddTransient<INoteTypeService, NoteTypeService>();
             services.AddTransient<IPriorityService, PriorityService>();
             services.AddTransient<IStatusService, StatusService>();
             services.AddTransient<ITagService, TagService>();

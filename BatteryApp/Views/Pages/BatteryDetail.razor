@@ -172,7 +172,7 @@
                             <div class="row justify-content-center">
                                 <div class="col-lg-3 d-flex align-items-center">
                                     <div class="btn-group" role="group" aria-label="active">
-                                        <button type="button" class="btn btn-sm @btnClassctiveCharges border-square" @onclick="@GetActiveCharges">Active</button>
+                                        <button type="button" class="btn btn-sm @btnClassActiveCharges border-square" @onclick="@GetActiveCharges">Active</button>
                                         <button type="button" class="btn btn-sm @btnClassAllCharges border-square" @onclick="@GetAllCharges">All</button>
                                     </div>
                                     <QuestionMarkToolTip Text="Toggle between Active Items (Open items or items completed within the last 3 days) and All Items"></QuestionMarkToolTip>
@@ -292,7 +292,7 @@
     private int maxTextareaRows = 8;
     private int textareaRows;
 
-    private string btnClassctiveCharges = "btn-secondary";
+    private string btnClassActiveCharges = "btn-secondary";
     private string btnClassAllCharges = "btn-outline-secondary";
     private string dateTimeFormat = "MM/dd/yyyy HH:mm:ss";
     private string searchText = "";
@@ -384,7 +384,7 @@
     private async void GetAllCharges()
     {
         charges = await _chargeService.Get(battery);
-        btnClassctiveCharges = "btn-outline-secondary";
+        btnClassActiveCharges = "btn-outline-secondary";
         btnClassAllCharges = "btn-secondary";
         StateHasChanged();
     }
@@ -392,7 +392,7 @@
     private async void GetActiveCharges()
     {
         charges = await _chargeService.GetActive(battery);
-        btnClassctiveCharges = "btn-secondary";
+        btnClassActiveCharges = "btn-secondary";
         btnClassAllCharges = "btn=outline-secondary";
         StateHasChanged();
     }

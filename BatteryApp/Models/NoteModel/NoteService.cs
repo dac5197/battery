@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Data;
+using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.TagModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -12,10 +13,12 @@ namespace BatteryApp.Models.NoteModel
     public class NoteService : INoteService
     {
         private readonly IDbContextFactory<AppDbContextFactory> _contextFactory;
+        private readonly INoteTypeService _noteTypeService;
 
-        public NoteService(IDbContextFactory<AppDbContextFactory> contextFactory)
+        public NoteService(IDbContextFactory<AppDbContextFactory> contextFactory, INoteTypeService noteTypeService)
         {
             _contextFactory = contextFactory;
+            _noteTypeService = noteTypeService;
         }
 
         public async Task<List<Note>> Get()
@@ -46,11 +49,30 @@ namespace BatteryApp.Models.NoteModel
             return note;
         }
 
+        public async Task<Note> AddNoteFromCharge(Charge charge, string noteText)
+        {
+            NoteType noteType = await _noteTypeService.Get("Note");
+
+            Note note = new()
+            {
+                ChargeId = charge.Id,
+                Description = noteText,
+                NoteTypeId = noteType.Id,
+                OwnerId = charge.OwnerId,
+                Timestamp = DateTime.UtcNow
+            };
+
+            using var context = _contextFactory.CreateDbContext();
+            context.Notes.Add(note);
+            await context.SaveChangesAsync();
+            return note;
+        }
+
         public async Task<Note> AddEntityHistoryNote(PropertyValues oldValues, PropertyValues newValues)
         {
             List<HistoryJson> historyJsonList = new();
-
             List<string> IgnoreFieldList = new() { "Created", "Updated" };
+            NoteType noteType = await _noteTypeService.Get("History");
 
             foreach (var property in newValues.Properties)
             {
@@ -82,20 +104,24 @@ namespace BatteryApp.Models.NoteModel
             {
                 ChargeId = newValues.GetValue<int>("Id"),
                 History = historyJsonList,
+                NoteTypeId = noteType.Id,
                 OwnerId = newValues.GetValue<string>("OwnerId"),
                 Timestamp = DateTime.UtcNow
             };
 
-            note = await Add(note);
+            if (historyJsonList.Count > 0)
+            {
+                note = await Add(note);
+            }
 
             return note;
         }
 
         public async Task<Note> AddTagHistoryNote(int chargeId, Tag tag)
         {
-            
-
+            NoteType noteType = await _noteTypeService.Get("Tag");
             List<HistoryJson> historyJsonList = new();
+
             HistoryJson record = new("Tag", null, tag.Name);
             historyJsonList.Add(record);
 
@@ -103,6 +129,7 @@ namespace BatteryApp.Models.NoteModel
             {
                 ChargeId = chargeId,
                 History = historyJsonList,
+                NoteTypeId = noteType.Id,
                 OwnerId = tag.OwnerId,
                 Timestamp = DateTime.UtcNow
             };

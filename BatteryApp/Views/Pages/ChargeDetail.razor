@@ -8,6 +8,7 @@
 @inject IInitializeChargeChildToParent _chargeRelationship
 @inject IJSRuntime _jsRuntime
 @inject INoteService _noteService
+@inject INoteTypeService _noteTypeService
 @inject IPriorityService _priorityService
 @inject IStatusService _statusService
 @inject ITagController _tagController
@@ -55,6 +56,7 @@
                     <div class="row px-4">
                         <div class="col px-0">
                             <div>
+                                <span class="oi oi-tags" style="color: #cc9900;"></span>
                                 Tags
                                 <a class="new-item mx-1" data-toggle="modal" data-target="#addTagModal">
                                     <span class="oi oi-plus"></span>
@@ -168,28 +170,49 @@
                 </div>
                 <!-- Enter new note -->
                 <div class="card border-square shadow-sm p-2 my-2">
-                    <div class="form-group">
+                    <div class="form-group m-0">
                         <h6>Notes</h6>
-                        <textarea rows="3" id="notes" class="form-control form-control-sm"></textarea>
+                        <InputTextArea @bind-Value="@noteText" rows="3" id="notes" class="form-control form-control-sm"></InputTextArea>
+                        <button @onclick="@SaveNote" class="btn btn-primary border-square my-2 float-right" type="button">Save</button>
                     </div>
+                    
                 </div>
                 <!-- Display notes and history -->
                 <div class="card border-square shadow-sm p-2 my-2">
-                    <h6>Notes and History</h6>
-                    @foreach (var note in notes.OrderByDescending(x => x.Timestamp))
-                    {
-                        <CascadingValue Value="@categories">
-                            <CascadingValue Value="priorities">
-                                <CascadingValue Value="statuses">
-                                        <NoteListItem @key="@note"
-                                                      DateTimeFormat="@dateTimeFormat" 
-                                                      Note="@note" 
-                                                      Profile="userProfile"></NoteListItem>
+                    <div class="row my-2">
+                        <div class="col">
+                            <h6>Notes and History</h6>
+                        </div>
+                        <div class="col pr-3">
+                            <div class="float-right">
+                                <div class="btn-group" role="group" aria-label="active">
+                                    <button @onclick="@ShowNoteNotes" type="button" class="btn btn-sm @btnClassNoteNotes border-square">Notes</button>
+                                    <button @onclick="@ShowHistoryNotes" type="button" class="btn btn-sm @btnClassHistoryNotes border-square">History</button>
+                                    <button @onclick="@ShowAllNotes" type="button" class="btn btn-sm @btnClassAllNotes border-square">All</button>
+                                </div>
+                                <QuestionMarkToolTip Text="Toggle display of Note item types.  Choose between user entered note text, history tracking items, and show all."></QuestionMarkToolTip>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            @foreach (var note in filteredNotes.OrderByDescending(x => x.Timestamp))
+                            {
+                                <CascadingValue Value="@categories">
+                                    <CascadingValue Value="priorities">
+                                        <CascadingValue Value="statuses">
+                                            <NoteListItem @key="@note"
+                                                          DateTimeFormat="@dateTimeFormat"
+                                                          Note="@note"
+                                                          Profile="userProfile"
+                                                          Type="noteTypes.Where(x => x.Id == note.NoteTypeId).FirstOrDefault()"></NoteListItem>
+                                        </CascadingValue>
+                                    </CascadingValue>
                                 </CascadingValue>
-                            </CascadingValue>
-                        </CascadingValue>
-                        
-                    }
+
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- Related items (Battery, parent, children) -->
@@ -315,7 +338,9 @@
 
     private List<Category> categories = new();
     private List<Charge> children = new();
+    private List<Note> filteredNotes = new();
     private List<Note> notes = new();
+    private List<NoteType> noteTypes = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
     private List<Tag> batteryTags = new();
@@ -325,7 +350,11 @@
     private int maxTextareaRows = 15;
     private int textareaRows;
 
+    private string btnClassNoteNotes = "btn-secondary";
+    private string btnClassHistoryNotes = "btn-outline-secondary";
+    private string btnClassAllNotes = "btn-outline-secondary";
     private string dateTimeFormat = "MM/dd/yyyy HH:mm:ss";
+    private string noteText;
 
     protected override async Task OnInitializedAsync()
     {
@@ -345,6 +374,9 @@
         batteryTags = await _tagController.GetAllTagsForBatteryAsync(battery);
 
         notes = await _noteService.GetAllNotesForCharge(charge.Id);
+        noteTypes = await _noteTypeService.Get();
+        var type = noteTypes.Where(t => t.Name == "Note").FirstOrDefault();
+        filteredNotes = notes.Where(x => x.NoteTypeId == type.Id).ToList();
 
         userProfile = await _userProfileService.Get(charge.OwnerId);
 
@@ -357,6 +389,12 @@
     private async void HandleValidSubmit()
     {
         await _chargeService.Update(charge);
+
+        if (!string.IsNullOrWhiteSpace(noteText))
+        {
+            await _noteService.AddNoteFromCharge(charge, noteText);
+        }
+
         charge = await _chargeService.Get(Id);
         category = await _categoryService.Get(charge.CategoryId);
         notes = await _noteService.GetAllNotesForCharge(charge.Id);
@@ -405,6 +443,43 @@
         await _tagController.DeleteTagAndAllRelationshipsAsync(tagToDelete.Id);
         await _jsRuntime.InvokeAsync<object>("CloseModal", "deleteTagModal");
         TagStateChanged();
+    }
+
+    private async void SaveNote()
+    {
+        await _noteService.AddNoteFromCharge(charge, noteText);
+        notes = await _noteService.GetAllNotesForCharge(charge.Id);
+        noteText = "";
+        StateHasChanged();
+    }
+
+    private void ShowAllNotes()
+    {
+        filteredNotes = notes;
+        btnClassNoteNotes = "btn-outline-secondary";
+        btnClassHistoryNotes = "btn-outline-secondary";
+        btnClassAllNotes = "btn-secondary";
+        StateHasChanged();
+    }
+
+    private void ShowNoteNotes()
+    {
+        var type = noteTypes.Where(t => t.Name == "Note").FirstOrDefault();
+        filteredNotes = notes.Where(x => x.NoteTypeId == type.Id).ToList();
+        btnClassNoteNotes = "btn-secondary";
+        btnClassHistoryNotes = "btn-outline-secondary";
+        btnClassAllNotes = "btn-outline-secondary";
+        StateHasChanged();
+    }
+
+    private void ShowHistoryNotes()
+    {
+        var type = noteTypes.Where(t => t.Name == "Note").FirstOrDefault();
+        filteredNotes = notes.Where(x => x.NoteTypeId != type.Id).ToList();
+        btnClassNoteNotes = "btn-outline-secondary";
+        btnClassHistoryNotes = "btn-secondary";
+        btnClassAllNotes = "btn-outline-secondary";
+        StateHasChanged();
     }
 }
 
