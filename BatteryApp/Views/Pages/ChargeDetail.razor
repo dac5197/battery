@@ -226,10 +226,10 @@
                             </a>
                         </div>
                     </div>
-                    <hr />
-                    <div class="card border-0 p-0">
-                        <p>Battery</p>
-                        <hr />
+                    <hr class="mt-0 mb-3" />
+                    <div class="card border-0 mb-2 p-0">
+                        <p class="mb-1">Battery</p>
+                        <hr class="my-1"/>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item border-0">
                                 <a href="@($"/battery/{battery.Id}")" class="link-black">
@@ -242,9 +242,9 @@
                     </div>
                     @if (charge.ParentId is not null)
                     {
-                        <div class="card border-0 p-0">
-                            <p>Parent</p>
-                            <hr />
+                        <div class="card border-0 mb-2 p-0">
+                            <p class="mb-1">Parent</p>
+                            <hr class="my-1" />
                             <ul class="list-group list-group-flush">
                                 <ChargeDetail_RelatedListItem Charge="@parent" IsParent="true"></ChargeDetail_RelatedListItem>
                             </ul>
@@ -252,9 +252,9 @@
                     }
                     @if (children.Count > 0)
                     {
-                        <div class="card border-0 p-0">
-                            <p>Children</p>
-                            <hr />
+                        <div class="card border-0 mb-2 p-0">
+                            <p class="mb-1">Children</p>
+                            <hr class="my-1" />
                             <ul class="list-group list-group-flush">
                                 @foreach (var child in children)
                                 {
@@ -394,6 +394,7 @@
         if (!string.IsNullOrWhiteSpace(noteText))
         {
             await _noteService.AddNoteFromCharge(charge, noteText);
+            noteText = "";
         }
 
         charge = await _chargeService.Get(Id);
