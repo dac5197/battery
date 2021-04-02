@@ -350,9 +350,11 @@
     private int maxTextareaRows = 15;
     private int textareaRows;
 
-    private string btnClassNoteNotes = "btn-secondary";
-    private string btnClassHistoryNotes = "btn-outline-secondary";
-    private string btnClassAllNotes = "btn-outline-secondary";
+    private string btnActive = "btn-secondary";
+    private string btnInactive = "btn-outline-secondary";
+    private string btnClassNoteNotes;
+    private string btnClassHistoryNotes;
+    private string btnClassAllNotes;
     private string dateTimeFormat = "MM/dd/yyyy HH:mm:ss";
     private string noteText;
 
@@ -375,8 +377,7 @@
 
         notes = await _noteService.GetAllNotesForCharge(charge.Id);
         noteTypes = await _noteTypeService.Get();
-        var type = noteTypes.Where(t => t.Name == "Note").FirstOrDefault();
-        filteredNotes = notes.Where(x => x.NoteTypeId == type.Id).ToList();
+        ShowNoteNotes();
 
         userProfile = await _userProfileService.Get(charge.OwnerId);
 
@@ -417,14 +418,16 @@
     private async void ChildrenStateChanged()
     {
         children = await _chargeService.GetChildren(charge);
+        await RefreshNotes();
         StateHasChanged();
     }
 
     private async void TagStateChanged()
     {
+        charge = await _chargeService.Get(Id);
         tags = await _tagController.GetAllTagsForChargeAsync(charge.Id);
         batteryTags = await _tagController.GetAllTagsForBatteryAsync(battery);
-        notes = await _noteService.GetAllNotesForCharge(charge.Id);
+        await RefreshNotes();
         StateHasChanged();
     }
 
@@ -456,9 +459,9 @@
     private void ShowAllNotes()
     {
         filteredNotes = notes;
-        btnClassNoteNotes = "btn-outline-secondary";
-        btnClassHistoryNotes = "btn-outline-secondary";
-        btnClassAllNotes = "btn-secondary";
+        btnClassNoteNotes = btnInactive;
+        btnClassHistoryNotes = btnInactive;
+        btnClassAllNotes = btnActive;
         StateHasChanged();
     }
 
@@ -466,9 +469,9 @@
     {
         var type = noteTypes.Where(t => t.Name == "Note").FirstOrDefault();
         filteredNotes = notes.Where(x => x.NoteTypeId == type.Id).ToList();
-        btnClassNoteNotes = "btn-secondary";
-        btnClassHistoryNotes = "btn-outline-secondary";
-        btnClassAllNotes = "btn-outline-secondary";
+        btnClassNoteNotes = btnActive;
+        btnClassHistoryNotes = btnInactive;
+        btnClassAllNotes = btnInactive;
         StateHasChanged();
     }
 
@@ -476,10 +479,33 @@
     {
         var type = noteTypes.Where(t => t.Name == "Note").FirstOrDefault();
         filteredNotes = notes.Where(x => x.NoteTypeId != type.Id).ToList();
-        btnClassNoteNotes = "btn-outline-secondary";
-        btnClassHistoryNotes = "btn-secondary";
-        btnClassAllNotes = "btn-outline-secondary";
+        btnClassNoteNotes = btnInactive;
+        btnClassHistoryNotes = btnActive;
+        btnClassAllNotes = btnInactive;
         StateHasChanged();
+    }
+
+    private async Task RefreshNotes()
+    {
+        notes = await _noteService.GetAllNotesForCharge(charge.Id);
+
+        if (btnClassNoteNotes == btnActive)
+        {
+            ShowNoteNotes();
+            return;
+        }
+
+        if (btnClassHistoryNotes == btnActive)
+        {
+            ShowHistoryNotes();
+            return;
+        }
+
+        if (btnClassAllNotes == btnActive)
+        {
+            ShowAllNotes();
+            return;
+        }
     }
 }
 

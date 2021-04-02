@@ -11,12 +11,14 @@ namespace BatteryApp.Internals
 {
     public class TagController : ITagController
     {
+        private readonly IChargeService _chargeService;
         private readonly IChargeTagRelationService _chargeTagRelationService;
         private readonly INoteService _noteService;
         private readonly ITagService _tagService;
 
-        public TagController(IChargeTagRelationService chargeTagRelationService, INoteService noteService, ITagService tagService)
+        public TagController(IChargeService chargeService, IChargeTagRelationService chargeTagRelationService, INoteService noteService, ITagService tagService)
         {
+            _chargeService = chargeService;
             _chargeTagRelationService = chargeTagRelationService;
             _noteService = noteService;
             _tagService = tagService;
@@ -42,6 +44,7 @@ namespace BatteryApp.Internals
             var newTag = await _tagService.Add(tag);
             await _chargeTagRelationService.Add(chargeId, newTag.Id);
             await _noteService.AddTagHistoryNote(chargeId, tag);
+            await _chargeService.SetUpdated(chargeId);
         }
 
         public async Task AddRelationshipAsync(int chargeId, Tag tag)
@@ -52,14 +55,15 @@ namespace BatteryApp.Internals
             {
                 await _chargeTagRelationService.Add(chargeId, tag.Id);
                 await _noteService.AddTagHistoryNote(chargeId, tag);
+                await _chargeService.SetUpdated(chargeId);
             }
         }
 
         public async Task RemoveTagFromChargeAsync(int chargeId, Tag tag)
         {
-            await _chargeTagRelationService.Delete(chargeId, tag.Id);
             await _noteService.RemoveTagHistoryNote(chargeId, tag);
-
+            await _chargeTagRelationService.Delete(chargeId, tag.Id);
+            await _chargeService.SetUpdated(chargeId);
         }
 
         public async Task DeleteTagAndAllRelationshipsAsync(int tagId)

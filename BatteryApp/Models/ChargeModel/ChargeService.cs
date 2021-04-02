@@ -85,7 +85,13 @@ namespace BatteryApp.Models.ChargeModel
             await context.SaveChangesAsync();
             
             await _noteService.AddEntityHistoryNote(oldValues, newValues);
-         
+
+            if (charge.ParentId is not null)
+            {
+                var parent = await Get((int)charge.ParentId);
+                await _noteService.AddChildParentHistoryNote(charge, parent);
+            }
+
             return charge;
         }
 
@@ -101,6 +107,16 @@ namespace BatteryApp.Models.ChargeModel
 
             await _noteService.AddEntityHistoryNote(oldValues, newValues);
 
+            await context.SaveChangesAsync();
+
+            return charge;
+        }
+
+        public async Task<Charge> SetUpdated(int chargeId)
+        {
+            var charge = await Get(chargeId);
+            using var context = _contextFactory.CreateDbContext();
+            context.Entry(charge).State = EntityState.Modified;
             await context.SaveChangesAsync();
 
             return charge;

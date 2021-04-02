@@ -139,8 +139,39 @@ namespace BatteryApp.Models.NoteModel
             return note;
         }
 
+        public async Task<Note> AddRelatedLinkHistoryNote(int chargeid, string desc, string linkType, string ownerId)
+        {
+            NoteType noteType = await _noteTypeService.Get("Related");
+            List<HistoryJson> historyJsonList = new();
+
+            HistoryJson record = new(linkType, null, desc);
+            historyJsonList.Add(record);
+
+            Note note = new()
+            {
+                ChargeId = chargeid,
+                History = historyJsonList,
+                NoteTypeId = noteType.Id,
+                OwnerId = ownerId,
+                Timestamp = DateTime.UtcNow
+            };
+
+            note = await Add(note);
+
+            return note;
+        }
+
+        public async Task AddChildParentHistoryNote(Charge child, Charge parent)
+        {
+            // Add Child related link to Parent
+            await AddRelatedLinkHistoryNote(parent.Id, $"{child.Id}: {child.Title}", "Child", child.OwnerId);
+            // Add Parent related link to Child
+            await AddRelatedLinkHistoryNote(child.Id, $"{parent.Id}: {parent.Title}", "Parent", child.OwnerId);
+        }
+
         public async Task<Note> RemoveTagHistoryNote(int chargeId, Tag tag)
         {
+            NoteType noteType = await _noteTypeService.Get("Tag");
             List<HistoryJson> historyJsonList = new();
             HistoryJson record = new("Tag", tag.Name, null);
             historyJsonList.Add(record);
@@ -149,6 +180,7 @@ namespace BatteryApp.Models.NoteModel
             {
                 ChargeId = chargeId,
                 History = historyJsonList,
+                NoteTypeId = noteType.Id,
                 OwnerId = tag.OwnerId,
                 Timestamp = DateTime.UtcNow
             };

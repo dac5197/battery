@@ -9,8 +9,10 @@ namespace BatteryApp.Models.NoteModel
     public interface INoteService
     {
         Task<Note> Add(Note note);
+        Task AddChildParentHistoryNote(Charge child, Charge parent);
         Task<Note> AddEntityHistoryNote(PropertyValues oldValues, PropertyValues newValues);
         Task<Note> AddNoteFromCharge(Charge charge, string noteText);
+        Task<Note> AddRelatedLinkHistoryNote(int chargeid, string desc, string linkType, string ownerId);
         Task<Note> AddTagHistoryNote(int chargeId, Tag tag);
         Task Delete(int id);
         Task<List<Note>> Get();
