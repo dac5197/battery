@@ -12,13 +12,11 @@ namespace BatteryApp.Internals
     public class InitializeChargeChildToParent : IInitializeChargeChildToParent
     {
         private readonly ICategoryService _categoryService;
-        private readonly INoteService _noteService;
         private readonly IPriorityService _priorityService;
 
-        public InitializeChargeChildToParent(ICategoryService categoryService, INoteService noteService, IPriorityService priorityService)
+        public InitializeChargeChildToParent(ICategoryService categoryService, IPriorityService priorityService)
         {
             _categoryService = categoryService;
-            _noteService = noteService;
             _priorityService = priorityService;
         }
 

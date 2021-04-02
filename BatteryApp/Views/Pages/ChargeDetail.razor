@@ -398,7 +398,7 @@
 
         charge = await _chargeService.Get(Id);
         category = await _categoryService.Get(charge.CategoryId);
-        notes = await _noteService.GetAllNotesForCharge(charge.Id);
+        await RefreshNotes();
         StateHasChanged();
     }
 
@@ -424,10 +424,17 @@
 
     private async void TagStateChanged()
     {
-        charge = await _chargeService.Get(Id);
+
         tags = await _tagController.GetAllTagsForChargeAsync(charge.Id);
         batteryTags = await _tagController.GetAllTagsForBatteryAsync(battery);
         await RefreshNotes();
+        await ChargeStateChanged();
+
+    }
+
+    private async Task ChargeStateChanged()
+    {
+        charge = await _chargeService.Get(Id);
         StateHasChanged();
     }
 
@@ -451,9 +458,10 @@
     private async void SaveNote()
     {
         await _noteService.AddNoteFromCharge(charge, noteText);
-        notes = await _noteService.GetAllNotesForCharge(charge.Id);
+        await _chargeService.SetUpdated(charge.Id);
         noteText = "";
-        StateHasChanged();
+        await RefreshNotes();
+        await ChargeStateChanged();
     }
 
     private void ShowAllNotes()
