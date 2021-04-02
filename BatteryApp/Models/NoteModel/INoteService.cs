@@ -18,6 +18,7 @@ namespace BatteryApp.Models.NoteModel
         Task<List<Note>> Get();
         Task<Note> Get(int id);
         Task<List<Note>> GetAllNotesForCharge(int chargeId);
+        Task<Note> RemoveChildParentHistoryNote(Charge child);
         Task<Note> RemoveTagHistoryNote(int chargeId, Tag tag);
         Task<Note> Update(Note note);
     }

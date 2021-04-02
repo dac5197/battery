@@ -190,6 +190,28 @@ namespace BatteryApp.Models.NoteModel
             return note;
         }
 
+        public async Task<Note> RemoveChildParentHistoryNote(Charge child)
+        {
+            NoteType noteType = await _noteTypeService.Get("Related");
+            List<HistoryJson> historyJsonList = new();
+
+            HistoryJson record = new("Child", $"{child.Id}: {child.Title}", null);
+            historyJsonList.Add(record);
+
+            Note note = new()
+            {
+                ChargeId = (int)child.ParentId,
+                History = historyJsonList,
+                NoteTypeId = noteType.Id,
+                OwnerId = child.OwnerId,
+                Timestamp = DateTime.UtcNow
+            };
+
+            note = await Add(note);
+
+            return note;
+        }
+
         public async Task<Note> Update(Note note)
         {
             using var context = _contextFactory.CreateDbContext();
