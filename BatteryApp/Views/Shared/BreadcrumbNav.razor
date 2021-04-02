@@ -1,10 +1,12 @@
-﻿@inject IBreadcrumbManager _breadcrumb
+﻿@inject NavigationManager _navManager
+
+@inject IBreadcrumbManager _breadcrumb
 @implements IDisposable
 
 @if (_breadcrumb.IsVisible)
 {
-    <nav class="border-bottom" aria-label="breadcrumb">
-        <ul class="breadcrumb mb-0">
+    <nav class="border-square border shadow-sm mt-2" aria-label="breadcrumb">
+        <ul class="breadcrumb border-square mb-0">
             @foreach (var link in _breadcrumb.Links)
             {
                 @if (link == _breadcrumb.Links.Last())
@@ -16,14 +18,10 @@
                 else
                 {
                     <li class="breadcrumb-item">
-                        <a href="@link.Url" aria-current="page">@link.Label</a>
+                        <a href="" aria-current="page" @onclick="@(() => GoToLink(link.Url))" @onclick:preventDefault>@link.Label</a>
                     </li>
                 }
             }
-            @*<li class="breadcrumb-item">
-                    <a href="#">Battery</a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">Charge</li>*@
         </ul>
     </nav>
 }
@@ -38,5 +36,10 @@
     public void Dispose()
     {
         _breadcrumb.OnChange -= StateHasChanged;
+    }
+
+    private void GoToLink(string url)
+    {
+        _navManager.NavigateTo(url, true);
     }
 }
