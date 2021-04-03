@@ -208,50 +208,24 @@
                     {
                         <div class="col">
                             <div class="card border-square shadow-sm px-2 pt-2 pb-0 h-100">
-
-                                @if (showFilteredCharges)
+                                <h5 class="text-center">
+                                    @status.Name
+                                    (@filteredCharges.Where(x => x.ParentId is null).Where(x => x.StatusId == status.Id).Count())
+                                </h5>
+                                @foreach (var charge in filteredCharges
+                                                            .Where(x => x.ParentId is null)
+                                                            .Where(x => x.StatusId == status.Id)
+                                                            .OrderBy(x => x.Id))
                                 {
-                                    <h5 class="text-center">
-                                        @status.Name
-                                        (@filteredCharges.Where(x => x.ParentId is null).Where(x => x.StatusId == status.Id).Count())
-                                    </h5>
-                                    @foreach (var charge in filteredCharges
-                                                              .Where(x => x.ParentId is null)
-                                                              .Where(x => x.StatusId == status.Id)
-                                                              .OrderBy(x => x.Id))
-                                    {
-                                        <ChargeListItem @key="charge"
-                                                        Categories="@categories"
-                                                        Charge="@charge"
-                                                        CompleteStatus="@statuses.OrderBy(x => x.Order).Last()"
-                                                        Priorities="@priorities"
-                                                        Statuses="statuses"
-                                                        SearchChildTitle="@searchText"
-                                                        ShowChildren="true"
-                                                        ParentStateChanged="@StateChanged"></ChargeListItem>
-                                    }
-                                }
-                                else
-                                {
-                                    <h5 class="text-center">
-                                        @status.Name
-                                        (@charges.Where(x => x.ParentId is null).Where(x => x.StatusId == status.Id).Count())
-                                    </h5>
-                                    @foreach (var charge in charges
-                                                              .Where(x => x.ParentId is null)
-                                                              .Where(x => x.StatusId == status.Id)
-                                                              .OrderBy(x => x.Id))
-                                    {
-                                        <ChargeListItem @key="charge"
-                                                        Categories="@categories"
-                                                        Charge="@charge"
-                                                        CompleteStatus="@statuses.OrderBy(x => x.Order).Last()"
-                                                        Priorities="@priorities"
-                                                        Statuses="statuses"
-                                                        SearchChildTitle="@searchText"
-                                                        ShowChildren="false"
-                                                        ParentStateChanged="@StateChanged"></ChargeListItem>
-                                    }
+                                    <ChargeListItem @key="charge"
+                                                    Categories="@categories"
+                                                    Charge="@charge"
+                                                    CompleteStatus="@statuses.OrderBy(x => x.Order).Last()"
+                                                    Priorities="@priorities"
+                                                    Statuses="statuses"
+                                                    SearchChildTitle="@searchText"
+                                                    ShowChildren="@showChargeCardChildren"
+                                                    ParentStateChanged="@StateChanged"></ChargeListItem>
                                 }
 
                             </div>
@@ -284,7 +258,7 @@
     private List<Status> statuses = new();
     private PaginatedList<Charge> paginatedCharges = new();
 
-    private bool showFilteredCharges = false;
+    private bool showChargeCardChildren = false;
     private bool showPriorityScoreCard = false;
     private bool showStatusScoreCard = false;
 
@@ -308,6 +282,8 @@
         charges = await _chargeService.GetActive(battery);
         priorities = await _priorityService.Get(userId);
         statuses = await _statusService.Get();
+
+        filteredCharges = charges;
 
         textareaRows = _calcTextareaRows.CalculateRows(battery.Description, minTextareaRows, maxTextareaRows);
 
@@ -355,6 +331,7 @@
 
     private void FilterChargesBySearch(ChangeEventArgs e)
     {
+
         searchText = e.Value.ToString();
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
 
@@ -370,20 +347,22 @@
             }
         }
 
-        showFilteredCharges = true;
+        showChargeCardChildren = true;
         StateHasChanged();
     }
 
     private void ClearSearch()
     {
         searchText = "";
-        showFilteredCharges = false;
+        showChargeCardChildren = false;
+        filteredCharges = charges;
         StateHasChanged();
     }
 
     private async void GetAllCharges()
     {
         charges = await _chargeService.Get(battery);
+        filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
         btnClassActiveCharges = "btn-outline-secondary";
         btnClassAllCharges = "btn-secondary";
         StateHasChanged();
@@ -392,6 +371,7 @@
     private async void GetActiveCharges()
     {
         charges = await _chargeService.GetActive(battery);
+        filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
         btnClassActiveCharges = "btn-secondary";
         btnClassAllCharges = "btn-outline-secondary";
         StateHasChanged();
