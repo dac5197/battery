@@ -7,6 +7,20 @@
 </div>
 
 <style>
+    /*  For Width 175px:
+            Left Margin Tool Tip
+                Set .tooltip-text margin-left -60px
+                Set .tooltip-text::after margin-left -5px
+
+            Center Margin Tool Tip
+                Set .tooltip-text margin-left -90px
+                Set .tooltip-text::after margin-left 25px
+
+            Right Margin Tool Tip
+                Set .tooltip-text margin-left -120px
+                Set .tooltip-text::after margin-left 55px
+    */
+
     .question-mark-icon {
         color: steelblue;
         border: 1.75px solid steelblue;
@@ -35,11 +49,11 @@
         width: 175px;
         bottom: 100%;
         left: 50%;
-        margin-left: -60px;
+        margin-left: -90px;
         background-color: #363636;
         color: #fff;
         text-align: center;
-        padding: 5px 0;
+        padding: 5px 2px;
         border-radius: 0px;
         z-index: 1;
     }
@@ -49,7 +63,7 @@
         position: absolute;
         top: 100%;
         left: 34%;
-        margin-left: -5px;
+        margin-left: 25px;
         border-width: 5px;
         border-style: solid;
         border-color: #555 transparent transparent transparent;

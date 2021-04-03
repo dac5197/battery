@@ -1,0 +1,28 @@
+﻿<div class="btn-group" role="group" aria-label="active">
+    <button type="button" class="btn btn-sm @BtnOneClass border-square" @onclick="@(() => BtnOneAction.Invoke())">@BtnOneText</button>
+    <button type="button" class="btn btn-sm @BtnTwoClass border-square" @onclick="@(() => BtnTwoAction.Invoke())">@BtnTwoText</button>
+</div>
+<QuestionMarkToolTip Text=@QuestionToolTipText></QuestionMarkToolTip>
+
+@code {
+    [Parameter]
+    public string BtnOneClass { get; set; }
+
+    [Parameter]
+    public string BtnOneText { get; set; }
+
+    [Parameter]
+    public string BtnTwoClass { get; set; }
+
+    [Parameter]
+    public string BtnTwoText { get; set; }
+
+    [Parameter]
+    public string QuestionToolTipText { get; set; }
+
+    [Parameter]
+    public Action BtnOneAction { get; set; }
+
+    [Parameter]
+    public Action BtnTwoAction { get; set; }
+}

@@ -1,0 +1,47 @@
+﻿<div class="row mb-3">
+    @foreach (var status in Statuses.OrderBy(x => x.Order))
+    {
+        <div class="col">
+            <div class="card border-square shadow-sm px-2 pt-2 pb-0 h-100">
+                <h5 class="text-center">
+                    @status.Name
+                    (@Charges.Where(x => x.ParentId is null).Where(x => x.StatusId == status.Id).Count())
+                </h5>
+                @foreach (var charge in Charges
+                                           .Where(x => x.ParentId is null)
+                                           .Where(x => x.StatusId == status.Id)
+                                           .OrderBy(x => x.Id))
+                {
+                    <ChargeCardListItem @key="charge"
+                                        Charge="@charge"
+                                        CompleteStatus="@Statuses.OrderBy(x => x.Order).Last()"
+                                        ParentStateChanged="@ParentStateChanged"></ChargeCardListItem>
+                }
+
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<Charge> Charges { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    [CascadingParameter(Name = "Categories")]
+    private List<Category> Categories { get; set; }
+
+    [CascadingParameter(Name = "Priorities")]
+    private List<Priority> Priorities { get; set; }
+
+    [CascadingParameter(Name = "Statuses")]
+    private List<Status> Statuses { get; set; }
+
+    [CascadingParameter(Name = "SearchText")]
+    private string SearchText { get; set; }
+
+    [CascadingParameter(Name = "ShowChildren")]
+    private bool ShowChildren { get; set; }
+}

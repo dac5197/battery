@@ -41,6 +41,9 @@
     [Parameter]
     public bool IsParent { get; set; }
 
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
     private Category category = new();
 
     private bool isCompleted = false;
@@ -60,6 +63,7 @@
     {
         isCompleted = !isCompleted;
         await _chargeChildController.ToggleCompletedStatusAsync(Charge, isCompleted);
-        StateHasChanged();
+        ParentStateChanged?.Invoke();
+        //StateHasChanged();
     }
 }

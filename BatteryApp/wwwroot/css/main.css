@@ -25,6 +25,14 @@ box-shadow: 0px -7px 25px 0px rgba(255, 202, 50, 0.86);
 */
 }
 
+.charge-detail {
+    color: black;
+}
+
+.charge-detail:hover {
+    text-decoration: underline;
+}
+
 .completed {
     text-decoration: line-through;
     color: gray !important;
@@ -51,6 +59,10 @@ box-shadow: 0px -7px 25px 0px rgba(255, 202, 50, 0.86);
 
 .w-10ch {
     width: 10ch;
+}
+
+.w-12ch {
+    width: 12ch;
 }
 
 .border-transparent {

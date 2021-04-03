@@ -1,0 +1,63 @@
+﻿<div class="row mb-3">
+    <div class="col">
+        <div class="card border-square shadow-sm px-2 pt-2 pb-0 h-100">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Children</th>
+                        <th>Created</th>
+                        <th>Updated</th>
+                        <th>Completed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var charge in Charges)
+                    {
+                        <tr>
+                            <td>
+                                <a href="@($"/charge/{charge.Id}")">
+                                    <h6 class="charge-detail">@charge.Id</h6>
+                                </a>
+                            </td>
+                            <td>@charge.Title</td>
+                            <td>@charge.PriorityId</td>
+                            <td>@charge.StatusId</td>
+                            <td>0/0</td>
+                            <td>@charge.Created</td>
+                            <td>@charge.Updated</td>
+                            <td>@charge.Completed</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<Charge> Charges { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    [CascadingParameter(Name = "Categories")]
+    private List<Category> Categories { get; set; }
+
+    [CascadingParameter(Name = "Priorities")]
+    private List<Priority> Priorities { get; set; }
+
+    [CascadingParameter(Name = "Statuses")]
+    private List<Status> Statuses { get; set; }
+
+    [CascadingParameter(Name = "SearchText")]
+    private string SearchText { get; set; }
+
+    [CascadingParameter(Name = "ShowChildren")]
+    private bool ShowChildren { get; set; }
+
+}
