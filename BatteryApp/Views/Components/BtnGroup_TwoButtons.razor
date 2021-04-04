@@ -2,7 +2,7 @@
     <button type="button" class="btn btn-sm @BtnOneClass border-square" @onclick="@(() => BtnOneAction.Invoke())">@BtnOneText</button>
     <button type="button" class="btn btn-sm @BtnTwoClass border-square" @onclick="@(() => BtnTwoAction.Invoke())">@BtnTwoText</button>
 </div>
-<QuestionMarkToolTip Text=@QuestionToolTipText></QuestionMarkToolTip>
+<QuestionMarkToolTip Text=@QuestionToolTipText Alignment="@QuestionToolTipAlignment"></QuestionMarkToolTip>
 
 @code {
     [Parameter]
@@ -19,6 +19,9 @@
 
     [Parameter]
     public string QuestionToolTipText { get; set; }
+
+    [Parameter]
+    public string QuestionToolTipAlignment { get; set; }
 
     [Parameter]
     public Action BtnOneAction { get; set; }
