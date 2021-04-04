@@ -15,46 +15,14 @@
             </div>
         </div>
         <div class="row mb-2">
-                <div class="col">
-                    <p class="small mb-1">Priority</p>
-                    <button id="priorityCharge-@Charge.Id" type="button" class="btn btn-sm border-square dopdown-toggle small mx-1 py-0 px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                       style="color: @priority.FontColor; background-color: @priority.BgColor">
-                        @priority.DisplayName
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="priorityCharge-@Charge.Id">
-                        @foreach (var p in Priorities.OrderBy(x => x.Severity))
-                        {
-                            @if (p.Id == Charge.PriorityId)
-                            {
-                                <a class="dropdown-item small bg-info"> @p.DisplayName</a>
-                            }
-                            else
-                            {
-                                <a class="dropdown-item small" href="" @onclick="@(() => ChangeChargePriority(p.Id))" @onclick:preventDefault="true"> @p.DisplayName</a>
-                            }
-                        }
-                    </div>
-                </div>
-                <div class="col">
-                    <p class="small mb-1">Status</p>
-                    <button id="statusCharge-@Charge.Id" type="button" class="btn btn-sm border-square dopdown-toggle mx-1 py-0 px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                       style="color: @status.FontColor; background-color: @status.BgColor">
-                        @status.Name
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="statusCharge-@Charge.Id">
-                        @foreach (var s in Statuses.OrderBy(x => x.Order))
-                        {
-                            @if (s.Id == Charge.StatusId)
-                            {
-                                <a class="dropdown-item small bg-info"> @s.Name</a>
-                            }
-                            else
-                            {
-                                <a class="dropdown-item small" href="" @onclick="@(() => ChangeChargeStatus(s.Id))" @onclick:preventDefault="true"> @s.Name</a>
-                            }
-                        }
-                    </div>
-                </div>
+            <div class="col">
+                <p class="small mb-1">Priority</p>
+                <BtnDropDownPriorities Charge="@Charge" Priorities="@Priorities" ParentStateChanged="@ParentStateChanged"></BtnDropDownPriorities>
+            </div>
+            <div class="col">
+                <p class="small mb-1">Status</p>
+                <BtnDropDownStatuses Charge="@Charge" Statuses="@Statuses" ParentStateChanged="@ParentStateChanged"></BtnDropDownStatuses>
+            </div>
         </div>
         <div class="row mb-2">
             <div class="col">
@@ -156,21 +124,6 @@
         category = Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault();
         priority = Priorities.Where(x => x.Id == Charge.PriorityId).FirstOrDefault();
         status = Statuses.Where(x => x.Id == Charge.StatusId).FirstOrDefault();
-    }
-
-    private async void ChangeChargePriority(int priorityId)
-    {
-        Charge.PriorityId = priorityId;
-        await _chargeService.Update(Charge);
-        priority = Priorities.Where(x => x.Id == priorityId).FirstOrDefault();
-        ParentStateChanged?.Invoke();
-    }
-
-    private async void ChangeChargeStatus(int statusId)
-    {
-        Charge.StatusId = statusId;
-        await _chargeService.Update(Charge);
-        ParentStateChanged?.Invoke();
     }
 
     private void ToggleShowChildren()
