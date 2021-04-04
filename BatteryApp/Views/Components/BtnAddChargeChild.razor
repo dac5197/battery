@@ -1,0 +1,52 @@
+﻿@inject IInitializeChargeChildToParent _chargeRelationship
+
+<a class="new-item" data-toggle="modal" data-target="#chargeModal" @onclick="@InitializeSpark">
+    <span class="oi oi-plus"></span>
+</a>
+
+<style>
+    .new-item {
+        color: forestgreen !important;
+        border-bottom: solid transparent;
+    }
+
+        .new-item:hover {
+            color: forestgreen;
+            border-bottom: solid;
+            border-bottom-color: forestgreen;
+        }
+</style>
+
+@code {
+    [Parameter]
+    public Charge Charge { get; set; }
+
+    [Parameter]
+    public Charge Child { get; set; }
+
+    [Parameter]
+    public EventCallback<Charge> ChildChanged { get; set; }
+
+    //[Parameter]
+    //public Action AddAction { get; set; }
+
+    //[Parameter]
+    //public Action<Charge> AddActionWithParameter { get; set; }
+
+    //private void CallAddActionWithParameter()
+    //{
+    //    AddActionWithParameter.Invoke(Charge);
+    //}
+
+    private async void InitializeSpark()
+    {
+        Child = new Charge();
+        Child = await _chargeRelationship.SetRelationshipAsync(Charge, Child);
+        await ChangeChildValue();
+    }
+
+    private Task ChangeChildValue()
+    {
+        return ChildChanged.InvokeAsync(Child);
+    }
+}

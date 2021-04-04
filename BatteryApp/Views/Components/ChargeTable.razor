@@ -1,7 +1,11 @@
-﻿<div class="row mb-3">
+﻿@inject IChargeService _chargeService
+@inject IInitializeChargeChildToParent _chargeRelationship
+@inject IStatusService _statusService
+
+<div class="row mb-3">
     <div class="col">
         <div class="card border-square shadow-sm px-2 pt-2 pb-0 h-100">
-            <table class="table table-hover">
+            <table class="table table-hover table-sm">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -15,28 +19,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var charge in Charges)
+                    @foreach (var charge in Charges.Where(x => x.ParentId is null))
                     {
-                        <tr>
-                            <td>
-                                <a href="@($"/charge/{charge.Id}")">
-                                    <h6 class="charge-detail">@charge.Id</h6>
-                                </a>
-                            </td>
-                            <td>@charge.Title</td>
-                            <td>@charge.PriorityId</td>
-                            <td>@charge.StatusId</td>
-                            <td>0/0</td>
-                            <td>@charge.Created</td>
-                            <td>@charge.Updated</td>
-                            <td>@charge.Completed</td>
-                        </tr>
+                        <ChargeTableItem @key="@charge"
+                                         @bind-Child="@spark"
+                                         Charge="@charge"
+                                         Children="@Charges.Where(x => x.ParentId == charge.Id).ToList()"
+                                         ParentStateChanged="@ParentStateChanged"></ChargeTableItem>
                     }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+<ChargeDetailModal Charge="@spark" ParentStateChanged="@StateChanged"></ChargeDetailModal>
 
 @code {
     [Parameter]
@@ -60,4 +57,11 @@
     [CascadingParameter(Name = "ShowChildren")]
     private bool ShowChildren { get; set; }
 
+    private Charge spark = new();
+
+    private async void StateChanged()
+    {
+        Charges = await _chargeService.GetActive();
+        StateHasChanged();
+    }
 }

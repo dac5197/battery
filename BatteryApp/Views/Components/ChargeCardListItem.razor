@@ -7,7 +7,7 @@
             <div class="col">
                 <a href="@($"/charge/{Charge.Id}")">
                     <h6 class="charge-detail">
-                        <span class="oi @category.Icon" style="color: @category.IconColor;"></span>
+                        <CategoryIcon Category="@category"></CategoryIcon>
                         @Charge.Id | @Charge.Title
                     </h6>
                 </a>
@@ -39,21 +39,11 @@
         <div class="row mb-2">
 
             <div class="col">
-                @if (children.Count() > 0)
-                {
-                    <p class="small mb-1">Related Items</p>
-                    @foreach (var cat in Categories)
-                    {
-                        @if (children.Where(x => x.CategoryId == cat.Id).Count() > 0)
-                        {
-                            <button type="button" class="btn btn-sm border-square mx-1 py-0 px-1" style="background-color: @cat.IconColor" @onclick="@ToggleShowChildren">
-                                <span class="oi @cat.Icon" style="color: white"></span>
-                                <span class="badge badge-light border-square">@children.Where(x => x.StatusId == CompleteStatus.Id && x.CategoryId == cat.Id).Count()/@children.Where(x => x.CategoryId == cat.Id).Count()</span>
-                                <span class="sr-only">@cat.Name Count</span>
-                            </button>
-                        }
-                    }
-                }
+                <BtnToggleChargeChildren Categories="@Categories"
+                                         Children="@children"
+                                         CompleteStatus="CompleteStatus"
+                                         ShowHeader="true"
+                                         ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
             </div>
         </div>
         @if (ShowChildren)
@@ -65,7 +55,6 @@
                 }
             </ul>
         }
-
     </div>
 </div>
 
@@ -129,6 +118,7 @@
     private void ToggleShowChildren()
     {
         ShowChildren = !ShowChildren;
+        StateHasChanged();
     }
 
     private async void ChargeCardStateChanged()

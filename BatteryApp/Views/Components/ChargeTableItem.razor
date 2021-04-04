@@ -1,0 +1,132 @@
+﻿@inject IConfiguration _configuration
+
+@inject IChargeService _chargeService
+
+<tr>
+    <td>
+        <a href="@($"/charge/{Charge.Id}")">
+
+            <p class="charge-detail mb-0">
+                <CategoryIcon Category="@Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault()"></CategoryIcon>
+                @Charge.Id
+            </p>
+        </a>
+    </td>
+    <td>@Charge.Title</td>
+    <td>
+        <BtnDropDownPriorities Charge="@Charge" 
+                               Priorities="Priorities" 
+                               ParentStateChanged="@ParentStateChanged"></BtnDropDownPriorities>
+    </td>
+    <td>
+        <BtnDropDownStatuses Charge="@Charge" 
+                             Statuses="@Statuses" 
+                             ParentStateChanged="@ParentStateChanged"></BtnDropDownStatuses>
+    </td>
+    @if (IsChild is false)
+    {
+        <td>
+            <BtnToggleChargeChildren Categories="@Categories"
+                                     Children="@Children"
+                                     CompleteStatus="@Statuses.OrderBy(x => x.Order).Last()"
+                                     ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
+            <BtnAddChargeChild @bind-Child="@boundChild"
+                               Charge="@Charge"></BtnAddChargeChild>
+        </td>
+    }
+    <td>@Charge.Created.ToLocalTime().ToString(dateTimeFormat)</td>
+    <td>@Charge.Updated.ToLocalTime().ToString(dateTimeFormat)</td>
+    <td>@Charge.Completed?.ToLocalTime().ToString(dateTimeFormat)</td>
+</tr>
+
+@if (ShowChildren)
+{
+    <tr>
+        <td colspan="8">
+            <table class="table table-hover table-sm px-5">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Updated</th>
+                        <th>Completed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var child in Children)
+                    {
+                        <ChargeTableItem @key="@child" 
+                                         Charge="@child" 
+                                         IsChild="true" 
+                                         ParentStateChanged="StateChanged"></ChargeTableItem>
+                    }
+                </tbody>
+            </table>
+        </td>
+    </tr>
+        
+}
+
+
+@code {
+    [Parameter]
+    public Charge Charge { get; set; }
+
+    [Parameter]
+    public List<Charge> Children { get; set; }
+
+    [Parameter]
+    public bool IsChild { get; set; } = false;
+
+    [Parameter]
+    public Charge Child { get; set; }
+
+    [Parameter]
+    public EventCallback<Charge> ChildChanged { get; set; }
+
+    private Charge boundChild
+    {
+        get => Child;
+        set => ChildChanged.InvokeAsync(value);
+    }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    [CascadingParameter(Name = "Categories")]
+    private List<Category> Categories { get; set; }
+
+    [CascadingParameter(Name = "Priorities")]
+    private List<Priority> Priorities { get; set; }
+
+    [CascadingParameter(Name = "Statuses")]
+    private List<Status> Statuses { get; set; }
+
+    [CascadingParameter(Name = "SearchText")]
+    private string SearchText { get; set; }
+
+    [CascadingParameter(Name = "ShowChildren")]
+    private bool ShowChildren { get; set; }
+
+    private string dateTimeFormat;
+
+    protected override void OnInitialized()
+    {
+        dateTimeFormat = _configuration["Configurations:DateTimeFormat"];
+    }
+
+    private void ToggleShowChildren()
+    {
+        ShowChildren = !ShowChildren;
+        StateHasChanged();
+    }
+
+    private async void StateChanged()
+    {
+        Children = await _chargeService.GetChildren(Charge);
+        StateHasChanged();
+    }
+}

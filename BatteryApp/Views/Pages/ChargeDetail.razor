@@ -1,5 +1,7 @@
 ﻿@page "/charge/{id:int}"
 
+@inject IConfiguration _configuration
+
 @inject IBreadcrumbManager _breadcrumb
 @inject IBatteryService _batteryService
 @inject ICalculateTextareaRows _calcTextareaRows
@@ -27,7 +29,7 @@
                                 <div class="row pl-4">
                                     <div class="col-lg-12 p-0">
                                         <h6 class="card-title align-items-center">
-                                            <span class="oi @category.Icon cat-icon"></span>
+                                            <CategoryIcon Category="@category"></CategoryIcon>
                                             @charge.Id
                                         </h6>
                                     </div>
@@ -70,7 +72,12 @@
                             <div class="col-lg-12 px-0">
                                 @foreach (var tag in tags)
                                 {
-                                    <TagListItem Charge="@charge" Tag="@tag" ParentStateChanged="@TagStateChanged" SetTagToDelete="@SetTagToDelete" SetTagToEdit="@SetTagToEdit" ShowRemove="true"></TagListItem>
+                                    <TagListItem Charge="@charge" 
+                                                 Tag="@tag" 
+                                                 ParentStateChanged="@TagStateChanged" 
+                                                 SetTagToDelete="@SetTagToDelete" 
+                                                 SetTagToEdit="@SetTagToEdit" 
+                                                 ShowRemove="true"></TagListItem>
                                 }
                             </div>
                         </div>
@@ -147,7 +154,7 @@
                         </div>
                         <div class="col-lg-3">
                             <h6>Owner</h6>
-                            
+
                             <p><UserInitialsIcon UserProfile="@userProfile"></UserInitialsIcon>@userProfile.FirstName @userProfile.LastName</p>
                         </div>
                         <div class="col-lg-3 align-items-center">
@@ -175,7 +182,7 @@
                         <InputTextArea @bind-Value="@noteText" rows="3" id="notes" class="form-control form-control-sm"></InputTextArea>
                         <button @onclick="@SaveNote" class="btn btn-primary border-square my-2 float-right" type="button">Save</button>
                     </div>
-                    
+
                 </div>
                 <!-- Display notes and history -->
                 <div class="card border-square shadow-sm p-2 my-2">
@@ -221,15 +228,14 @@
                     <div class="d-flex">
                         <div><h6>Related Items</h6></div>
                         <div class="ml-auto pr-3">
-                            <a class="new-item" data-toggle="modal" data-target="#chargeModal" @onclick="(() => InitializeSpark())">
-                                <span class="oi oi-plus"></span>
-                            </a>
+                            <BtnAddChargeChild @bind-Child="@spark"
+                                               Charge="@charge"></BtnAddChargeChild>
                         </div>
                     </div>
                     <hr class="mt-0 mb-3" />
                     <div class="card border-0 mb-2 p-0">
                         <p class="mb-1">Battery</p>
-                        <hr class="my-1"/>
+                        <hr class="my-1" />
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item border-0">
                                 <a href="@($"/battery/{battery.Id}")" class="link-black">
@@ -284,35 +290,21 @@
 <DeteteTagModal Delete="@DeleteTag"></DeteteTagModal>
 
 <style>
-    .cat-icon {
-        color: @category.IconColor;
-    }
     .cat-border {
         box-shadow: 20px 0 @category.IconColor inset;
     }
 
-
-    .new-item {
-        color: forestgreen !important;
-        border-bottom: solid transparent;
-    }
-
-    .new-item:hover {
-        color: forestgreen;
-        border-bottom: solid;
-        border-bottom-color: forestgreen;
-    }
-
+   
     .remove-item {
         color: darkred !important;
         border-bottom: solid transparent;
     }
 
-        .remove-item:hover {
-            color: darkred;
-            border-bottom: solid;
-            border-bottom-color: darkred;
-        }
+    .remove-item:hover {
+        color: darkred;
+        border-bottom: solid;
+        border-bottom-color: darkred;
+    }
 
     .border-bottom-only {
         border-right: none;
@@ -355,7 +347,7 @@
     private string btnClassNoteNotes;
     private string btnClassHistoryNotes;
     private string btnClassAllNotes;
-    private string dateTimeFormat = "MM/dd/yyyy HH:mm:ss";
+    private string dateTimeFormat;
     private string noteText;
 
     protected override async Task OnInitializedAsync()
@@ -381,6 +373,7 @@
 
         userProfile = await _userProfileService.Get(charge.OwnerId);
 
+        dateTimeFormat = _configuration["Configurations:DateTimeFormat"];
         textareaRows = _calcTextareaRows.CalculateRows(charge.Description);
 
         await _breadcrumb.Initialize(charge);
@@ -401,14 +394,6 @@
         category = await _categoryService.Get(charge.CategoryId);
         await RefreshNotes();
         StateHasChanged();
-    }
-
-    private async void InitializeSpark()
-    {
-        spark = new Charge();
-        var initialStatus = await _statusService.GetInitialStatus();
-        spark.StatusId = initialStatus.Id;
-        spark = await _chargeRelationship.SetRelationshipAsync(charge, spark);
     }
 
     private void ResizeTextarea(ChangeEventArgs e)

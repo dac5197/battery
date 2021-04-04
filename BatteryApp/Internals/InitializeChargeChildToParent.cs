@@ -2,6 +2,7 @@
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.NoteModel;
 using BatteryApp.Models.PriorityModel;
+using BatteryApp.Models.StatusModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,13 @@ namespace BatteryApp.Internals
     {
         private readonly ICategoryService _categoryService;
         private readonly IPriorityService _priorityService;
+        private readonly IStatusService _statusService;
 
-        public InitializeChargeChildToParent(ICategoryService categoryService, IPriorityService priorityService)
+        public InitializeChargeChildToParent(ICategoryService categoryService, IPriorityService priorityService, IStatusService statusService)
         {
             _categoryService = categoryService;
             _priorityService = priorityService;
+            _statusService = statusService;
         }
 
         public async Task<Charge> SetRelationshipAsync(Charge parent, Charge child)
@@ -32,6 +35,9 @@ namespace BatteryApp.Internals
             // Set child priority to default priority
             var defaultPriority = await _priorityService.GetDefault(parent.OwnerId);
             child.PriorityId = defaultPriority.Id;
+            // Set child to initial status
+            var initialStatus = await _statusService.GetInitialStatus();
+            child.StatusId = initialStatus.Id;
 
             return child;
         }

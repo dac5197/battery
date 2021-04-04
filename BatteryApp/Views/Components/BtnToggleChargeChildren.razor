@@ -1,0 +1,35 @@
+﻿@if (Children.Count() > 0)
+{
+    @if (ShowHeader)
+    {
+        <p class="small mb-1">Related Items</p>
+    }
+    @foreach (var cat in Categories)
+    {
+        @if (Children.Where(x => x.CategoryId == cat.Id).Count() > 0)
+        {
+            <button type="button" class="btn btn-sm border-square mx-1 py-0 px-1" style="background-color: @cat.IconColor" @onclick="@(() => ToggleShowChildren.Invoke())">
+                <span class="oi @cat.Icon" style="color: white"></span>
+                <span class="badge badge-light border-square">@Children.Where(x => x.StatusId == CompleteStatus.Id && x.CategoryId == cat.Id).Count()/@Children.Where(x => x.CategoryId == cat.Id).Count()</span>
+                <span class="sr-only">@cat.Name Count</span>
+            </button>
+        }
+    }
+}
+
+@code {
+    [Parameter]
+    public List<Category> Categories { get; set; }
+
+    [Parameter]
+    public List<Charge> Children { get; set; }
+
+    [Parameter]
+    public Status CompleteStatus { get; set; }
+
+    [Parameter]
+    public bool ShowHeader { get; set; } = false;
+
+    [Parameter]
+    public Action ToggleShowChildren { get; set; }
+}
