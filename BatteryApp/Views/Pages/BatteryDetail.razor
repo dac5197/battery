@@ -224,7 +224,9 @@
                             <CascadingValue Name="Statuses" Value="@statuses">
                                 <CascadingValue Name="SearchText" Value="@searchText">
                                     <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
-                                        <ChargeCardList Charges="@filteredCharges" ParentStateChanged="@StateChanged"></ChargeCardList>
+                                        <ChargeCardList @bind-Child="@chargeObject"
+                                                        Charges="@filteredCharges" 
+                                                        ParentStateChanged="@StateChanged"></ChargeCardList>
                                     </CascadingValue>
                                 </CascadingValue>
                             </CascadingValue>
@@ -239,7 +241,9 @@
                             <CascadingValue Name="Statuses" Value="@statuses">
                                 <CascadingValue Name="SearchText" Value="@searchText">
                                     <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
-                                        <ChargeTable Charges="@filteredCharges" ParentStateChanged="@StateChanged"></ChargeTable>
+                                        <ChargeTable @bind-Child="@chargeObject"
+                                                     Charges="@filteredCharges" 
+                                                     ParentStateChanged="@StateChanged"></ChargeTable>
                                     </CascadingValue>
                                 </CascadingValue>
                             </CascadingValue>
@@ -271,7 +275,7 @@
     private List<Charge> filteredCharges = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
-    private PaginatedList<Charge> paginatedCharges = new();
+    //private PaginatedList<Charge> paginatedCharges = new();
 
     private bool showChargeCardChildren = false;
     private bool showChargeCardView = true;
@@ -437,6 +441,9 @@
         showChargeCardView = true;
         btnClassChargeCardView = btnActive;
         btnClassChargeTableView = btnInactive;
+
+        ResetChargeCardViewParameters();
+
         StateHasChanged();
     }
 
@@ -445,7 +452,16 @@
         showChargeCardView = false;
         btnClassChargeCardView = btnInactive;
         btnClassChargeTableView = btnActive;
+
+        ResetChargeCardViewParameters();
+
         StateHasChanged();
+    }
+
+    private void ResetChargeCardViewParameters()
+    {
+        chargeObject = new Charge();
+        showChargeCardChildren = !string.IsNullOrWhiteSpace(searchText);
     }
 
 }

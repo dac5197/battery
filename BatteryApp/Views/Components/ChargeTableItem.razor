@@ -27,7 +27,7 @@
     {
         <td>
             <BtnToggleChargeChildren Categories="@Categories"
-                                     Children="@Children"
+                                     Children="@children"
                                      CompleteStatus="@Statuses.OrderBy(x => x.Order).Last()"
                                      ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
             <BtnAddChargeChild @bind-Child="@boundChild"
@@ -56,7 +56,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var child in Children)
+                    @foreach (var child in children)
                     {
                         <ChargeTableItem @key="@child" 
                                          Charge="@child" 
@@ -76,9 +76,6 @@
     public Charge Charge { get; set; }
 
     [Parameter]
-    public List<Charge> Children { get; set; }
-
-    [Parameter]
     public bool IsChild { get; set; } = false;
 
     [Parameter]
@@ -90,7 +87,11 @@
     private Charge boundChild
     {
         get => Child;
-        set => ChildChanged.InvokeAsync(value);
+        set
+        {
+            ChildChanged.InvokeAsync(value);
+            ShowChildrenIfChargeIsParent();
+        }
     }
 
     [Parameter]
@@ -113,9 +114,32 @@
 
     private string dateTimeFormat;
 
-    protected override void OnInitialized()
+    private List<Charge> children = new();
+
+    protected override async Task OnInitializedAsync()
     {
+        children = await _chargeService.GetChildren(Charge);
         dateTimeFormat = _configuration["Configurations:DateTimeFormat"];
+
+        ShowChildrenIfChargeIsParent();
+    }
+
+    private void ShowChildrenIfChargeIsParent()
+    {
+        if (Child?.ParentId is not null)
+        {
+            ShowChildren = IsChargeParent();
+        }
+    }
+
+    private bool IsChargeParent()
+    {
+        if (Child.ParentId == Charge.Id)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private void ToggleShowChildren()
@@ -126,7 +150,8 @@
 
     private async void StateChanged()
     {
-        Children = await _chargeService.GetChildren(Charge);
+        children = await _chargeService.GetChildren(Charge);
+        await _chargeService.Get(Charge.Id);
         StateHasChanged();
     }
 }

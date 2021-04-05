@@ -39,10 +39,14 @@
         <div class="row mb-2">
 
             <div class="col">
+                <p class="small mb-1">
+                    Related Items
+                    <BtnAddChargeChild @bind-Child="@boundChild"
+                                       Charge="@Charge"></BtnAddChargeChild>
+                </p>
                 <BtnToggleChargeChildren Categories="@Categories"
                                          Children="@children"
                                          CompleteStatus="CompleteStatus"
-                                         ShowHeader="true"
                                          ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
             </div>
         </div>
@@ -98,6 +102,22 @@
     [Parameter]
     public Action ParentStateChanged { get; set; }
 
+    [Parameter]
+    public Charge Child { get; set; }
+
+    [Parameter]
+    public EventCallback<Charge> ChildChanged { get; set; }
+
+    private Charge boundChild
+    {
+        get => Child;
+        set
+        {
+            ChildChanged.InvokeAsync(value);
+            ShowChildrenIfChargeIsParent();
+        }
+    }
+
     private Category category = new();
     private Priority priority = new();
     private Status status = new();
@@ -113,6 +133,26 @@
         category = Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault();
         priority = Priorities.Where(x => x.Id == Charge.PriorityId).FirstOrDefault();
         status = Statuses.Where(x => x.Id == Charge.StatusId).FirstOrDefault();
+
+        ShowChildrenIfChargeIsParent();
+    }
+
+    private void ShowChildrenIfChargeIsParent()
+    {
+        if (Child?.ParentId is not null)
+        {
+            ShowChildren = IsChargeParent();
+        }
+    }
+
+    private bool IsChargeParent()
+    {
+        if (Child.ParentId == Charge.Id)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private void ToggleShowChildren()
@@ -121,9 +161,8 @@
         StateHasChanged();
     }
 
-    private async void ChargeCardStateChanged()
+    private void ChargeCardStateChanged()
     {
-        await _chargeService.Get(Charge.Id);
         StateHasChanged();
     }
 }

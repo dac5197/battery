@@ -27,17 +27,6 @@
     [Parameter]
     public EventCallback<Charge> ChildChanged { get; set; }
 
-    //[Parameter]
-    //public Action AddAction { get; set; }
-
-    //[Parameter]
-    //public Action<Charge> AddActionWithParameter { get; set; }
-
-    //private void CallAddActionWithParameter()
-    //{
-    //    AddActionWithParameter.Invoke(Charge);
-    //}
-
     private async void InitializeSpark()
     {
         Child = new Charge();

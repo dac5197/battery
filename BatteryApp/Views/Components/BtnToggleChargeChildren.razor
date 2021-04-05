@@ -1,9 +1,5 @@
 ﻿@if (Children.Count() > 0)
 {
-    @if (ShowHeader)
-    {
-        <p class="small mb-1">Related Items</p>
-    }
     @foreach (var cat in Categories)
     {
         @if (Children.Where(x => x.CategoryId == cat.Id).Count() > 0)
@@ -26,9 +22,6 @@
 
     [Parameter]
     public Status CompleteStatus { get; set; }
-
-    [Parameter]
-    public bool ShowHeader { get; set; } = false;
 
     [Parameter]
     public Action ToggleShowChildren { get; set; }
