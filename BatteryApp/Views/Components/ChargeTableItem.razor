@@ -14,13 +14,13 @@
     </td>
     <td>@Charge.Title</td>
     <td>
-        <BtnDropDownPriorities Charge="@Charge" 
-                               Priorities="Priorities" 
+        <BtnDropDownPriorities Charge="@Charge"
+                               Priorities="Priorities"
                                ParentStateChanged="@ParentStateChanged"></BtnDropDownPriorities>
     </td>
     <td>
-        <BtnDropDownStatuses Charge="@Charge" 
-                             Statuses="@Statuses" 
+        <BtnDropDownStatuses Charge="@Charge"
+                             Statuses="@Statuses"
                              ParentStateChanged="@ParentStateChanged"></BtnDropDownStatuses>
     </td>
     @if (IsChild is false)
@@ -41,33 +41,37 @@
 
 @if (ShowChildren)
 {
-    <tr>
-        <td colspan="8">
-            <table class="table table-hover table-sm px-5">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Title</th>
-                        <th>Priority</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                        <th>Updated</th>
-                        <th>Completed</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var child in children)
-                    {
-                        <ChargeTableItem @key="@child" 
-                                         Charge="@child" 
-                                         IsChild="true" 
-                                         ParentStateChanged="StateChanged"></ChargeTableItem>
-                    }
-                </tbody>
-            </table>
-        </td>
-    </tr>
-        
+    @if (Charge.ParentId is null)
+    {
+        <tr>
+            <td colspan="8">
+                <table class="table table-hover table-sm px-5">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Updated</th>
+                            <th>Completed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var child in children.Where(x => x.Title.ToLower().Contains(SearchText.ToLower())).ToList())
+                        {
+                            <ChargeTableItem @key="@child"
+                                             Charge="@child"
+                                             IsChild="true"
+                                             ParentStateChanged="StateChanged"></ChargeTableItem>
+                        }
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    }
+
+
 }
 
 
