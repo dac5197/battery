@@ -14,7 +14,7 @@
                                           .Where(x => x.StatusId == status.Id)
                                           .OrderBy(x => x.Id))
                 {
-                    <ChargeCardListItem @key="charge"
+                    <ChargeCardListItem @key="@charge"
                                         @bind-Child="@boundChild"
                                         Charge="@charge"
                                         CompleteStatus="@Statuses.OrderBy(x => x.Order).Last()"

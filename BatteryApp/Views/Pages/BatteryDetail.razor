@@ -255,7 +255,12 @@
 
             </div>
 
-            <ChargeDetailModal Charge="@chargeObject" ParentStateChanged="@StateChanged"></ChargeDetailModal>
+            <ChargeDetailModal @ref="@chargeDetailModal"
+                               Charge="@chargeObject" 
+                               Categories="@categories"
+                               Priorities="@priorities"
+                               Statuses="@statuses"
+                               ParentStateChanged="@StateChanged"></ChargeDetailModal>
 
             @*<ConfirmDeleteDialog Charge="@chargeObject" Delete="@DeleteCharge"></ConfirmDeleteDialog>*@
         }
@@ -280,6 +285,7 @@
     private List<Status> statuses = new();
     //private PaginatedList<Charge> paginatedCharges = new();
 
+    private ChargeDetailModal chargeDetailModal;
     private ChargeTable chargeTable;
 
     private bool showChargeCardChildren = false;
@@ -338,6 +344,7 @@
     {
         chargeObject = new Charge();
         chargeObject = await _chargeLifecycle.SetDefaultValuesAsync(battery, chargeObject);
+        chargeDetailModal.StateChanged();
     }
 
     private async void StateChanged()
@@ -415,7 +422,7 @@
         charges = await _chargeService.Get(battery);
         chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
-        chargeTable.ResetSort();
+        chargeTable?.ResetSort();
 
         StateHasChanged();
     }
@@ -425,7 +432,7 @@
         charges = await _chargeService.GetActive(battery);
         chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
-        chargeTable.ResetSort();
+        chargeTable?.ResetSort();
 
         StateHasChanged();
     }
