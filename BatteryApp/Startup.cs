@@ -78,7 +78,7 @@ namespace BatteryApp
             // Add Project View Utils
             services.AddTransient<ICalculateTextareaRows, CalculateTextareaRows>();
             services.AddScoped<IBreadcrumbManager, BreadcrumbManager>();
-            services.AddScoped<ITableSort_Charges, TableSort_Charges>();
+            services.AddTransient<ITableSort_Charges, TableSort_Charges>();
 
             // Radzen Services
             services.AddScoped<DialogService>();

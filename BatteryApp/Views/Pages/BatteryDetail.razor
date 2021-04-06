@@ -11,7 +11,6 @@
 @inject IChargeService _chargeService
 @inject IPriorityService _priorityService
 @inject IStatusService _statusService
-@inject ITableSort_Charges _tableSort
 @inject IJSRuntime _jsRuntime
 
 <AuthorizeView Context="authContext">
@@ -243,6 +242,7 @@
                                 <CascadingValue Name="SearchText" Value="@searchText">
                                     <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
                                         <ChargeTable @bind-Child="@chargeObject"
+                                                     @ref="@chargeTable"
                                                      Charges="@filteredCharges" 
                                                      ChargeChildrenCounts="@chargeChildrenCounts"
                                                      ParentStateChanged="@StateChanged"></ChargeTable>
@@ -279,6 +279,8 @@
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
     //private PaginatedList<Charge> paginatedCharges = new();
+
+    private ChargeTable chargeTable;
 
     private bool showChargeCardChildren = false;
     private bool showChargeCardView = true;
@@ -413,7 +415,7 @@
         charges = await _chargeService.Get(battery);
         chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
-        _tableSort.Reset();
+        chargeTable.ResetSort();
 
         StateHasChanged();
     }
@@ -423,7 +425,7 @@
         charges = await _chargeService.GetActive(battery);
         chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
-        _tableSort.Reset();
+        chargeTable.ResetSort();
 
         StateHasChanged();
     }

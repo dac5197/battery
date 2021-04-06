@@ -87,6 +87,11 @@
     [CascadingParameter(Name = "ShowChildren")]
     private bool ShowChildren { get; set; }
 
+    public void ResetSort()
+    {
+        _tableSort.Reset();
+    }
+
     private void SortTable(string colName)
     {
         Charges = _tableSort.Sort(colName, Charges);
@@ -116,6 +121,8 @@
         Charges = _tableSort.Sort(colName, Charges, null, null, null, Categories);
         StateHasChanged();
     }
+
+
 
     //protected override void OnInitialized()
     //{
