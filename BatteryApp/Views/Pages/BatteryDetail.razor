@@ -243,6 +243,7 @@
                                     <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
                                         <ChargeTable @bind-Child="@chargeObject"
                                                      Charges="@filteredCharges" 
+                                                     ChargeChildrenCounts="@chargeChildrenCounts"
                                                      ParentStateChanged="@StateChanged"></ChargeTable>
                                     </CascadingValue>
                                 </CascadingValue>
@@ -273,6 +274,7 @@
     private List<Category> categories = new();
     private List<Charge> charges = new();
     private List<Charge> filteredCharges = new();
+    private List<ChargeChildrenCount> chargeChildrenCounts = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
     //private PaginatedList<Charge> paginatedCharges = new();
@@ -306,6 +308,7 @@
         battery = await _batteryService.Get(Id);
         categories = await _categoryService.Get(userId);
         charges = await _chargeService.GetActive(battery);
+        chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
         priorities = await _priorityService.Get(userId);
         statuses = await _statusService.Get();
 
@@ -407,6 +410,7 @@
     private async Task GetAllCharges()
     {
         charges = await _chargeService.Get(battery);
+        chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
 
         StateHasChanged();
@@ -415,6 +419,7 @@
     private async Task GetActiveCharges()
     {
         charges = await _chargeService.GetActive(battery);
+        chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
 
         StateHasChanged();

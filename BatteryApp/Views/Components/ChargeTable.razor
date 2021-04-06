@@ -8,6 +8,9 @@
                 <thead>
                     <tr>
                         <th>
+                            Type
+                        </th>
+                        <th>
                             <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Id"))" @onclick:preventDefault>
                                 #
                                 <span class="oi @(_tableSort.GetIcon("Id"))"></span>
@@ -31,7 +34,12 @@
                                 <span class="oi @(_tableSort.GetIcon("Status"))"></span>
                             </button>
                         </th>
-                        <th>Children</th>
+                        <th>
+                            <button class="border-0 bg-transparent" @onclick="@(() => SortTableByChildrenCount("Children"))" @onclick:preventDefault>
+                                Children
+                                <span class="oi @(_tableSort.GetIcon("Children"))"></span>
+                            </button>
+                        </th>
                         <th>
                             <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Created"))" @onclick:preventDefault>
                                 Created
@@ -83,6 +91,9 @@
     }
 
     [Parameter]
+    public List<ChargeChildrenCount> ChargeChildrenCounts { get; set; }
+
+    [Parameter]
     public Action ParentStateChanged { get; set; }
 
     [CascadingParameter(Name = "Categories")]
@@ -113,6 +124,11 @@
     private void SortTableByStatus(string colName)
     {
         Charges = _tableSort.Sort(colName, Charges, null, Statuses);
+    }
+
+    private void SortTableByChildrenCount(string colName)
+    {
+        Charges = _tableSort.Sort(colName, Charges, null, null, ChargeChildrenCounts);
     }
 
     //protected override void OnInitialized()

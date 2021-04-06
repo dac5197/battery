@@ -13,12 +13,6 @@ namespace BatteryApp.Views.Utils
         private bool _isSortedAscending;
 
         private string _currentSortColumn;
-        private readonly IChargeService _chargeService;
-
-        public TableSort_Charges(IChargeService chargeService)
-        {
-            _chargeService = chargeService;
-        }
 
         public string GetIcon(string columnName)
         {
@@ -37,11 +31,15 @@ namespace BatteryApp.Views.Utils
             }
         }
 
-        public List<Charge> Sort(string columnName, List<Charge> charges, List<Priority> priorities = null, List<Status> statuses = null)
+        public List<Charge> Sort(string columnName,
+                                 List<Charge> charges,
+                                 List<Priority> priorities = null,
+                                 List<Status> statuses = null,
+                                 List<ChargeChildrenCount> chargeChildrenCounts = null)
         {
             if (columnName != _currentSortColumn)
             {
-                charges = SortAscending(columnName, charges, priorities, statuses);
+                charges = SortAscending(columnName, charges, priorities, statuses, chargeChildrenCounts);
                 _currentSortColumn = columnName;
                 _isSortedAscending = true;
             }
@@ -49,11 +47,11 @@ namespace BatteryApp.Views.Utils
             {
                 if (_isSortedAscending)
                 {
-                    charges = SortDescending(columnName, charges, priorities, statuses);
+                    charges = SortDescending(columnName, charges, priorities, statuses, chargeChildrenCounts);
                 }
                 else
                 {
-                    charges = SortAscending(columnName, charges, priorities, statuses);
+                    charges = SortAscending(columnName, charges, priorities, statuses, chargeChildrenCounts);
                 }
                 _isSortedAscending = !_isSortedAscending;
             }
@@ -61,10 +59,22 @@ namespace BatteryApp.Views.Utils
             return charges;
         }
 
-        private static List<Charge> SortAscending(string columnName, List<Charge> charges, List<Priority> priorities = null, List<Status> statuses = null)
+        private static List<Charge> SortAscending(string columnName,
+                                                  List<Charge> charges,
+                                                  List<Priority> priorities = null,
+                                                  List<Status> statuses = null,
+                                                  List<ChargeChildrenCount> chargeChildrenCounts = null)
         {
             switch (columnName)
             {
+                case "Children":
+                    charges = (from charge in charges
+                               join count in chargeChildrenCounts
+                               on charge.Id equals count.ChargeId
+                               orderby count.ChildrenCount
+                               select charge).ToList();
+                    break;
+
                 case "Priority":
                     charges = (from charge in charges
                                join priority in priorities
@@ -89,10 +99,22 @@ namespace BatteryApp.Views.Utils
             return charges;
         }
 
-        private static List<Charge> SortDescending(string columnName, List<Charge> charges, List<Priority> priorities = null, List<Status> statuses = null)
+        private static List<Charge> SortDescending(string columnName,
+                                                   List<Charge> charges,
+                                                   List<Priority> priorities = null,
+                                                   List<Status> statuses = null,
+                                                   List<ChargeChildrenCount> chargeChildrenCounts = null)
         {
             switch (columnName)
             {
+                case "Children":
+                    charges = (from charge in charges
+                               join count in chargeChildrenCounts
+                               on charge.Id equals count.ChargeId
+                               orderby count.ChildrenCount descending
+                               select charge).ToList();
+                    break;
+
                 case "Priority":
                     charges = (from charge in charges
                                join priority in priorities

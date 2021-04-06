@@ -8,6 +8,10 @@ namespace BatteryApp.Views.Utils
     public interface ITableSort_Charges
     {
         string GetIcon(string columnName);
-        List<Charge> Sort(string columnName, List<Charge> charges, List<Priority> priorities = null, List<Status> statuses = null);
+        List<Charge> Sort(string columnName,
+                          List<Charge> charges,
+                          List<Priority> priorities = null,
+                          List<Status> statuses = null,
+                          List<ChargeChildrenCount> chargeChildrenCounts = null);
     }
 }

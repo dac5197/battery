@@ -65,6 +65,26 @@ namespace BatteryApp.Models.ChargeModel
             return children;
         }
 
+        public async Task<List<ChargeChildrenCount>> GetChildrenCount(List<Charge> charges)
+        {
+            //using var context = _contextFactory.CreateDbContext();
+
+            List<ChargeChildrenCount> chargeChildrenCounts = new();
+
+            foreach (var charge in charges)
+            {
+                var children = await GetChildren(charge);
+                ChargeChildrenCount chargeChildrenCount = new()
+                { 
+                    ChargeId = charge.Id,
+                    ChildrenCount = children.Count
+                };
+                chargeChildrenCounts.Add(chargeChildrenCount);
+            }
+
+            return chargeChildrenCounts;
+        }
+
         public async Task<Charge> GetParent(Charge charge)
         {
             using var context = _contextFactory.CreateDbContext();
