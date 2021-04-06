@@ -1,6 +1,7 @@
 ﻿@inject IConfiguration _configuration
 
 @inject IChargeService _chargeService
+@inject ITableSort_Charges _tableSort
 
 <tr>
     <td class="text-center">
@@ -50,14 +51,30 @@
                 <table class="table table-hover table-sm px-5">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>#</th>
-                            <th>Title</th>
-                            <th>Priority</th>
-                            <th>Status</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                            <th>Completed</th>
+                            <th>
+                                <TableHeaderSort FieldNameOverride="Type" FieldName="Category" SortIcon="@(_tableSort.GetIcon("Category"))" SortMethod="SortTableByCategory"></TableHeaderSort>
+                            </th>
+                            <th>
+                                <TableHeaderSort FieldNameOverride="#" FieldName="Id" SortIcon="@(_tableSort.GetIcon("Id"))" SortMethod="SortTable"></TableHeaderSort>
+                            </th>
+                            <th>
+                                <TableHeaderSort FieldName="Title" SortIcon="@(_tableSort.GetIcon("Title"))" SortMethod="SortTable"></TableHeaderSort>
+                            </th>
+                            <th>
+                                <TableHeaderSort FieldName="Priority" SortIcon="@(_tableSort.GetIcon("Priority"))" SortMethod="SortTableByPriority"></TableHeaderSort>
+                            </th>
+                            <th>
+                                <TableHeaderSort FieldName="Status" SortIcon="@(_tableSort.GetIcon("Status"))" SortMethod="SortTableByStatus"></TableHeaderSort>
+                            </th>
+                            <th>
+                                <TableHeaderSort FieldName="Created" SortIcon="@(_tableSort.GetIcon("Created"))" SortMethod="SortTable"></TableHeaderSort>
+                            </th>
+                            <th>
+                                <TableHeaderSort FieldName="Updated" SortIcon="@(_tableSort.GetIcon("Updated"))" SortMethod="SortTable"></TableHeaderSort>
+                            </th>
+                            <th>
+                                <TableHeaderSort FieldName="Completed" SortIcon="@(_tableSort.GetIcon("Completed"))" SortMethod="SortTable"></TableHeaderSort>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -159,6 +176,30 @@
     {
         children = await _chargeService.GetChildren(Charge);
         await _chargeService.Get(Charge.Id);
+        StateHasChanged();
+    }
+
+    private void SortTable(string colName)
+    {
+        children = _tableSort.Sort(colName, children);
+        StateHasChanged();
+    }
+
+    private void SortTableByPriority(string colName)
+    {
+        children = _tableSort.Sort(colName, children, Priorities);
+        StateHasChanged();
+    }
+
+    private void SortTableByStatus(string colName)
+    {
+        children = _tableSort.Sort(colName, children, null, Statuses);
+        StateHasChanged();
+    }
+
+    private void SortTableByCategory(string colName)
+    {
+        children = _tableSort.Sort(colName, children, null, null, null, Categories);
         StateHasChanged();
     }
 }

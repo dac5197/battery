@@ -8,58 +8,31 @@
                 <thead>
                     <tr>
                         <th>
-                            <button class="border-0 bg-transparent" @onclick="@(() => SortTableByCategory("Category"))" @onclick:preventDefault>
-                                <strong>Type</strong>
-                                <span class="oi @(_tableSort.GetIcon("Category"))"></span>
-                            </button>
+                            <TableHeaderSort FieldNameOverride="Type" FieldName="Category" SortIcon="@(_tableSort.GetIcon("Category"))" SortMethod="SortTableByCategory"></TableHeaderSort>
                         </th>
                         <th>
-                            <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Id"))" @onclick:preventDefault>
-                                <strong>#</strong>
-                                <span class="oi @(_tableSort.GetIcon("Id"))"></span>
-                            </button>
+                            <TableHeaderSort FieldNameOverride="#" FieldName="Id" SortIcon="@(_tableSort.GetIcon("Id"))" SortMethod="SortTable"></TableHeaderSort>
                         </th>
                         <th>
-                            <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Title"))" @onclick:preventDefault>
-                                <strong>Title</strong>
-                                <span class="oi @(_tableSort.GetIcon("Title"))"></span>
-                            </button>
+                            <TableHeaderSort FieldName="Title" SortIcon="@(_tableSort.GetIcon("Title"))" SortMethod="SortTable"></TableHeaderSort>
                         </th>
                         <th>
-                            <button class="border-0 bg-transparent" @onclick="@(() => SortTableByPriority("Priority"))" @onclick:preventDefault>
-                                <strong>Priority</strong>
-                                <span class="oi @(_tableSort.GetIcon("Priority"))"></span>
-                            </button>
+                            <TableHeaderSort FieldName="Priority" SortIcon="@(_tableSort.GetIcon("Priority"))" SortMethod="SortTableByPriority"></TableHeaderSort>
                         </th>
                         <th>
-                            <button class="border-0 bg-transparent" @onclick="@(() => SortTableByStatus("Status"))" @onclick:preventDefault>
-                                <strong>Status</strong>
-                                <span class="oi @(_tableSort.GetIcon("Status"))"></span>
-                            </button>
+                            <TableHeaderSort FieldName="Status" SortIcon="@(_tableSort.GetIcon("Status"))" SortMethod="SortTableByStatus"></TableHeaderSort>
                         </th>
                         <th>
-                            <button class="border-0 bg-transparent" @onclick="@(() => SortTableByChildrenCount("Children"))" @onclick:preventDefault>
-                                <strong>Children</strong>
-                                <span class="oi @(_tableSort.GetIcon("Children"))"></span>
-                            </button>
+                            <TableHeaderSort FieldName="Children" SortIcon="@(_tableSort.GetIcon("Children"))" SortMethod="SortTableByChildrenCount"></TableHeaderSort>
                         </th>
                         <th>
-                            <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Created"))" @onclick:preventDefault>
-                                <strong>Created</strong>
-                                <span class="oi @(_tableSort.GetIcon("Created"))"></span>
-                            </button>
+                            <TableHeaderSort FieldName="Created" SortIcon="@(_tableSort.GetIcon("Created"))" SortMethod="SortTable"></TableHeaderSort>
                         </th>
                         <th>
-                            <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Updated"))" @onclick:preventDefault>
-                                <strong>Updated</strong>
-                                <span class="oi @(_tableSort.GetIcon("Updated"))"></span>
-                            </button>
+                            <TableHeaderSort FieldName="Updated" SortIcon="@(_tableSort.GetIcon("Updated"))" SortMethod="SortTable"></TableHeaderSort>
                         </th>
                         <th>
-                            <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Completed"))" @onclick:preventDefault>
-                                <strong>Completed</strong>
-                                <span class="oi @(_tableSort.GetIcon("Completed"))"></span>
-                            </button>
+                            <TableHeaderSort FieldName="Completed" SortIcon="@(_tableSort.GetIcon("Completed"))" SortMethod="SortTable"></TableHeaderSort>
                         </th>
                     </tr>
                 </thead>
@@ -117,26 +90,31 @@
     private void SortTable(string colName)
     {
         Charges = _tableSort.Sort(colName, Charges);
+        StateHasChanged();
     }
 
     private void SortTableByPriority(string colName)
     {
         Charges = _tableSort.Sort(colName, Charges, Priorities);
+        StateHasChanged();
     }
 
     private void SortTableByStatus(string colName)
     {
         Charges = _tableSort.Sort(colName, Charges, null, Statuses);
+        StateHasChanged();
     }
 
     private void SortTableByChildrenCount(string colName)
     {
         Charges = _tableSort.Sort(colName, Charges, null, null, ChargeChildrenCounts);
+        StateHasChanged();
     }
 
     private void SortTableByCategory(string colName)
     {
         Charges = _tableSort.Sort(colName, Charges, null, null, null, Categories);
+        StateHasChanged();
     }
 
     //protected override void OnInitialized()

@@ -1,0 +1,26 @@
+﻿<button class="border-0 bg-transparent" @onclick="@(() => SortMethod.Invoke(FieldName))" @onclick:preventDefault>
+    <strong>
+        @if (string.IsNullOrWhiteSpace(FieldNameOverride))
+        {
+            @FieldName
+        }
+        else
+        {
+            @FieldNameOverride
+        }
+    </strong>
+    <span class="oi @SortIcon"></span>
+</button>
+@code {
+    [Parameter]
+    public string SortIcon { get; set; }
+
+    [Parameter]
+    public string FieldName { get; set; }
+
+    [Parameter]
+    public string FieldNameOverride { get; set; }
+
+    [Parameter]
+    public Action<string> SortMethod { get; set; }
+}
