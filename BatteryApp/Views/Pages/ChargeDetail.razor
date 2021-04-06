@@ -283,7 +283,11 @@
     </EditForm>
 </div>
 
-<ChargeDetailModal Charge="@spark" ParentStateChanged="@ChildrenStateChanged"></ChargeDetailModal>
+<ChargeDetailModal Charge="@spark"
+                   Categories="@categories"
+                   Priorities="@priorities"
+                   Statuses="@statuses"
+                   ParentStateChanged="@ChildrenStateChanged"></ChargeDetailModal>
 <DeleteChargeModal Charge="@charge" Children="@children"></DeleteChargeModal>
 <AddTagModal Battery="@battery" Charge="@charge" ParentStateChanged="@TagStateChanged" Tags="batteryTags"></AddTagModal>
 <EditTagModal Tag="@tagToEdit" ParentStateChanged="@TagStateChanged"></EditTagModal>
@@ -443,11 +447,15 @@
 
     private async void SaveNote()
     {
-        await _noteService.AddNoteFromCharge(charge, noteText);
-        await _chargeService.SetUpdated(charge.Id);
-        noteText = "";
-        await RefreshNotes();
-        await ChargeStateChanged();
+        if (!string.IsNullOrWhiteSpace(noteText))
+        {
+            await _noteService.AddNoteFromCharge(charge, noteText);
+            await _chargeService.SetUpdated(charge.Id);
+            noteText = "";
+            await RefreshNotes();
+            await ChargeStateChanged();
+        }
+
     }
 
     private void ShowAllNotes()
