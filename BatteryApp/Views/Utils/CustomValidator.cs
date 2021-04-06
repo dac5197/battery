@@ -12,7 +12,7 @@ namespace BatteryApp.Views.Utils
         // Validator blazor component
         // https://docs.microsoft.com/en-us/aspnet/core/blazor/forms-validation?view=aspnetcore-5.0
 
-        private ValidationMessageStore messageStore;
+        private ValidationMessageStore _messageStore;
 
         [CascadingParameter]
         private EditContext CurrentEditContext { get; set; }
@@ -28,19 +28,19 @@ namespace BatteryApp.Views.Utils
                     $"inside an {nameof(EditForm)}.");
             }
 
-            messageStore = new ValidationMessageStore(CurrentEditContext);
+            _messageStore = new ValidationMessageStore(CurrentEditContext);
 
             CurrentEditContext.OnValidationRequested += (s, e) =>
-                messageStore.Clear();
+                _messageStore.Clear();
             CurrentEditContext.OnFieldChanged += (s, e) =>
-                messageStore.Clear(e.FieldIdentifier);
+                _messageStore.Clear(e.FieldIdentifier);
         }
 
         public void DisplayErrors(Dictionary<string, List<string>> errors)
         {
             foreach (var err in errors)
             {
-                messageStore.Add(CurrentEditContext.Field(err.Key), err.Value);
+                _messageStore.Add(CurrentEditContext.Field(err.Key), err.Value);
             }
 
             CurrentEditContext.NotifyValidationStateChanged();
@@ -48,7 +48,7 @@ namespace BatteryApp.Views.Utils
 
         public void ClearErrors()
         {
-            messageStore.Clear();
+            _messageStore.Clear();
             CurrentEditContext.NotifyValidationStateChanged();
         }
     }
