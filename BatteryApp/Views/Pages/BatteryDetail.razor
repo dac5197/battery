@@ -11,6 +11,7 @@
 @inject IChargeService _chargeService
 @inject IPriorityService _priorityService
 @inject IStatusService _statusService
+@inject ITableSort_Charges _tableSort
 @inject IJSRuntime _jsRuntime
 
 <AuthorizeView Context="authContext">
@@ -412,6 +413,7 @@
         charges = await _chargeService.Get(battery);
         chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
+        _tableSort.Reset();
 
         StateHasChanged();
     }
@@ -421,6 +423,7 @@
         charges = await _chargeService.GetActive(battery);
         chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
+        _tableSort.Reset();
 
         StateHasChanged();
     }

@@ -8,53 +8,56 @@
                 <thead>
                     <tr>
                         <th>
-                            Type
+                            <button class="border-0 bg-transparent" @onclick="@(() => SortTableByCategory("Category"))" @onclick:preventDefault>
+                                <strong>Type</strong>
+                                <span class="oi @(_tableSort.GetIcon("Category"))"></span>
+                            </button>
                         </th>
                         <th>
                             <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Id"))" @onclick:preventDefault>
-                                #
+                                <strong>#</strong>
                                 <span class="oi @(_tableSort.GetIcon("Id"))"></span>
                             </button>
                         </th>
                         <th>
                             <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Title"))" @onclick:preventDefault>
-                                Title
+                                <strong>Title</strong>
                                 <span class="oi @(_tableSort.GetIcon("Title"))"></span>
                             </button>
                         </th>
                         <th>
                             <button class="border-0 bg-transparent" @onclick="@(() => SortTableByPriority("Priority"))" @onclick:preventDefault>
-                                Priority
+                                <strong>Priority</strong>
                                 <span class="oi @(_tableSort.GetIcon("Priority"))"></span>
                             </button>
                         </th>
                         <th>
                             <button class="border-0 bg-transparent" @onclick="@(() => SortTableByStatus("Status"))" @onclick:preventDefault>
-                                Status
+                                <strong>Status</strong>
                                 <span class="oi @(_tableSort.GetIcon("Status"))"></span>
                             </button>
                         </th>
                         <th>
                             <button class="border-0 bg-transparent" @onclick="@(() => SortTableByChildrenCount("Children"))" @onclick:preventDefault>
-                                Children
+                                <strong>Children</strong>
                                 <span class="oi @(_tableSort.GetIcon("Children"))"></span>
                             </button>
                         </th>
                         <th>
                             <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Created"))" @onclick:preventDefault>
-                                Created
+                                <strong>Created</strong>
                                 <span class="oi @(_tableSort.GetIcon("Created"))"></span>
                             </button>
                         </th>
                         <th>
                             <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Updated"))" @onclick:preventDefault>
-                                Updated
+                                <strong>Updated</strong>
                                 <span class="oi @(_tableSort.GetIcon("Updated"))"></span>
                             </button>
                         </th>
                         <th>
                             <button class="border-0 bg-transparent" @onclick="@(() => SortTable("Completed"))" @onclick:preventDefault>
-                                Completed
+                                <strong>Completed</strong>
                                 <span class="oi @(_tableSort.GetIcon("Completed"))"></span>
                             </button>
                         </th>
@@ -129,6 +132,11 @@
     private void SortTableByChildrenCount(string colName)
     {
         Charges = _tableSort.Sort(colName, Charges, null, null, ChargeChildrenCounts);
+    }
+
+    private void SortTableByCategory(string colName)
+    {
+        Charges = _tableSort.Sort(colName, Charges, null, null, null, Categories);
     }
 
     //protected override void OnInitialized()

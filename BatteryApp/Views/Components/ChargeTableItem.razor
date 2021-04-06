@@ -3,11 +3,13 @@
 @inject IChargeService _chargeService
 
 <tr>
+    <td class="text-center">
+        <CategoryIcon Category="@Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault()"></CategoryIcon>
+    </td>
     <td>
         <a href="@($"/charge/{Charge.Id}")">
 
             <p class="charge-detail mb-0">
-                <CategoryIcon Category="@Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault()"></CategoryIcon>
                 @Charge.Id
             </p>
         </a>
@@ -48,6 +50,7 @@
                 <table class="table table-hover table-sm px-5">
                     <thead>
                         <tr>
+                            <th>Type</th>
                             <th>#</th>
                             <th>Title</th>
                             <th>Priority</th>
