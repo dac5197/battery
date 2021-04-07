@@ -18,6 +18,38 @@ namespace BatteryApp.Internals
             _statusService = statusService;
         }
 
+        public async Task CompleteOpenChildren(Charge charge)
+        {
+            var openChildren = await GetOpenChildren(charge);
+            var completedStatus = await _statusService.GetCompletedStatus();
+
+            foreach (var child in openChildren)
+            {
+                child.StatusId = completedStatus.Id;
+                await _chargeService.Update(child);
+            }
+        }
+
+        public async Task<List<Charge>> GetOpenChildren(Charge charge)
+        {
+            var children = await _chargeService.GetChildren(charge);
+            var completedStatus = await _statusService.GetCompletedStatus();
+
+            return children.Where(x => x.StatusId != completedStatus.Id).ToList();
+        }
+
+        public async Task<bool> HasOpenChildren(Charge charge)
+        {
+            var openChildren = await GetOpenChildren(charge);
+
+            if (openChildren.Count > 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public async Task ToggleCompletedStatusAsync(Charge charge, bool isComplete)
         {
             if (isComplete)
@@ -41,5 +73,7 @@ namespace BatteryApp.Internals
 
             await _chargeService.Update(charge);
         }
+
+       
     }
 }

@@ -6,6 +6,7 @@
 @inject IBatteryService _batteryService
 @inject ICalculateTextareaRows _calcTextareaRows
 @inject ICategoryService _categoryService
+@inject IChargeChildController _chargeChildController
 @inject IChargeService _chargeService
 @inject IInitializeChargeChildToParent _chargeRelationship
 @inject IJSRuntime _jsRuntime
@@ -264,7 +265,7 @@
                             <ul class="list-group list-group-flush">
                                 @foreach (var child in children)
                                 {
-                                    <ChargeDetail_RelatedListItem Charge="@child" IsParent="false"></ChargeDetail_RelatedListItem>
+                                    <ChargeDetail_RelatedListItem Charge="@child" IsParent="false" ParentStateChanged="@ChildrenStateChanged"></ChargeDetail_RelatedListItem>
                                 }
                             </ul>
                         </div>
@@ -288,9 +289,17 @@
                    Priorities="@priorities"
                    Statuses="@statuses"
                    ParentStateChanged="@ChildrenStateChanged"></ChargeDetailModal>
+
+<ChargeChildrenWarningModal Charge="@charge"
+                            CompletedOpenChildren="@CompletedOpenChildren"
+                            OpenChildren="@children.Where(x => x.StatusId != completeStatus.Id).ToList()"></ChargeChildrenWarningModal>
+
 <DeleteChargeModal Charge="@charge" Children="@children"></DeleteChargeModal>
+
 <AddTagModal Battery="@battery" Charge="@charge" ParentStateChanged="@TagStateChanged" Tags="batteryTags"></AddTagModal>
+
 <EditTagModal Tag="@tagToEdit" ParentStateChanged="@TagStateChanged"></EditTagModal>
+
 <DeteteTagModal Delete="@DeleteTag"></DeteteTagModal>
 
 <style>
@@ -328,6 +337,7 @@
     private Charge charge = new Charge();
     private Charge parent = new();
     private Charge spark = new();
+    private Status completeStatus = new();
     private Tag tagToDelete = new();
     private Tag tagToEdit = new();
     private UserProfile userProfile = new();
@@ -341,6 +351,8 @@
     private List<Status> statuses = new();
     private List<Tag> batteryTags = new();
     private List<Tag> tags = new();
+
+    private bool hasOpenChildren;
 
     private int minTextareaRows = 5;
     private int maxTextareaRows = 15;
@@ -356,36 +368,48 @@
 
     protected override async Task OnInitializedAsync()
     {
-
+        // Get entities
         charge = await _chargeService.Get(Id);
-
         battery = await _batteryService.Get(charge.BatteryId);
         children = await _chargeService.GetChildren(charge);
         parent = await _chargeService.GetParent(charge);
+        completeStatus = await _statusService.GetCompletedStatus();
 
+        // Get Lists
         categories = await _categoryService.Get();
-        category = categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault();
         priorities = await _priorityService.Get(charge.OwnerId);
         statuses = await _statusService.Get();
 
+        // Get tags
         tags = await _tagController.GetAllTagsForChargeAsync(charge.Id);
         batteryTags = await _tagController.GetAllTagsForBatteryAsync(battery);
 
+        // Get notes
         notes = await _noteService.GetAllNotesForCharge(charge.Id);
         noteTypes = await _noteTypeService.Get();
         ShowNoteNotes();
 
+        // Get page objects
+        category = categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault();
+        hasOpenChildren = await _chargeChildController.HasOpenChildren(charge);
         userProfile = await _userProfileService.Get(charge.OwnerId);
 
         dateTimeFormat = _configuration["Configurations:DateTimeFormat"];
         textareaRows = _calcTextareaRows.CalculateRows(charge.Description);
 
+        // Get breadcrumb nav links
         await _breadcrumb.Initialize(charge);
         _breadcrumb.Show();
     }
 
     private async void HandleValidSubmit()
     {
+        if (hasOpenChildren && charge.StatusId == completeStatus.Id)
+        {
+            await _jsRuntime.InvokeAsync<object>("ShowModal", "chargeChildrenWarningModal");
+            return;
+        }
+
         await _chargeService.Update(charge);
 
         if (!string.IsNullOrWhiteSpace(noteText))
@@ -395,6 +419,7 @@
         }
 
         charge = await _chargeService.Get(Id);
+        children = await _chargeService.GetChildren(charge);
         category = await _categoryService.Get(charge.CategoryId);
         await RefreshNotes();
         StateHasChanged();
@@ -408,6 +433,7 @@
     private async void ChildrenStateChanged()
     {
         children = await _chargeService.GetChildren(charge);
+        hasOpenChildren = await _chargeChildController.HasOpenChildren(charge);
         await RefreshNotes();
         StateHasChanged();
     }
@@ -455,7 +481,6 @@
             await RefreshNotes();
             await ChargeStateChanged();
         }
-
     }
 
     private void ShowAllNotes()
@@ -508,6 +533,12 @@
             ShowAllNotes();
             return;
         }
+    }
+
+    private void CompletedOpenChildren()
+    {
+        hasOpenChildren = false;
+        HandleValidSubmit();
     }
 }
 

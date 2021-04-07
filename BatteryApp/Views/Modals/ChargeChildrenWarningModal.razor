@@ -1,0 +1,63 @@
+﻿@inject IChargeChildController _chargeChildController
+@inject IJSRuntime _jsRuntime
+
+<div class="modal fade" tabindex="-1" role="dialog" id="chargeChildrenWarningModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Complete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6>Unable to complete item due to open children.</h6>
+                <h6>Do you want to complete chidlren and continue save?</h6>
+                <br />
+                <p>Item to be completed:</p>
+                <ul class="list-group border-0 px-2">
+                    <li class="list-group-item list-group-item-primary border-square">@Charge.Id | @Charge.Title </li>
+                </ul>
+                @if (OpenChildren.Count > 0)
+                {
+                    <br />
+                    <p>Related Items to be completed (@OpenChildren.Count):</p>
+                    <ul class="list-groupborder-0 px-4">
+                        @foreach (var child in OpenChildren)
+                        {
+                            <li class="list-group-item list-group-item-info border-square">@child.Id | @child.Title </li>
+                        }
+
+                    </ul>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" @onclick="@CompleteChildren">Confirm</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Charge Charge { get; set; }
+
+    [Parameter]
+    public List<Charge> OpenChildren { get; set; }
+
+    [Parameter]
+    public Action CompletedOpenChildren { get; set; }
+
+    private async void CompleteChildren()
+    {
+        await _chargeChildController.CompleteOpenChildren(Charge);
+        await CloseModal();
+        CompletedOpenChildren.Invoke();
+    }
+
+    private async Task CloseModal()
+    {
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "chargeChildrenWarningModal");
+    }
+}

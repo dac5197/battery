@@ -1,4 +1,8 @@
-﻿@inject IChargeService _chargeService
+﻿@inject IChargeChildController _chargeChildController
+@inject IChargeOpenChildrenModalHelper _chargeOpenChildrenModalHelper
+@inject IChargeService _chargeService
+@inject IStatusService _statusService
+@inject IJSRuntime _jsRuntime
 
 <button id="statusCharge-@Charge.Id" type="button" class="btn btn-sm border-square dopdown-toggle mx-1 py-0 px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
         style="color: @status.FontColor; background-color: @status.BgColor">
@@ -29,15 +33,26 @@
     public Action ParentStateChanged { get; set; }
 
     private Status status = new();
+    private Status completeStatus = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        completeStatus = await _statusService.GetCompletedStatus();
+
         status = Statuses.Where(x => x.Id == Charge.StatusId).FirstOrDefault();
-        base.OnInitialized();
     }
 
     private async void ChangeChargeStatus(int statusId)
     {
+        await _chargeOpenChildrenModalHelper.SetChargeAndOpenChildren(Charge);
+        //ParentStateChanged?.Invoke();
+
+        if (_chargeOpenChildrenModalHelper.HasChildren && statusId == completeStatus.Id)
+        {
+            await _jsRuntime.InvokeAsync<object>("ShowModal", "chargeChildrenWarningModal");
+            return;
+        }
+
         Charge.StatusId = statusId;
         await _chargeService.Update(Charge);
         ParentStateChanged?.Invoke();

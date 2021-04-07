@@ -10,13 +10,11 @@ namespace BatteryApp.Views.Utils
 {
     public class BreadcrumbManager : IBreadcrumbManager
     {
-        private readonly IBatteryService _batteryService;
         private readonly IChargeService _chargeService;
         private readonly ICategoryService _categoryService;
 
-        public BreadcrumbManager(IBatteryService batteryService, IChargeService chargeService, ICategoryService categoryService)
+        public BreadcrumbManager(IChargeService chargeService, ICategoryService categoryService)
         {
-            _batteryService = batteryService;
             _chargeService = chargeService;
             _categoryService = categoryService;
         }
