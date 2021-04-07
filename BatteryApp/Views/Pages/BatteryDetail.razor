@@ -265,18 +265,8 @@
                                ParentStateChanged="@StateChanged"></ChargeDetailModal>
 
             <ChargeChildrenWarningModal Charge="@_chargeOpenChildrenModalHelper.Charge"
-                                        CompletedOpenChildren="@StateChanged"
+                                        CompletedOpenChildren="@CompleteChargeWithChildren"
                                         OpenChildren="@_chargeOpenChildrenModalHelper.OpenChildren"></ChargeChildrenWarningModal>
-
-            @*@if (_chargeOpenChildrenModalHelper.Charge is not null)
-            {
-                <ChargeChildrenWarningModal Charge="@_chargeOpenChildrenModalHelper.Charge"
-                                            CompletedOpenChildren="@StateChanged"
-                                            OpenChildren="@_chargeOpenChildrenModalHelper.OpenChildren"></ChargeChildrenWarningModal>
-            }*@
-
-
-            @*<ConfirmDeleteDialog Charge="@chargeObject" Delete="@DeleteCharge"></ConfirmDeleteDialog>*@
         }
     </Authorized>
     <NotAuthorized>
@@ -497,4 +487,13 @@
         showChargeCardChildren = !string.IsNullOrWhiteSpace(searchText);
     }
 
+    private async void CompleteChargeWithChildren()
+    {
+        var charge = _chargeOpenChildrenModalHelper.Charge;
+        var completeStatus = await _statusService.GetCompletedStatus();
+        charge.StatusId = completeStatus.Id;
+        await _chargeService.Update(charge);
+
+        StateChanged();
+    }
 }

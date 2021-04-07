@@ -45,10 +45,10 @@
     private async void ChangeChargeStatus(int statusId)
     {
         await _chargeOpenChildrenModalHelper.SetChargeAndOpenChildren(Charge);
-        //ParentStateChanged?.Invoke();
 
         if (_chargeOpenChildrenModalHelper.HasChildren && statusId == completeStatus.Id)
         {
+            ParentStateChanged?.Invoke();
             await _jsRuntime.InvokeAsync<object>("ShowModal", "chargeChildrenWarningModal");
             return;
         }
