@@ -37,9 +37,9 @@
                                Charge="@Charge"></BtnAddChargeChild>
         </td>
     }
-    <td>@Charge.Created.ToLocalTime().ToString(dateTimeFormat)</td>
-    <td>@Charge.Updated.ToLocalTime().ToString(dateTimeFormat)</td>
-    <td>@Charge.Completed?.ToLocalTime().ToString(dateTimeFormat)</td>
+    <td class="small">@Charge.Created.ToLocalTime().ToString(dateTimeFormat)</td>
+    <td class="small">@Charge.Updated.ToLocalTime().ToString(dateTimeFormat)</td>
+    <td class="small">@Charge.Completed?.ToLocalTime().ToString(dateTimeFormat)</td>
 </tr>
 
 @if (ShowChildren)
