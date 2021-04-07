@@ -5,7 +5,7 @@
 
 <tr>
     <td class="text-center">
-        <CategoryIcon Category="@Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault()"></CategoryIcon>
+        <IconCategory Category="@Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault()"></IconCategory>
     </td>
     <td>
         <a href="@($"/charge/{Charge.Id}")">
