@@ -4,7 +4,7 @@
 @inject IBatteryService _batteryService
 @inject IBreadcrumbManager _breadcrumb
 
-<div class="container-fluid pt-4 px-4">
+
     <AuthorizeView>
         <Authorized>
             @if (batteries == null)
@@ -13,47 +13,179 @@
             }
             else
             {
-                <h3>Batteries</h3>
-                <div>
-                    <button data-toggle="modal" data-target="#batteryDetailModal" class="btn btn-warning" value="Add Battery">Add Battery</button>
-                </div>
-                <br />
-                <div class="row row-cols-sm-2 row-cols-md-4">
+                <div class="mt-2">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card border-square shadow-sm p-2 my-2">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-3">
+                                        <button  class="btn btn-warning border-square" data-toggle="modal" data-target="#batteryDetailModal" value="Add Battery">Add Battery</button>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text border-0 bg-transparent mr-n5">
+                                                    <span class="oi oi-magnifying-glass"></span>
+                                                </div>
+                                            </div>
+                                            <input type="text"
+                                                   class="form-control py-2 border-square bg-transparent pl-5"
+                                                   id="searchChargesInput"
+                                                   placeholder="Search"
+                                                   value="@searchText"
+                                                   @oninput="@(e => FilterBatteriesBySearch(e))" />
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-info border-square" @onclick="@ClearSearch">Clear</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="float-right">
+                                            <BtnGroup_TwoButtons BtnOneClass="@btnClassActiveBatteries"
+                                                                 BtnOneText="Active"
+                                                                 BtnOneAction="@SetActiveBatteriesFilter"
+                                                                 BtnTwoClass="@btnClassAllBatteries"
+                                                                 BtnTwoText="All"
+                                                                 BtnTwoAction="@SetAllBatteriesFilter"
+                                                                 QuestionToolTipAlignment="Right"
+                                                                 QuestionToolTipText="Toggle between Active Batteries and All Batteries"></BtnGroup_TwoButtons>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="row row-cols-sm-2 row-cols-md-6">
                     @foreach (var battery in batteries)
                     {
                         <BatteryListItem Battery="@battery"></BatteryListItem>
                     }
-                </div>
+                </div>*@
+                    <div class="row">
+                        <div class="col">
+                            <div class="card border-square shadow-sm p-2 my-2">
+                                <h3>Active Batteries</h3>
+                                @foreach (var battery in filteredBatteries.Where(x => x.IsActive == true))
+                                {
+                                    <BatteryListItemMW Battery="@battery"></BatteryListItemMW>
+                                }
+                                @if (filteredBatteries.Where(x => x.IsActive == false).ToList().Count > 0)
+                                {
+                                    <h3>Inactive Batteries</h3>
+                                    @foreach (var battery in filteredBatteries.Where(x => x.IsActive == false))
+                                    {
+                                        <BatteryListItemMW Battery="@battery"></BatteryListItemMW>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
 
-                <BatteryDetailModal ParentStateChanged="@StateChanged" UserId="@userId"></BatteryDetailModal>
+
+            
+
+                    <BatteryDetailModal ParentStateChanged="@StateChanged" UserId="@userId"></BatteryDetailModal>
+                </div>
             }
-            </Authorized>
+        </Authorized>
         <NotAuthorized>
             <a href="Identity/Account/Register">Register</a>
             <a href="Identity/Account/Login">Log in</a>
         </NotAuthorized>
     </AuthorizeView>
-</div>
+
 
 @code {
 
+    private string btnActive = "btn-secondary";
+    private string btnInactive = "btn-outline-secondary";
+    private string btnClassActiveBatteries;
+    private string btnClassAllBatteries;
+    private string searchText = "";
     private string userId;
 
     private List<Battery> batteries = new();
+    private List<Battery> filteredBatteries = new();
 
     protected override async Task OnInitializedAsync()
     {
         var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
-        batteries = await _batteryService.Get(userId);
+        batteries = await _batteryService.GetActive(userId);
+        filteredBatteries = batteries;
 
+        // Set filter button bootstrap classes
+        btnClassActiveBatteries = btnActive;
+        btnClassAllBatteries = btnInactive;
+
+        // Hide the breadcrump nav
         _breadcrumb.Hide();
     }
 
     private async void StateChanged()
     {
-        batteries = await _batteryService.Get(userId);
+        if (btnClassActiveBatteries == btnActive)
+        {
+            await GetActiveBatteries();
+        }
+        else
+        {
+            await GetAllBatteries();
+        }
         StateHasChanged();
     }
+
+    private void ClearSearch()
+    {
+        searchText = "";
+        filteredBatteries = batteries;
+        StateHasChanged();
+    }
+
+    private void FilterBatteriesBySearch(ChangeEventArgs e)
+    {
+
+        searchText = e.Value.ToString();
+        FilterBatteryList();
+
+        StateHasChanged();
+    }
+
+    private void FilterBatteryList()
+    {
+        filteredBatteries = batteries.Where(x => x.Name.ToLower().Contains(searchText.ToLower())).ToList();
+    }
+
+    private async Task GetAllBatteries()
+    {
+        batteries = await _batteryService.Get(userId);
+        FilterBatteryList();
+        StateHasChanged();
+    }
+
+    private async void SetAllBatteriesFilter()
+    {
+        btnClassActiveBatteries = btnInactive;
+        btnClassAllBatteries = btnActive;
+
+        await GetAllBatteries();
+    }
+
+    private async Task GetActiveBatteries()
+    {
+        batteries = await _batteryService.GetActive(userId);
+        FilterBatteryList();
+        StateHasChanged();
+    }
+
+    private async void SetActiveBatteriesFilter()
+    {
+        btnClassActiveBatteries = btnActive;
+        btnClassAllBatteries = btnInactive;
+
+        await GetActiveBatteries();
+    }
+
+
 }

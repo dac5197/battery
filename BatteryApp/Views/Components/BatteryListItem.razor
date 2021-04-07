@@ -2,31 +2,64 @@
 @inject IStatusService _statusService
 
 
-<NavLink href="@($"/battery/{Battery.Id}")" class="battery-navlink-black">
-    <div class="card bg-dark shadow-sm pb-1 pt-2 pb-5 border-square m-3">
+<NavLink href="@($"/battery/{Battery.Id}")" class="battery-navlink-black mb-3">
+    <div class="card bg-dark border-square shadow-sm pb-1 pt-2 pb-5 m-3 battery-card">
         <div class="card bg-light mx-2 mt-2 mb-4 p-2 border-square">
             <div class="card-header border-0">
-                <h4 class="card-title">
+                <h5 class="card-title">
                     <IconBattery />
                     @Battery.Id | @Battery.Name
-                </h4>
+                </h5>
             </div>
             <div class="card-body">
                 <div class="row mb-3">
-                    <h5>Charges: @charges.Count</h5>
+                    <div class="col">
+                        <h6>Active Charges: @charges.Count</h6>
+                    </div>
                 </div>
                 <div class="row">
-                    <div class="card-group">
+                    <div class="col">
+                        <ul class="list-group list-group-horizontal px-4">
+                            @foreach (var status in statuses)
+                            {
+                                <li class="list-group-item text-center border-0 py-1" style="background-color:@status.BgColor; color:@status.FontColor">
+                                    @status.Name <span class="badge badge-light border-square shadow-sm">@charges.Where(x => x.StatusId == status.Id).Count()</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    
+
+                    @*<table class="table table-bordered table-sm" style="border-color: black">
+                        <thead>
+                            <tr>
+                                @foreach (var status in statuses)
+                                {
+                                    <th class="text-center" style="background-color:@status.BgColor; color:@status.FontColor">@status.Name</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                @foreach (var status in statuses)
+                                {
+                                    <td class="text-center" style="background-color:@status.BgColor; color:@status.FontColor">@charges.Where(x => x.StatusId == status.Id).Count()</td>
+                                }
+                            </tr>
+                        </tbody>
+                    </table>*@
+
+                    @*<div class="card-group">
                         @foreach (var status in statuses)
                         {
                             <div class="card border-square border-0 align-content-center justify-content-center pt-2 pb-1 px-2 charge-count-readout"
                                     style="background-color:@status.BgColor; color:@status.FontColor">
-                                <h6 class="text-center">
+                                <p class="text-center small">
                                     @status.Name <span class="badge badge-light">@charges.Where(x => x.StatusId == status.Id).Count()</span>
-                                </h6>
+                                </p>
                             </div>
                         }
-                    </div>
+                    </div>*@
                 </div>
             </div>
         </div>
@@ -35,7 +68,11 @@
 
 <style>
     .charge-count-readout {
-        min-width: 8rem;
+        min-width: 6rem;
+    }
+
+    .battery-card{
+        width: 400px;
     }
 </style>
 
@@ -48,7 +85,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        charges = await _chargeService.Get(Battery);
+        charges = await _chargeService.GetActiveParentsOnly(Battery);
         statuses = await _statusService.Get();
 
     }

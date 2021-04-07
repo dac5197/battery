@@ -12,7 +12,7 @@
     }
     <a href="@($"/charge/{Charge.Id}")" class="link-black" @onclick="HandleClick">
         <div class="d-inline">
-            <span class="oi @category.Icon cat-child-icon-@Charge.Id"></span>
+            <IconCategory Category="@category"></IconCategory>
         </div>
         @if (isCompleted)
         {

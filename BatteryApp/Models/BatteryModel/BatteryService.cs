@@ -29,6 +29,15 @@ namespace BatteryApp.Models.BatteryModel
             return batteries.Where(x => x.OwnerId == userId).ToList();
         }
 
+        public async Task<List<Battery>> GetActive(string userId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var batteries = await context.Batteries.ToListAsync();
+            return batteries.Where(x => x.OwnerId == userId)
+                            .Where(x => x.IsActive == true)
+                            .ToList();
+        }
+
         public async Task<Battery> Get(int id)
         {
             using var context = _contextFactory.CreateDbContext();

@@ -1,0 +1,55 @@
+﻿@inject IChargeService _chargeService
+@inject IStatusService _statusService
+
+<div class="row">
+    <div class="col-lg-12">
+        <NavLink href="@($"/battery/{Battery.Id}")" class="link-no-underline">
+            <div class="card bg-light shadow-sm mx-2 mt-2 mb-4 p-2 border-square battery-navlink-black">
+                <div class="card-header border-0">
+                    <h5 class="card-title">
+                        <IconBattery />
+                        @Battery.Id | @Battery.Name
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col">
+                            <h6>Active Charges: @charges.Count</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        @foreach (var status in statuses)
+                        {
+                            <div class="col">
+                                <div class="card border-square">
+                                    <div class="d-flex justify-content-md-between align-items-center py-1 px-1 px-lg-4"
+                                         style="background-color:@status.BgColor; color:@status.FontColor">
+                                        @status.Name
+                                        <span class="badge badge-light border-square">@charges.Where(x => x.StatusId == status.Id).Count()</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+
+                    </div>
+                </div>
+            </div>
+        </NavLink>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Battery Battery { get; set; }
+
+    private List<Charge> charges = new();
+    private List<Status> statuses = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        charges = await _chargeService.GetActiveParentsOnly(Battery);
+        statuses = await _statusService.Get();
+
+    }
+}
