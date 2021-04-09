@@ -3,6 +3,7 @@
 @inject AuthenticationStateProvider _authStateProvider
 @inject IBatteryService _batteryService
 @inject IBreadcrumbManager _breadcrumb
+@inject ICategoryService _categoryService
 
 
     <AuthorizeView>
@@ -81,10 +82,7 @@
                         </div>
                     </div>
 
-
-            
-
-                    <BatteryDetailModal ParentStateChanged="@StateChanged" UserId="@userId"></BatteryDetailModal>
+                    <BatteryDetailModal DefaultCategories="@defaultCategories" ParentStateChanged="@StateChanged" UserId="@userId"></BatteryDetailModal>
                 </div>
             }
         </Authorized>
@@ -106,6 +104,7 @@
 
     private List<Battery> batteries = new();
     private List<Battery> filteredBatteries = new();
+    private List<Category> defaultCategories = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,6 +113,8 @@
 
         batteries = await _batteryService.GetActive(userId);
         filteredBatteries = batteries;
+
+        defaultCategories = _categoryService.GetDefaultValues();
 
         // Set filter button bootstrap classes
         btnClassActiveBatteries = btnActive;

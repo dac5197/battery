@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BatteryApp.Models.BatteryModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -22,6 +23,10 @@ namespace BatteryApp.Models.PriorityModel
         [Required]
         [MaxLength(450)]
         public string OwnerId { get; set; }
+
+        [Required]
+        public int BatteryId { get; set; }
+        public virtual Battery Battery { get; set; }
 
         public bool IsDefault { get; set; }
 

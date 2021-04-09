@@ -1,0 +1,32 @@
+﻿@if (IsActive)
+{
+    <button type="button" class="list-group-item list-group-item-action active border-square" aria-current="true" @onclick="@ToggleActive">
+        @ChildContent
+    </button>
+}
+else
+{
+    <button type="button" class="list-group-item list-group-item-action border-square" aria-current="true" @onclick="@ToggleActive">
+        @ChildContent
+    </button>
+}
+
+@code {
+    [Parameter]
+    public bool IsActive { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    private void ToggleActive()
+    {
+        IsActive = !IsActive;
+
+        ParentStateChanged.Invoke();
+    }
+
+
+}

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BatteryApp.Models.BatteryModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,10 +20,18 @@ namespace BatteryApp.Models.CategoryModel
         [MaxLength(450)]
         public string OwnerId { get; set; }
 
+        [Required]
+        public int BatteryId { get; set; }
+        public virtual Battery Battery { get; set; }
+
         [MaxLength(20)]
         public string Icon { get; set; }
 
         [MaxLength(20)]
         public string IconColor { get; set; }
+
+        public bool IsDefaultChildCategory { get; set; }
+
+        public bool IsDefaultChargeCategory { get; set; }
     }
 }

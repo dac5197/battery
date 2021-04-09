@@ -1,7 +1,9 @@
 ﻿using BatteryApp.Data;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -43,6 +45,51 @@ namespace BatteryApp.Models.CategoryModel
             var categories = await context.Categories.ToListAsync();
             var category = categories.Where(x => x.Name.ToLower() == name.ToLower()).FirstOrDefault();
             return category;
+        }
+
+        public async Task<Category> GetDefaultChargeCategory(int batteryId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var categories = await context.Categories.ToListAsync();
+            var category = categories.Where(x => x.BatteryId == batteryId)
+                                     .Where(x => x.IsDefaultChargeCategory == true)
+                                     .FirstOrDefault();
+            return category;
+        }
+
+        public async Task<Category> GetDefaultChildCategory(int batteryId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var categories = await context.Categories.ToListAsync();
+            var category = categories.Where(x => x.BatteryId == batteryId)
+                                     .Where(x => x.IsDefaultChildCategory == true)
+                                     .FirstOrDefault();
+            return category;
+        }
+
+        public List<Category> GetDefaultValues()
+        {
+            var file = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\data\\batterydefaults.json");
+            var json = File.ReadAllText(file);
+            dynamic jsonObject = JsonConvert.DeserializeObject(json);
+
+            List<Category> categories = new();
+
+            foreach (var item in jsonObject["Categories"])
+            {
+                Category category = new()
+                {  
+                    Name = item["Name"],
+                    Icon = item["Icon"],
+                    IconColor = item["IconColor"],
+                    IsDefaultChargeCategory = item["IsDefaultChargeCategory"],
+                    IsDefaultChildCategory = item["IsDefaultChildCategory"],
+                };
+
+                categories.Add(category);
+            }
+
+            return categories;
         }
 
         public async Task<Category> Add(Category category)

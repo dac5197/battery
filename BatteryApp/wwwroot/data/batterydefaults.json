@@ -1,0 +1,75 @@
+{
+  "Categories": [
+    {
+      "Name": "Charge",
+      "Icon": "oi-bolt",
+      "IconColor": "#cccc00",
+      "IsDefaultChargeCategory": true,
+      "IsDefaultChildCategory":  false
+    },
+    {
+      "Name": "Defect",
+      "Icon": "oi-bug",
+      "IconColor": "#b30000",
+      "IsDefaultChargeCategory": false,
+      "IsDefaultChildCategory": false
+    },
+    {
+      "Name": "Spark",
+      "Icon": "oi-sun",
+      "IconColor": "#e65c00",
+      "IsDefaultChargeCategory": false,
+      "IsDefaultChildCategory": true
+    }
+  ],
+  "Priorities": [
+    {
+      "Name": "Critical",
+      "Severity": "1",
+      "BgColor": "#e60000",
+      "FontColor": "#ffffff",
+      "IsDefault": false
+    },
+    {
+      "Name": "High",
+      "Severity": "2",
+      "BgColor": "#ff8c1a",
+      "FontColor": "#ffffff",
+      "IsDefault": false
+    },
+    {
+      "Name": "Medium",
+      "Severity": "3",
+      "BgColor": "#e6b800",
+      "FontColor": "#ffffff",
+      "IsDefault": true
+    },
+    {
+      "Name": "Low",
+      "Severity": "4",
+      "BgColor": "#cccccc",
+      "FontColor": "#ffffff",
+      "IsDefault": false
+    }
+  ],
+  "Status": [
+    {
+      "Name": "Queued",
+      "Order": "1",
+      "BgColor": "#cce6ff",
+      "FontColor": "#000000"
+    },
+    {
+      "Name": "In Progress",
+      "Order": "2",
+      "BgColor": "#ffffcc",
+      "FontColor": "#000000"
+    },
+    {
+      "Name": "Completed",
+      "Order": "3",
+      "BgColor": "#b3ffd9",
+      "FontColor": "#000000"
+    }
+  ]
+}

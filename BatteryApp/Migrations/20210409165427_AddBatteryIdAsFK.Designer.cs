@@ -4,14 +4,16 @@ using BatteryApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BatteryApp.Migrations
 {
     [DbContext(typeof(AppDbContextFactory))]
-    partial class ChargeContextModelSnapshot : ModelSnapshot
+    [Migration("20210409165427_AddBatteryIdAsFK")]
+    partial class AddBatteryIdAsFK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,16 +76,6 @@ namespace BatteryApp.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<bool>("IsDefaultChargeCategory")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool>("IsDefaultChildCategory")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -98,8 +90,6 @@ namespace BatteryApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BatteryId");
 
                     b.ToTable("Categories");
                 });
@@ -262,8 +252,6 @@ namespace BatteryApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BatteryId");
-
                     b.ToTable("Priorities");
                 });
 
@@ -300,8 +288,6 @@ namespace BatteryApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BatteryId");
 
                     b.ToTable("Statuses");
                 });
@@ -397,17 +383,6 @@ namespace BatteryApp.Migrations
                     b.ToTable("UserProfiles");
                 });
 
-            modelBuilder.Entity("BatteryApp.Models.CategoryModel.Category", b =>
-                {
-                    b.HasOne("BatteryApp.Models.BatteryModel.Battery", "Battery")
-                        .WithMany()
-                        .HasForeignKey("BatteryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Battery");
-                });
-
             modelBuilder.Entity("BatteryApp.Models.ChargeModel.Charge", b =>
                 {
                     b.HasOne("BatteryApp.Models.BatteryModel.Battery", "Battery")
@@ -460,28 +435,6 @@ namespace BatteryApp.Migrations
                     b.Navigation("Charge");
 
                     b.Navigation("NoteType");
-                });
-
-            modelBuilder.Entity("BatteryApp.Models.PriorityModel.Priority", b =>
-                {
-                    b.HasOne("BatteryApp.Models.BatteryModel.Battery", "Battery")
-                        .WithMany()
-                        .HasForeignKey("BatteryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Battery");
-                });
-
-            modelBuilder.Entity("BatteryApp.Models.StatusModel.Status", b =>
-                {
-                    b.HasOne("BatteryApp.Models.BatteryModel.Battery", "Battery")
-                        .WithMany()
-                        .HasForeignKey("BatteryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Battery");
                 });
 
             modelBuilder.Entity("BatteryApp.Models.TagModel.ChargeTagRelation", b =>

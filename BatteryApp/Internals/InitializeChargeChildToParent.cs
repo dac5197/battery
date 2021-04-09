@@ -30,7 +30,7 @@ namespace BatteryApp.Internals
             child.OwnerId = parent.OwnerId;
             child.BatteryId = parent.BatteryId;
             // Get Child category ("spark") and assign it to child
-            var childCategory = await _categoryService.GetByName("spark");
+            var childCategory = await _categoryService.GetDefaultChildCategory(parent.BatteryId);
             child.CategoryId = childCategory.Id;
             // Set child priority to default priority
             var defaultPriority = await _priorityService.GetDefault(parent.OwnerId);

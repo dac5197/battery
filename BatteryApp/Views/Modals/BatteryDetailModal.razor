@@ -14,19 +14,105 @@
             <div class="modal-body">
                 <EditForm Model="@battery" OnValidSubmit="@HandleValidSubmit">
                     <DataAnnotationsValidator />
-                    <div class="form-group">
-                        <label for="title">Title</label>
-                        <InputText @bind-Value="@battery.Name" id="title" class="form-control" />
-                        <ValidationMessage For="@(() => battery.Name)" />
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="title">Title</label>
+                                <InputText @bind-Value="@battery.Name" id="title" class="form-control" />
+                                <ValidationMessage For="@(() => battery.Name)" />
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="desc">Description</label>
-                        <InputTextArea @bind-Value="@battery.Description" @oninput="@(e => resizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control">@battery.Description</InputTextArea>
-                        <ValidationMessage For="@(() => battery.Description)" />
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="desc">Description</label>
+                                <InputTextArea @bind-Value="@battery.Description" @oninput="@(e => resizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control">@battery.Description</InputTextArea>
+                                <ValidationMessage For="@(() => battery.Description)" />
+                            </div>
+                        </div>
                     </div>
-                    <br />
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <div class="row">
+                        <div class="col">
+                            <a class="link-black" role="button" href="" @onclick="@ToggleAdvancedOptions" @onclick:preventDefault="true">
+                                <p>
+                                    @if (showAdvancedOptions)
+                                    {
+                                        <span class="oi oi-caret-bottom"></span>
+
+                                    }
+                                    else
+                                    {
+                                        <span class="oi oi-caret-right"></span>
+                                    }
+                                    Advanced Options
+                                </p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row px-5">
+                        <div class="col">
+                            @if (showAdvancedOptions)
+                            {
+                                <div class="list-group">
+                                    <BatteryModalAdvOptionsListItem IsActive="@showCategoryOptions" ParentStateChanged="@CategoryStateChanged">Categories</BatteryModalAdvOptionsListItem>
+                                    @if (showCategoryOptions)
+                                    {
+                                        <table class="table table-sm table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Icon</th>
+                                                    <th>Name</th>
+                                                    <th>Default?</th>
+                                                    <th>Child Category?</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var category in DefaultCategories)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <IconCategory Category="@category"></IconCategory>
+                                                        </td>
+                                                        <td>@category.Name</td>
+                                                        <td>@category.IsDefaultChargeCategory</td>
+                                                        <td>@category.IsDefaultChildCategory</td>
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+                                        </table>
+
+                                        @*<div class="list-group">
+                                            @foreach (var category in DefaultCategories)
+	                                        {   
+                                                <button type="button" class="list-group-item list-group-item-action" disabled>
+                                                    @category.
+                                                </button>
+	                                        }
+                                            
+                                        </div>*@
+                                    }
+                                    <BatteryModalAdvOptionsListItem IsActive="@showPriorityOptions" ParentStateChanged="@PriorityStateChanged">Priorities</BatteryModalAdvOptionsListItem>
+                                    @if (showPriorityOptions)
+                                    {
+                                        <p>Priority options</p>
+                                    }
+                                    <BatteryModalAdvOptionsListItem IsActive="@showStatusOptions" ParentStateChanged="@StatusStateChanged">Statuses</BatteryModalAdvOptionsListItem>
+                                    @if (showStatusOptions)
+                                    {
+                                        <p>Status options</p>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
                 </EditForm>
             </div>
         </div>
@@ -39,9 +125,17 @@
     public string UserId { get; set; }
 
     [Parameter]
+    public List<Category> DefaultCategories { get; set; }
+
+    [Parameter]
     public Action ParentStateChanged { get; set; }
 
     private Battery battery = new();
+
+    private bool showAdvancedOptions = false;
+    private bool showCategoryOptions = false;
+    private bool showPriorityOptions = false;
+    private bool showStatusOptions = false;
 
     private int textareaRows;
 
@@ -55,14 +149,57 @@
         ParentStateChanged?.Invoke();
     }
 
-    private void resizeTextarea(ChangeEventArgs e)
-    {
-        textareaRows = _calcTextareaRows.CalculateRows((string)e.Value);
-    }
-
     public async Task CloseModal()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "batteryDetailModal");
     }
 
+    private void resizeTextarea(ChangeEventArgs e)
+    {
+        textareaRows = _calcTextareaRows.CalculateRows((string)e.Value);
+    }
+
+    private void ToggleAdvancedOptions()
+    {
+        showAdvancedOptions = !showAdvancedOptions;
+    }
+
+    private void CategoryStateChanged()
+    {
+        showCategoryOptions = !showCategoryOptions;
+
+        if (showCategoryOptions)
+        {
+            showPriorityOptions = false;
+            showStatusOptions = false;
+        }
+
+        StateHasChanged();
+    }
+
+    private void PriorityStateChanged()
+    {
+        showPriorityOptions = !showPriorityOptions;
+
+        if (showPriorityOptions)
+        {
+            showCategoryOptions = false;
+            showStatusOptions = false;
+        }
+
+        StateHasChanged();
+    }
+
+    private void StatusStateChanged()
+    {
+        showStatusOptions = !showStatusOptions;
+
+        if (showStatusOptions)
+        {
+            showCategoryOptions = false;
+            showPriorityOptions = false;
+        }
+
+        StateHasChanged();
+    }
 }

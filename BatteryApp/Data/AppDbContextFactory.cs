@@ -111,8 +111,17 @@ namespace BatteryApp.Data
             // Set Unique constraint on Tag+BatteryId
             // https://entityframeworkcore.com/knowledge-base/41246614/entity-framework-core-add-unique-constraint-code-first
             modelBuilder.Entity<Tag>()
-            .HasIndex(p => new { p.Name, p.BatteryId })
+            .HasIndex(t => new { t.Name, t.BatteryId })
             .IsUnique(true);
+
+            // Set Default Values
+            modelBuilder.Entity<Category>()
+                .Property(c => c.IsDefaultChildCategory)
+                .HasDefaultValue(false);
+            
+            modelBuilder.Entity<Category>()
+                .Property(c => c.IsDefaultChargeCategory)
+                .HasDefaultValue(false);
         }      
     }
 }

@@ -1,4 +1,5 @@
-﻿using BatteryApp.Models.ChargeModel;
+﻿using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.ChargeModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,6 +20,10 @@ namespace BatteryApp.Models.StatusModel
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Value should be greater than or equal to 1")]
         public int Order { get; set; }
+
+        [Required]
+        public int BatteryId { get; set; }
+        public virtual Battery Battery { get; set; }
 
         public ICollection<Charge> Charges { get; set; }
 
