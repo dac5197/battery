@@ -1,10 +1,11 @@
-﻿@inject ICalculateTextareaRows _calcTextareaRows
-@inject IBatteryService _batteryService
+﻿@inject IBatteryService _batteryService
+@inject ICalculateTextareaRows _calcTextareaRows
+@inject ICategoryService _categoryService
 @inject IJSRuntime _jsRuntime
 
 <div class="modal fade" tabindex="-1" role="dialog" id="batteryDetailModal">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-square">
             <div class="modal-header">
                 <h5 class="modal-title">Battery Detail</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -65,18 +66,29 @@
                                                     <th>Name</th>
                                                     <th>Default?</th>
                                                     <th>Child Category?</th>
+                                                    <th>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach (var category in DefaultCategories)
+                                                @foreach (var category in categories)
                                                 {
                                                     <tr>
-                                                        <td>
+                                                        <td class="pl-2">
                                                             <IconCategory Category="@category"></IconCategory>
                                                         </td>
                                                         <td>@category.Name</td>
                                                         <td>@category.IsDefaultChargeCategory</td>
                                                         <td>@category.IsDefaultChildCategory</td>
+                                                        <td>
+                                                            <button class="btn btn-info btn-sm border-square"
+                                                                    type="button"
+                                                                    data-toggle="modal"
+                                                                    data-target="#batteryDetailEditAdvancedOptionsModal"
+                                                                    @onclick="(() => SetEditCategory(category))">
+                                                                Edit
+                                                            </button>
+                                                            <button class="btn btn-danger btn-sm border-square" type="button">X</button>
+                                                        </td>
                                                     </tr>
                                                 }
 
@@ -84,14 +96,14 @@
                                         </table>
 
                                         @*<div class="list-group">
-                                            @foreach (var category in DefaultCategories)
-	                                        {   
-                                                <button type="button" class="list-group-item list-group-item-action" disabled>
-                                                    @category.
-                                                </button>
-	                                        }
-                                            
-                                        </div>*@
+                                                @foreach (var category in DefaultCategories)
+                                                {
+                                                    <button type="button" class="list-group-item list-group-item-action" disabled>
+                                                        @category.
+                                                    </button>
+                                                }
+
+                                            </div>*@
                                     }
                                     <BatteryModalAdvOptionsListItem IsActive="@showPriorityOptions" ParentStateChanged="@PriorityStateChanged">Priorities</BatteryModalAdvOptionsListItem>
                                     @if (showPriorityOptions)
@@ -109,8 +121,8 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary border-square">Submit</button>
+                            <button type="button" class="btn btn-secondary border-square" data-dismiss="modal">Cancel</button>
                         </div>
                     </div>
                 </EditForm>
@@ -118,6 +130,8 @@
         </div>
     </div>
 </div>
+
+<BatteryDetailEditAdvancedOptionModal Category="@editCategory" ParentStateChanged="@CategoryStateChanged"></BatteryDetailEditAdvancedOptionModal>
 
 @code {
 
@@ -131,6 +145,9 @@
     public Action ParentStateChanged { get; set; }
 
     private Battery battery = new();
+    private Category editCategory = new();
+
+    private List<Category> categories = new();
 
     private bool showAdvancedOptions = false;
     private bool showCategoryOptions = false;
@@ -138,6 +155,11 @@
     private bool showStatusOptions = false;
 
     private int textareaRows;
+
+    protected override void OnInitialized()
+    {
+        categories = _categoryService.GetDefaultValues();
+    }
 
     private async void HandleValidSubmit()
     {
@@ -166,13 +188,16 @@
 
     private void CategoryStateChanged()
     {
-        showCategoryOptions = !showCategoryOptions;
+        showCategoryOptions = true;
 
-        if (showCategoryOptions)
-        {
-            showPriorityOptions = false;
-            showStatusOptions = false;
-        }
+        showPriorityOptions = false;
+        showStatusOptions = false;
+
+        //if (showCategoryOptions)
+        //{
+        //    showPriorityOptions = false;
+        //    showStatusOptions = false;
+        //}
 
         StateHasChanged();
     }
@@ -202,4 +227,10 @@
 
         StateHasChanged();
     }
+
+    private void SetEditCategory(Category category)
+    {
+        editCategory = category;
+    }
+
 }

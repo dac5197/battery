@@ -1,0 +1,135 @@
+﻿@inject ICategoryService _categoryService
+@inject IJSRuntime _jsRuntime
+
+<div class="modal fade" tabindex="-1" role="dialog" id="batteryDetailEditAdvancedOptionsModal" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-square">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <EditForm Model="@Category" OnValidSubmit="@HandleValidSubmit">
+                <div class="modal-body">
+                    <div class="row px-2 mb-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="category-name">Icon Color</label>
+                                <InputText id="category-name" type="color" class="form-control border-square" @bind-Value="@Category.IconColor" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <p>Icon</p>
+                            <button type="button" class="btn btn-outline-secondary border-square dropdown-toggle px-1 pt-1 pb-0" id="dropdownIconMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="oi @Category.Icon"></span>
+                            </button>
+                            <div class="dropdown-menu pr-3" aria-labelledby="dropdownIconMenu" style="max-height: 400px; overflow-y:auto;">
+                                <input type="text" class="form-control form-control-sm border-square ml-2 mb-2" />
+                                @foreach (var icon in icons)
+                                {
+                                    @if (Category.Icon is not null)
+                                    {
+                                        @if (Category.Icon.Substring(3) == icon.ToString().ToLower())
+                                        {
+                                            <button type="button" class="btn btn-secondary border-0 border-square p-1 m-1" title="@icon" @onclick="(() => SetCategoryIcon(icon))">
+                                                <span class="oi oi-@icon"></span>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-outline-secondary border-0 border-square p-1 m-1" title="@icon" @onclick="(() => SetCategoryIcon(icon))">
+                                                <span class="oi oi-@icon"></span>
+                                            </button>
+                                        }
+                                    }
+                                }
+                                </div>
+                            @*@foreach (var icon in icons)
+        {
+            <button type="button" class="btn btn-outline-dark border-0 border-square p-1 m-1">
+                <span class="oi oi-@icon"></span>
+            </button>
+        }*@
+                        </div>
+                    </div>
+                   
+                    @*<div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <button class="btn btn-outline-secondary dropdown-toggle border-square" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span style="
+                                            background-color: @Category.IconColor;
+                                            width: 10px !important;
+                                            padding: 2px;
+                                                "></span>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="#">Action</a>
+                                    <a class="dropdown-item" href="#">Another action</a>
+                                    <a class="dropdown-item" href="#">Something else here</a>
+                                    <div role="separator" class="dropdown-divider"></div>
+                                    <a class="dropdown-item " href="#">Separated link</a>
+                                </div>
+                            </div>
+                            <InputText @bind-Value="@Category.IconColor" type="color" class="form-control border-square" readonly />
+                        </div>*@
+                    <div class="row px-2 mb-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="category-name">Name</label>
+                                <InputText id="category-name" type="text" class="form-control border-square" @bind-Value="@Category.Name" />
+                            </div>
+                            <div class="form-check">
+                                <InputCheckbox @bind-Value="@Category.IsDefaultChargeCategory" class="form-check-input border-square" type="checkbox" id="category-childCat" />
+                                <label class="form-check-label" for="defaultCheck1">
+                                    Is Default Category?
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <InputCheckbox @bind-Value="@Category.IsDefaultChildCategory" class="form-check-input border-square" type="checkbox" id="category-default" />
+                                <label class="form-check-label" for="defaultCheck1">
+                                    Is Child Category?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success border-square">Submit</button>
+                    <button type="button" class="btn btn-secondary border-square" data-dismiss="modal">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Category Category { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    private List<string> icons = new();
+
+    protected override void OnInitialized()
+    {
+        icons = _categoryService.GetIconList();
+    }
+
+    private async void HandleValidSubmit()
+    {
+        await CloseModal();
+        ParentStateChanged?.Invoke();
+    }
+
+    public async Task CloseModal()
+    {
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "batteryDetailEditAdvancedOptionsModal");
+    }
+
+    private void SetCategoryIcon(string icon)
+    {
+        Category.Icon = $"oi-{icon}";
+    }
+}

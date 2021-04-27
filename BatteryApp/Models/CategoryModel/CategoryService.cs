@@ -92,6 +92,18 @@ namespace BatteryApp.Models.CategoryModel
             return categories;
         }
 
+        public List<string> GetIconList()
+        {
+            var file = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\data\\OpenIconicList.csv");
+
+            List<string> icons = File.ReadAllLines(file)
+                                     .Skip(1)
+                                     .ToList();
+
+            return icons;
+
+        }
+
         public async Task<Category> Add(Category category)
         {
             using var context = _contextFactory.CreateDbContext();

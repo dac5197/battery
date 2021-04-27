@@ -14,6 +14,7 @@ namespace BatteryApp.Models.CategoryModel
         Task<Category> GetDefaultChargeCategory(int batteryId);
         Task<Category> GetDefaultChildCategory(int batteryId);
         List<Category> GetDefaultValues();
+        List<string> GetIconList();
         Task<Category> Update(Category category);
     }
 }

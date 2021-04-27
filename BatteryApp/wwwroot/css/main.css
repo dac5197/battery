@@ -61,3 +61,12 @@
 .link-no-underline:hover {
     text-decoration: none;
 }
+
+/* modal backdrop fix */
+.modal:nth-of-type(even) {
+    z-index: 1052 !important;
+}
+
+.modal-backdrop.show:nth-of-type(even) {
+    z-index: 1051 !important;
+}
