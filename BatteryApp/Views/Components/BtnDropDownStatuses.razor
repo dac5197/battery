@@ -37,7 +37,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        completeStatus = await _statusService.GetCompletedStatus();
+        completeStatus = await _statusService.GetCompletedStatus(Charge.BatteryId);
 
         status = Statuses.Where(x => x.Id == Charge.StatusId).FirstOrDefault();
     }

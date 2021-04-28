@@ -36,7 +36,7 @@ namespace BatteryApp.Internals
             var defaultPriority = await _priorityService.GetDefault(parent.OwnerId);
             child.PriorityId = defaultPriority.Id;
             // Set child to initial status
-            var initialStatus = await _statusService.GetInitialStatus();
+            var initialStatus = await _statusService.GetInitialStatus(parent.BatteryId);
             child.StatusId = initialStatus.Id;
 
             return child;

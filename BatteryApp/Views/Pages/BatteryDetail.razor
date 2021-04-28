@@ -321,11 +321,11 @@
 
         // Get entities
         battery = await _batteryService.Get(Id);
-        categories = await _categoryService.Get(userId);
+        categories = await _categoryService.Get(battery);
         charges = await _chargeService.GetActive(battery);
         chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
-        priorities = await _priorityService.Get(userId);
-        statuses = await _statusService.Get();
+        priorities = await _priorityService.Get(battery);
+        statuses = await _statusService.Get(battery);
 
         // Set filtered charge list
         filteredCharges = charges;
@@ -490,7 +490,7 @@
     private async void CompleteChargeWithChildren()
     {
         var charge = _chargeOpenChildrenModalHelper.Charge;
-        var completeStatus = await _statusService.GetCompletedStatus();
+        var completeStatus = await _statusService.GetCompletedStatus(battery.Id);
         charge.StatusId = completeStatus.Id;
         await _chargeService.Update(charge);
 

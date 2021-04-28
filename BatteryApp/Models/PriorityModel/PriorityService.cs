@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Data;
+using BatteryApp.Models.BatteryModel;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -22,6 +23,13 @@ namespace BatteryApp.Models.PriorityModel
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Priorities.ToListAsync();
+        }
+
+        public async Task<List<Priority>> Get(Battery battery)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var priorities = await context.Priorities.ToListAsync();
+            return priorities.Where(x => x.BatteryId == battery.Id).ToList();
         }
 
         public async Task<List<Priority>> Get(string userId)

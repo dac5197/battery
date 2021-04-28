@@ -22,6 +22,10 @@ namespace BatteryApp.Models.StatusModel
         public int Order { get; set; }
 
         [Required]
+        [MaxLength(450)]
+        public string OwnerId { get; set; }
+
+        [Required]
         public int BatteryId { get; set; }
         public virtual Battery Battery { get; set; }
 

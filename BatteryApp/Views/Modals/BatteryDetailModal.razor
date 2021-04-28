@@ -1,4 +1,5 @@
 ﻿@inject IBatteryService _batteryService
+@inject IBatteryAdvancedOptionsService _batteryAdvOptions
 @inject ICalculateTextareaRows _calcTextareaRows
 @inject ICategoryService _categoryService
 @inject IPriorityService _priorityService
@@ -289,12 +290,16 @@
         GetDefaultCategories();
         GetDefaultPriorities();
         GetDefaultStatuses();
+
+        battery.IsActive = true;
+        battery.OwnerId = UserId;
     }
 
     private async void HandleValidSubmit()
     {
-        battery.OwnerId = UserId;
-        await _batteryService.Add(battery);
+        Battery newBattery = await _batteryService.Add(battery);
+
+        await _batteryAdvOptions.SaveAsync(newBattery, categories, priorities, statuses);
 
         await CloseModal();
 

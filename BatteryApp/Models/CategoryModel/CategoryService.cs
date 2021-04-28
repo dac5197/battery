@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Data;
+using BatteryApp.Models.BatteryModel;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -23,6 +24,13 @@ namespace BatteryApp.Models.CategoryModel
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Categories.ToListAsync();
+        }
+
+        public async Task<List<Category>> Get(Battery battery)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var categories = await context.Categories.ToListAsync();
+            return categories.Where(x => x.BatteryId == battery.Id).ToList();
         }
 
         public async Task<List<Category>> Get(string userId)

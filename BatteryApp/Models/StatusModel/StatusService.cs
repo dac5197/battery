@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Data;
+using BatteryApp.Models.BatteryModel;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -24,6 +25,13 @@ namespace BatteryApp.Models.StatusModel
             return await context.Statuses.ToListAsync();
         }
 
+        public async Task<List<Status>> Get(Battery battery)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var statuses = await context.Statuses.ToListAsync();
+            return statuses.Where(x => x.BatteryId == battery.Id).ToList();
+        }
+
         public async Task<Status> Get(int id)
         {
             using var context = _contextFactory.CreateDbContext();
@@ -31,11 +39,13 @@ namespace BatteryApp.Models.StatusModel
             return status;
         }
 
-        public async Task<Status> GetCompletedStatus()
+        public async Task<Status> GetCompletedStatus(int batteryId)
         {
             using var context = _contextFactory.CreateDbContext();
             var statuses = await context.Statuses.ToListAsync();
-            var completedStatus = statuses.OrderByDescending(x => x.Order).FirstOrDefault();
+            var completedStatus = statuses.Where(x => x.BatteryId == batteryId)
+                                          .OrderByDescending(x => x.Order)
+                                          .FirstOrDefault();
             return completedStatus;
         }
 
@@ -63,11 +73,13 @@ namespace BatteryApp.Models.StatusModel
             return statuses;
         }
 
-        public async Task<Status> GetInitialStatus()
+        public async Task<Status> GetInitialStatus(int batteryId)
         {
             using var context = _contextFactory.CreateDbContext();
             var statuses = await context.Statuses.ToListAsync();
-            var initialStatus = statuses.OrderBy(x => x.Order).FirstOrDefault();
+            var initialStatus = statuses.Where(x => x.BatteryId == batteryId)
+                                        .OrderBy(x => x.Order)
+                                        .FirstOrDefault();
             return initialStatus;
         }
 

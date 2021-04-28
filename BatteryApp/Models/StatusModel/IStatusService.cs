@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BatteryApp.Models.BatteryModel;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BatteryApp.Models.StatusModel
@@ -8,10 +9,11 @@ namespace BatteryApp.Models.StatusModel
         Task<Status> Add(Status status);
         Task Delete(int id);
         Task<List<Status>> Get();
+        Task<List<Status>> Get(Battery battery);
         Task<Status> Get(int id);
-        Task<Status> GetCompletedStatus();
+        Task<Status> GetCompletedStatus(int batteryId);
         List<Status> GetDefaultValues();
-        Task<Status> GetInitialStatus();
+        Task<Status> GetInitialStatus(int batteryId);
         Task<Status> Update(Status status);
     }
 }
