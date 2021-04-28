@@ -1,7 +1,9 @@
 ﻿using BatteryApp.Data;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,6 +44,31 @@ namespace BatteryApp.Models.PriorityModel
             var priorities = await context.Priorities.ToListAsync();
             var priority = priorities.Where(x => x.OwnerId == userId && x.IsDefault == true).FirstOrDefault();
             return priority;
+        }
+
+        public List<Priority> GetDefaultValues()
+        {
+            var file = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\data\\batterydefaults.json");
+            var json = File.ReadAllText(file);
+            dynamic jsonObject = JsonConvert.DeserializeObject(json);
+
+            List<Priority> priorities = new();
+
+            foreach (var item in jsonObject["Priorities"])
+            {
+                Priority priority = new()
+                {
+                    Name = item["Name"],
+                    Severity = item["Severity"],
+                    BgColor = item["BgColor"],
+                    FontColor = item["FontColor"],
+                    IsDefault = item["IsDefault"],
+                };
+
+                priorities.Add(priority);
+            }
+
+            return priorities;
         }
 
         public async Task<Priority> Add(Priority priority)

@@ -1,0 +1,81 @@
+﻿@inject IPriorityService _priorityService
+@inject IJSRuntime _jsRuntime
+
+<div class="modal modal-child fade" tabindex="-1" role="dialog" id="BatteryDetailAdvOptions_EditPriorityModal" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-square">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Priority</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <EditForm Model="@Priority" OnValidSubmit="@HandleValidSubmit">
+                <div class="modal-body">
+                    <div class="row px-2 mb-2">
+                        <div class="col">
+                            <label for="category-fontColor">Font Color</label>
+                            <InputText id="category-fontColor" type="color" class="form-control border-square" @bind-Value="@Priority.FontColor" />
+                        </div>
+                        <div class="col">
+                            <label for="category-bgColor">Backgroung Color</label>
+                            <InputText id="category-bgColor" type="color" class="form-control border-square" @bind-Value="@Priority.BgColor" />
+                        </div>
+                    </div>
+                    <div class="row px-2 mb-2">
+                        <div class="col">
+                            <label for="priority-severity">Severity</label>
+                            <InputNumber id="priority-severity" class="form-control border-square" @bind-Value="@Priority.Severity" />
+                        </div>
+                        <div class="col">
+                            <label for="priority-name">Name</label>
+                            <InputText id="priority-name" type="text" class="form-control border-square" @bind-Value="@Priority.Name" />
+                        </div>
+                    </div>
+                    <div class="row pl-5 mt-4 mb-2">
+                        <div class="col">
+                            <InputCheckbox @bind-Value="@Priority.IsDefault" class="form-check-input border-square" type="checkbox" id="priority-isDefault" />
+                            <label class="form-check-label" for="defaultCheck1">
+                                Is Default?
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row px-2 mb-2">
+                        <div class="col">
+                            <p class="text-center">Preview</p>
+                            <p class="text-center">
+                                <span class="btn btn-sm border-square dopdown-toggle small mx-1 py-0 px-1"
+                                      style="color: @Priority.FontColor; background-color: @Priority.BgColor">
+                                    @Priority.DisplayName
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success border-square">Submit</button>
+                    <button type="button" class="btn btn-secondary border-square" data-dismiss="modal">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Priority Priority { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    private async void HandleValidSubmit()
+    {
+        await CloseModal();
+        ParentStateChanged?.Invoke();
+    }
+
+    public async Task CloseModal()
+    {
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "BatteryDetailAdvOptions_EditPriorityModal");
+    }
+}
