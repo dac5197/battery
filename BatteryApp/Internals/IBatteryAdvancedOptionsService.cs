@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BatteryApp.Internals
 {
-    public interface IBatteryAdvancedOptionsService
+    public interface IBatteryAdvancedOptionsSaveService
     {
         Task SaveAsync(Battery battery, List<Category> categories, List<Priority> priorities, List<Status> statuses);
     }

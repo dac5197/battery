@@ -1,0 +1,13 @@
+﻿@foreach (var error in Errors)
+{
+    @foreach (var message in error.Value)
+    {
+        <p style="color: red">@error.Key - @message</p>
+    }
+}
+
+
+@code {
+    [Parameter]
+    public Dictionary<string, List<string>> Errors { get; set; }
+}

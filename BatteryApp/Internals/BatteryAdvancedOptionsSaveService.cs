@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace BatteryApp.Internals
 {
-    public class BatteryAdvancedOptionsService : IBatteryAdvancedOptionsService
+    public class BatteryAdvancedOptionsSaveService : IBatteryAdvancedOptionsSaveService
     {
         private readonly ICategoryService _categoryService;
         private readonly IPriorityService _priorityService;
         private readonly IStatusService _statusService;
 
-        public BatteryAdvancedOptionsService(ICategoryService categoryService, IPriorityService priorityService, IStatusService statusService)
+        public BatteryAdvancedOptionsSaveService(ICategoryService categoryService, IPriorityService priorityService, IStatusService statusService)
         {
             _categoryService = categoryService;
             _priorityService = priorityService;

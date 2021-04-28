@@ -66,7 +66,7 @@ namespace BatteryApp.Data
             }
         }
 
-        private void SetTimeStamps(EntityEntry entry, DateTime utcNow)
+        private static void SetTimeStamps(EntityEntry entry, DateTime utcNow)
         {
             // for entities that inherit from BaseEntity,
             // set UpdatedOn / CreatedOn appropriately
