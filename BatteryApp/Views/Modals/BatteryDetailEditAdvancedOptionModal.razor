@@ -28,20 +28,17 @@
                                 <input type="search" class="form-control form-control-sm border-square ml-2 mb-2" @oninput="@(e => FilterIcons(e))" />
                                 @foreach (var icon in icons)
                                 {
-                                    @if (Category.Icon is not null)
+                                    @if (Category.Icon?.Substring(3) == icon.ToString().ToLower())
                                     {
-                                        @if (Category.Icon.Substring(3) == icon.ToString().ToLower())
-                                        {
-                                            <button type="button" class="btn btn-secondary border-0 border-square p-1 m-1" title="@icon" @onclick="(() => SetCategoryIcon(icon))">
-                                                <span class="oi oi-@icon"></span>
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            <button type="button" class="btn btn-outline-secondary border-0 border-square p-1 m-1" title="@icon" @onclick="(() => SetCategoryIcon(icon))">
-                                                <span class="oi oi-@icon"></span>
-                                            </button>
-                                        }
+                                        <button type="button" class="btn btn-secondary border-0 border-square p-1 m-1" title="@icon" @onclick="(() => SetCategoryIcon(icon))">
+                                            <span class="oi oi-@icon"></span>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-outline-secondary border-0 border-square p-1 m-1" title="@icon" @onclick="(() => SetCategoryIcon(icon))">
+                                            <span class="oi oi-@icon"></span>
+                                        </button>
                                     }
                                 }
                             </div>
@@ -90,7 +87,7 @@
     protected override void OnInitialized()
     {
         defaultIcons = _categoryService.GetIconList();
-        icons = defaultIcons;
+        icons = new List<string>(defaultIcons);
     }
 
     private async void HandleValidSubmit()
