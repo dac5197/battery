@@ -1,7 +1,9 @@
 ﻿using BatteryApp.Data;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,6 +37,30 @@ namespace BatteryApp.Models.StatusModel
             var statuses = await context.Statuses.ToListAsync();
             var completedStatus = statuses.OrderByDescending(x => x.Order).FirstOrDefault();
             return completedStatus;
+        }
+
+        public List<Status> GetDefaultValues()
+        {
+            var file = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\data\\batterydefaults.json");
+            var json = File.ReadAllText(file);
+            dynamic jsonObject = JsonConvert.DeserializeObject(json);
+
+            List<Status> statuses = new();
+
+            foreach (var item in jsonObject["Statuses"])
+            {
+                Status status = new()
+                {
+                    Name = item["Name"],
+                    Order = item["Order"],
+                    BgColor = item["BgColor"],
+                    FontColor = item["FontColor"],
+                };
+
+                statuses.Add(status);
+            }
+
+            return statuses;
         }
 
         public async Task<Status> GetInitialStatus()

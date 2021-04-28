@@ -2,6 +2,7 @@
 @inject ICalculateTextareaRows _calcTextareaRows
 @inject ICategoryService _categoryService
 @inject IPriorityService _priorityService
+@inject IStatusService _statusService
 @inject IJSRuntime _jsRuntime
 
 <div class="modal fade" tabindex="-1" role="dialog" id="batteryDetailModal">
@@ -57,131 +58,183 @@
                         <div class="col">
                             @if (showAdvancedOptions)
                             {
-                                <div class="list-group">
-                                    <!-- Category advanced options -->
-                                    <BatteryModalAdvOptionsListItem IsActive="@showCategoryOptions" ParentStateChanged="@ToggleCategoryOptions">Categories</BatteryModalAdvOptionsListItem>
-                                    @if (showCategoryOptions)
-                                    {
-                                        <table class="table table-sm table-hover">
-                                            <thead>
+                            <div class="list-group">
+                                <!-- Category advanced options -->
+                                <BatteryModalAdvOptionsListItem IsActive="@showCategoryOptions" ParentStateChanged="@ToggleCategoryOptions">Categories</BatteryModalAdvOptionsListItem>
+                                @if (showCategoryOptions)
+                                {
+                                    <table class="table table-sm table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Icon</th>
+                                                <th>Name</th>
+                                                <th>Default?</th>
+                                                <th>Child Category?</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var category in categories)
+                                            {
                                                 <tr>
-                                                    <th>Icon</th>
-                                                    <th>Name</th>
-                                                    <th>Default?</th>
-                                                    <th>Child Category?</th>
-                                                    <th>Actions</th>
+                                                    <td class="pl-2">
+                                                        <IconCategory Category="@category"></IconCategory>
+                                                    </td>
+                                                    <td>@category.Name</td>
+                                                    <td>@category.IsDefaultChargeCategory</td>
+                                                    <td>@category.IsDefaultChildCategory</td>
+                                                    <td>
+                                                        <button class="btn btn-info btn-sm border-square"
+                                                                type="button"
+                                                                data-toggle="modal"
+                                                                data-target="#BatteryDetailAdvOptions_EditCategoryModal"
+                                                                @onclick="(() => SetEditCategory(category))">
+                                                            Edit
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm border-square" type="button" @onclick="@(() => RemoveCategory(category))">X</button>
+                                                    </td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach (var category in categories)
-                                                {
-                                                    <tr>
-                                                        <td class="pl-2">
-                                                            <IconCategory Category="@category"></IconCategory>
-                                                        </td>
-                                                        <td>@category.Name</td>
-                                                        <td>@category.IsDefaultChargeCategory</td>
-                                                        <td>@category.IsDefaultChildCategory</td>
-                                                        <td>
-                                                            <button class="btn btn-info btn-sm border-square"
-                                                                    type="button"
-                                                                    data-toggle="modal"
-                                                                    data-target="#BatteryDetailAdvOptions_EditCategoryModal"
-                                                                    @onclick="(() => SetEditCategory(category))">
-                                                                Edit
-                                                            </button>
-                                                            <button class="btn btn-danger btn-sm border-square" type="button" @onclick="@(() => RemoveCategory(category))">X</button>
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                        <div class="row px-2 mb-3">
-                                            <div class="col">
-                                                <button type="button"
-                                                        class="btn btn-info btn-sm border-square"
-                                                        style="width: 32px;"
-                                                        title="Restore Defaults"
-                                                        @onclick="@GetDefaultCategories">
-                                                    <span class="oi oi-bookmark"></span>
-                                                </button>
-                                                <button type="button"
-                                                        class="btn btn-success btn-sm border-square"
-                                                        data-toggle="modal"
-                                                        data-target="#BatteryDetailAdvOptions_EditCategoryModal"
-                                                        style="width: 32px;"
-                                                        title="Add Category"
-                                                        @onclick="@SetEditCategoryToNew">
-                                                    <span class="oi oi-plus"></span>
-                                                </button>
-                                            </div>
+                                            }
+                                        </tbody>
+                                    </table>
+                                    <div class="row px-2 mb-3">
+                                        <div class="col">
+                                            <button type="button"
+                                                    class="btn btn-info btn-sm border-square"
+                                                    style="width: 32px;"
+                                                    title="Restore Defaults"
+                                                    @onclick="@GetDefaultCategories">
+                                                <span class="oi oi-bookmark"></span>
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-success btn-sm border-square"
+                                                    data-toggle="modal"
+                                                    data-target="#BatteryDetailAdvOptions_EditCategoryModal"
+                                                    style="width: 32px;"
+                                                    title="Add Category"
+                                                    @onclick="@SetEditCategoryToNew">
+                                                <span class="oi oi-plus"></span>
+                                            </button>
                                         </div>
-                                    }
-                                    <!-- Priority advanced options -->
-                                    <BatteryModalAdvOptionsListItem IsActive="@showPriorityOptions" ParentStateChanged="@TogglePriorityOptions">Priorities</BatteryModalAdvOptionsListItem>
-                                    @if (showPriorityOptions)
-                                    {
-                                        <table class="table table-sm table-hover">
-                                            <thead>
+                                    </div>
+                                }
+                                <!-- Priority advanced options -->
+                                <BatteryModalAdvOptionsListItem IsActive="@showPriorityOptions" ParentStateChanged="@TogglePriorityOptions">Priorities</BatteryModalAdvOptionsListItem>
+                                @if (showPriorityOptions)
+                                {
+                                    <table class="table table-sm table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Display Name</th>
+                                                <th>Default?</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var priority in priorities.OrderBy(x => x.Severity))
+                                            {
                                                 <tr>
-                                                    <th>Display Name</th>
-                                                    <th>Default?</th>
-                                                    <th>Actions</th>
+                                                    <td>
+                                                        <span class="btn btn-sm border-square dopdown-toggle small mx-1 py-0 px-1"
+                                                              style="color: @priority.FontColor; background-color: @priority.BgColor">
+                                                            @priority.DisplayName
+                                                        </span>
+                                                    </td>
+                                                    <td>@priority.IsDefault</td>
+                                                    <td>
+                                                        <button class="btn btn-info btn-sm border-square"
+                                                                type="button"
+                                                                data-toggle="modal"
+                                                                data-target="#BatteryDetailAdvOptions_EditPriorityModal"
+                                                                @onclick="(() => SetEditPriority(priority))">
+                                                            Edit
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm border-square" type="button" @onclick="@(() => RemovePriority(priority))">X</button>
+                                                    </td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach (var priority in priorities.OrderBy(x => x.Severity))
-                                                {
-                                                    <tr>
-                                                        <td>
-                                                            <span class="btn btn-sm border-square dopdown-toggle small mx-1 py-0 px-1"
-                                                                  style="color: @priority.FontColor; background-color: @priority.BgColor">
-                                                                @priority.DisplayName
-                                                            </span>
-                                                        </td>
-                                                        <td>@priority.IsDefault</td>
-                                                        <td>
-                                                            <button class="btn btn-info btn-sm border-square"
-                                                                    type="button"
-                                                                    data-toggle="modal"
-                                                                    data-target="#BatteryDetailAdvOptions_EditPriorityModal"
-                                                                    @onclick="(() => SetEditPriority(priority))">
-                                                                Edit
-                                                            </button>
-                                                            <button class="btn btn-danger btn-sm border-square" type="button" @onclick="@(() => RemovePriority(priority))">X</button>
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                        <div class="row px-2 mb-3">
-                                            <div class="col">
-                                                <button type="button"
-                                                        class="btn btn-info btn-sm border-square"
-                                                        style="width: 32px;"
-                                                        title="Restore Defaults"
-                                                        @onclick="@GetDefaultPriorities">
-                                                    <span class="oi oi-bookmark"></span>
-                                                </button>
-                                                <button type="button"
-                                                        class="btn btn-success btn-sm border-square"
-                                                        data-toggle="modal"
-                                                        data-target="#BatteryDetailAdvOptions_EditPriorityModal"
-                                                        style="width: 32px;"
-                                                        title="Add Category"
-                                                        @onclick="@SetEditPriorityToNew">
-                                                    <span class="oi oi-plus"></span>
-                                                </button>
-                                            </div>
+                                            }
+                                        </tbody>
+                                    </table>
+                                    <div class="row px-2 mb-3">
+                                        <div class="col">
+                                            <button type="button"
+                                                    class="btn btn-info btn-sm border-square"
+                                                    style="width: 32px;"
+                                                    title="Restore Defaults"
+                                                    @onclick="@GetDefaultPriorities">
+                                                <span class="oi oi-bookmark"></span>
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-success btn-sm border-square"
+                                                    data-toggle="modal"
+                                                    data-target="#BatteryDetailAdvOptions_EditPriorityModal"
+                                                    style="width: 32px;"
+                                                    title="Add Priority"
+                                                    @onclick="@SetEditPriorityToNew">
+                                                <span class="oi oi-plus"></span>
+                                            </button>
                                         </div>
-                                    }
-                                    <!-- Status advanced options -->
-                                    <BatteryModalAdvOptionsListItem IsActive="@showStatusOptions" ParentStateChanged="@ToggleStatusOptions">Statuses</BatteryModalAdvOptionsListItem>
-                                    @if (showStatusOptions)
-                                    {
-                                        <p>Status options</p>
-                                    }
-                                </div>
+                                    </div>
+                                }
+                                <!-- Status advanced options -->
+                                <BatteryModalAdvOptionsListItem IsActive="@showStatusOptions" ParentStateChanged="@ToggleStatusOptions">Statuses</BatteryModalAdvOptionsListItem>
+                                @if (showStatusOptions)
+                                {
+                                    <table class="table table-sm table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Order</th>
+                                                <th>Name</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var status in statuses.OrderBy(x => x.Order))
+                                            {
+                                                <tr>
+                                                    <td>@status.Order</td>
+                                                    <td>
+                                                        <span class="btn btn-sm border-square dopdown-toggle small mx-1 py-0 px-1"
+                                                              style="color: @status.FontColor; background-color: @status.BgColor">
+                                                            @status.Name
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-info btn-sm border-square"
+                                                                type="button"
+                                                                data-toggle="modal"
+                                                                data-target="#BatteryDetailAdvOptions_EditStatusModal"
+                                                                @onclick="(() => SetEditStatus(status))">
+                                                            Edit
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm border-square" type="button" @onclick="@(() => RemoveStatus(status))">X</button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                    <div class="row px-2 mb-3">
+                                        <div class="col">
+                                            <button type="button"
+                                                    class="btn btn-info btn-sm border-square"
+                                                    style="width: 32px;"
+                                                    title="Restore Defaults"
+                                                    @onclick="@GetDefaultStatuses">
+                                                <span class="oi oi-bookmark"></span>
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-success btn-sm border-square"
+                                                    data-toggle="modal"
+                                                    data-target="#BatteryDetailAdvOptions_EditStatusModal"
+                                                    style="width: 32px;"
+                                                    title="Add Status"
+                                                    @onclick="@SetEditStatusToNew">
+                                                <span class="oi oi-plus"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
                             }
                         </div>
                     </div>
@@ -196,9 +249,10 @@
         </div>
     </div>
 </div>
-
+<!-- Advanced Option Modals -->
 <BatteryDetailAdvOptions_EditCategoryModal Category="@editCategory" ParentStateChanged="@CategoryStateChanged"></BatteryDetailAdvOptions_EditCategoryModal>
 <BatteryDetailAdvOptions_EditPriorityModal Priority="@editPriority" ParentStateChanged="@PriorityStateChanged"></BatteryDetailAdvOptions_EditPriorityModal>
+<BatteryDetailAdvOptions_EditStatusModal Status="@editStatus" ParentStateChanged="@StatusStateChanged"></BatteryDetailAdvOptions_EditStatusModal>
 
 @code {
 
@@ -214,12 +268,15 @@
     private Battery battery = new();
     private Category editCategory = new();
     private Priority editPriority = new();
+    private Status editStatus = new();
 
     private List<Category> categories = new();
     private List<Priority> priorities = new();
+    private List<Status> statuses = new();
 
     private bool isNewCategory = false;
     private bool isNewPriority = false;
+    private bool isNewStatus = false;
     private bool showAdvancedOptions = false;
     private bool showCategoryOptions = false;
     private bool showPriorityOptions = false;
@@ -231,6 +288,7 @@
     {
         GetDefaultCategories();
         GetDefaultPriorities();
+        GetDefaultStatuses();
     }
 
     private async void HandleValidSubmit()
@@ -281,9 +339,6 @@
     {
         showCategoryOptions = true;
 
-        //showPriorityOptions = false;
-        //showStatusOptions = false;
-
         if (isNewCategory)
         {
             categories.Add(editCategory);
@@ -297,9 +352,6 @@
     {
         showPriorityOptions = true;
 
-        //showCategoryOptions = false;
-        //showStatusOptions = false;
-
         if (isNewPriority)
         {
             priorities.Add(editPriority);
@@ -311,12 +363,12 @@
 
     private void StatusStateChanged()
     {
-        showStatusOptions = !showStatusOptions;
+        showStatusOptions = true;
 
-        if (showStatusOptions)
+        if (isNewStatus)
         {
-            showCategoryOptions = false;
-            showPriorityOptions = false;
+            statuses.Add(editStatus);
+            isNewStatus = false;
         }
 
         StateHasChanged();
@@ -334,6 +386,12 @@
         isNewPriority = false;
     }
 
+    private void SetEditStatus(Status status)
+    {
+        editStatus = status;
+        isNewStatus = false;
+    }
+
     private void SetEditCategoryToNew()
     {
         editCategory = new Category();
@@ -346,6 +404,12 @@
         isNewPriority = true;
     }
 
+    private void SetEditStatusToNew()
+    {
+        editStatus = new Status();
+        isNewStatus = true;
+    }
+
     private void RemoveCategory(Category category)
     {
         categories.Remove(category);
@@ -356,6 +420,11 @@
         priorities.Remove(priority);
     }
 
+    private void RemoveStatus(Status status)
+    {
+        statuses.Remove(status);
+    }
+
     private void GetDefaultCategories()
     {
         categories = _categoryService.GetDefaultValues();
@@ -364,5 +433,10 @@
     private void GetDefaultPriorities()
     {
         priorities = _priorityService.GetDefaultValues();
+    }
+
+    private void GetDefaultStatuses()
+    {
+        statuses = _statusService.GetDefaultValues();
     }
 }

@@ -10,6 +10,7 @@ namespace BatteryApp.Models.StatusModel
         Task<List<Status>> Get();
         Task<Status> Get(int id);
         Task<Status> GetCompletedStatus();
+        List<Status> GetDefaultValues();
         Task<Status> GetInitialStatus();
         Task<Status> Update(Status status);
     }

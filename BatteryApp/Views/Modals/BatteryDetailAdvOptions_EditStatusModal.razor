@@ -1,6 +1,6 @@
 ﻿@inject IJSRuntime _jsRuntime
 
-<div class="modal modal-child fade" tabindex="-1" role="dialog" id="BatteryDetailAdvOptions_EditPriorityModal" data-backdrop="static">
+<div class="modal modal-child fade" tabindex="-1" role="dialog" id="BatteryDetailAdvOptions_EditStatusModal" data-backdrop="static">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content border-square">
             <div class="modal-header">
@@ -9,34 +9,26 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <EditForm Model="@Priority" OnValidSubmit="@HandleValidSubmit">
+            <EditForm Model="@Status" OnValidSubmit="@HandleValidSubmit">
                 <div class="modal-body">
                     <div class="row px-2 mb-2">
                         <div class="col">
                             <label for="category-fontColor">Font Color</label>
-                            <InputText id="category-fontColor" type="color" class="form-control border-square" @bind-Value="@Priority.FontColor" />
+                            <InputText id="status-fontColor" type="color" class="form-control border-square" @bind-Value="@Status.FontColor" />
                         </div>
                         <div class="col">
                             <label for="category-bgColor">Backgroung Color</label>
-                            <InputText id="category-bgColor" type="color" class="form-control border-square" @bind-Value="@Priority.BgColor" />
+                            <InputText id="status-bgColor" type="color" class="form-control border-square" @bind-Value="@Status.BgColor" />
                         </div>
                     </div>
                     <div class="row px-2 mb-2">
                         <div class="col">
-                            <label for="priority-severity">Severity</label>
-                            <InputNumber id="priority-severity" class="form-control border-square" @bind-Value="@Priority.Severity" />
+                            <label for="status-order">Order</label>
+                            <InputNumber id="status-order" class="form-control border-square" @bind-Value="@Status.Order" />
                         </div>
                         <div class="col">
-                            <label for="priority-name">Name</label>
-                            <InputText id="priority-name" type="text" class="form-control border-square" @bind-Value="@Priority.Name" />
-                        </div>
-                    </div>
-                    <div class="row pl-5 mt-4 mb-2">
-                        <div class="col">
-                            <InputCheckbox @bind-Value="@Priority.IsDefault" class="form-check-input border-square" type="checkbox" id="priority-isDefault" />
-                            <label class="form-check-label" for="defaultCheck1">
-                                Is Default?
-                            </label>
+                            <label for="status-name">Name</label>
+                            <InputText id="status-name" type="text" class="form-control border-square" @bind-Value="@Status.Name" />
                         </div>
                     </div>
                     <div class="row px-2 mb-2">
@@ -44,8 +36,8 @@
                             <p class="text-center">Preview</p>
                             <p class="text-center">
                                 <span class="btn btn-sm border-square dopdown-toggle small mx-1 py-0 px-1"
-                                      style="color: @Priority.FontColor; background-color: @Priority.BgColor">
-                                    @Priority.DisplayName
+                                      style="color: @Status.FontColor; background-color: @Status.BgColor">
+                                    @Status.Name
                                 </span>
                             </p>
                         </div>
@@ -60,9 +52,12 @@
     </div>
 </div>
 
+
+
+
 @code {
     [Parameter]
-    public Priority Priority { get; set; }
+    public Status Status { get; set; }
 
     [Parameter]
     public Action ParentStateChanged { get; set; }
@@ -75,6 +70,6 @@
 
     public async Task CloseModal()
     {
-        await _jsRuntime.InvokeAsync<object>("CloseModal", "BatteryDetailAdvOptions_EditPriorityModal");
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "BatteryDetailAdvOptions_EditStatusModal");
     }
 }

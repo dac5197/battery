@@ -52,7 +52,7 @@
       "IsDefault": false
     }
   ],
-  "Status": [
+  "Statuses": [
     {
       "Name": "Queued",
       "Order": "1",
