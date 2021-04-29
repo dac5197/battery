@@ -308,7 +308,7 @@
     {
         showErrors = false;
         errors.Clear();
-        errors = _batteryAdvOptionsValidation.Validate(categories);
+        errors = _batteryAdvOptionsValidation.Validate(categories, priorities, statuses);
 
         if (errors.Count() > 0)
         {
