@@ -71,8 +71,21 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
-                                        <button type="submit" class="btn btn-block btn-primary px-4 border-square"><strong>Save</strong></button>
-                                        <button data-toggle="modal" data-target="#chargeModal" class="btn btn-block btn-success px-4 border-square" value="Add Charge" @onclick="(() => InitializeChargeObject())"><strong>Add Charge</strong></button>
+                                        <button data-toggle="modal" data-target="#chargeModal" class="btn btn-success my-2 px-4 border-square" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
+                                        <div class="dropdown my-2">
+                                            <button class="btn btn-info border-square dropdown-toggle" type="button" id="dropdownOptionsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <span class="oi oi-menu"></span>
+                                            </button>
+                                            <div class="dropdown-menu border-square" aria-labelledby="dropdownOptionsMenu">
+                                                <button class="dropdown-item" type="button">Edit Categories</button>
+                                                <button class="dropdown-item" type="button">Edit Priorities</button>
+                                                <button class="dropdown-item" type="button">Edit Statuses</button>
+                                                <div class="dropdown-divider"></div>
+                                                <button type="submit" class="dropdown-item" >Save Battery</button>
+                                                <div class="dropdown-divider"></div>
+                                                <button class="dropdown-item" type="button">Delete Battery</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
