@@ -46,11 +46,11 @@ namespace BatteryApp.Models.PriorityModel
             return priority;
         }
 
-        public async Task<Priority> GetDefault(string userId)
+        public async Task<Priority> GetDefault(int batteryId)
         {
             using var context = _contextFactory.CreateDbContext();
             var priorities = await context.Priorities.ToListAsync();
-            var priority = priorities.Where(x => x.OwnerId == userId && x.IsDefault == true).FirstOrDefault();
+            var priority = priorities.Where(x => x.BatteryId == batteryId && x.IsDefault == true).FirstOrDefault();
             return priority;
         }
 

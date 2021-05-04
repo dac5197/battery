@@ -57,7 +57,7 @@ namespace BatteryApp.Internals
             var category = await _categoryService.GetDefaultChargeCategory(battery.Id);
             charge.CategoryId = category.Id;
 
-            var defaultPriority = await _priorityService.GetDefault(battery.OwnerId);
+            var defaultPriority = await _priorityService.GetDefault(battery.Id);
             charge.PriorityId = defaultPriority.Id;
 
             return charge;
