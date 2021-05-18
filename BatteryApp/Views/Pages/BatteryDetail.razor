@@ -71,12 +71,11 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
-                                        <button data-toggle="modal" data-target="#chargeModal" class="btn btn-success my-2 px-4 border-square" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
-                                        <div class="dropdown my-2">
+                                        <div class="dropdown my-2 float-right">
                                             <button class="btn btn-info border-square dropdown-toggle" type="button" id="dropdownOptionsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <span class="oi oi-menu"></span>
                                             </button>
-                                            <div class="dropdown-menu border-square" aria-labelledby="dropdownOptionsMenu">
+                                            <div class="dropdown-menu dropdown-menu-right border-square" aria-labelledby="dropdownOptionsMenu">
                                                 <button class="dropdown-item" type="button">Edit Categories</button>
                                                 <button class="dropdown-item" type="button">Edit Priorities</button>
                                                 <button class="dropdown-item" type="button">Edit Statuses</button>
@@ -188,6 +187,7 @@
                         <div class="card border-square shadow-sm p-2">
                             <div class="row justify-content-center">
                                 <div class="col-lg-3">
+                                    <button data-toggle="modal" data-target="#chargeModal" class="btn btn-success btn-sm my-2 px-3 border-square" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
                                     <BtnGroup_TwoButtons BtnOneClass="@btnClassActiveCharges"
                                                          BtnOneText="Active"
                                                          BtnOneAction="@SetActiveChargesFilter"
