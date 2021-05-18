@@ -8,5 +8,6 @@ namespace BatteryApp.Internals
     public interface IBatteryAdvancedOptionsValidationService
     {
         Dictionary<string, List<string>> Validate(List<Category> categories, List<Priority> priorities, List<Status> statuses);
+        Dictionary<string, List<string>> Validate(List<Category> categories);
     }
 }

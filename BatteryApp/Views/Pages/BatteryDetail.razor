@@ -76,7 +76,7 @@
                                                 <span class="oi oi-menu"></span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right border-square" aria-labelledby="dropdownOptionsMenu">
-                                                <button class="dropdown-item" type="button">Edit Categories</button>
+                                                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_CategoryOptionsModal">Edit Categories</button>
                                                 <button class="dropdown-item" type="button">Edit Priorities</button>
                                                 <button class="dropdown-item" type="button">Edit Statuses</button>
                                                 <div class="dropdown-divider"></div>
@@ -269,7 +269,7 @@
                 }
 
             </div>
-
+            <!-- Modals -->
             <ChargeDetailModal @ref="@chargeDetailModal"
                                Charge="@chargeObject"
                                Categories="@categories"
@@ -280,6 +280,8 @@
             <ChargeChildrenWarningModal Charge="@_chargeOpenChildrenModalHelper.Charge"
                                         CompletedOpenChildren="@CompleteChargeWithChildren"
                                         OpenChildren="@_chargeOpenChildrenModalHelper.OpenChildren"></ChargeChildrenWarningModal>
+
+            <BatteryDetailExisting_CategoryOptions Battery="battery" Categories="@categories" ParentStateChanged="@StateChanged"></BatteryDetailExisting_CategoryOptions>
         }
     </Authorized>
     <NotAuthorized>

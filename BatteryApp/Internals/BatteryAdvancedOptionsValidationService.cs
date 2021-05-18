@@ -23,6 +23,15 @@ namespace BatteryApp.Internals
             return _errors;
         }
 
+        public Dictionary<string, List<string>> Validate(List<Category> categories)
+        {
+            _errors.Clear();
+
+            ValidateCategories(categories);
+
+            return _errors;
+        }
+
         private void AddToErrors(string key, List<string> messages)
         {
             List<string> filteredMessages = messages.Where(x => !String.IsNullOrWhiteSpace(x)).ToList();

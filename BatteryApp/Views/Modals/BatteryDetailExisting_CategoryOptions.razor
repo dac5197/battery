@@ -1,0 +1,208 @@
+﻿@inject IBatteryAdvancedOptionsValidationService _validationService
+@inject ICategoryService _categoryService
+@inject IChargeService _chargeService
+
+@inject IJSRuntime _jsRuntime
+
+<div class="modal fade" tabindex="-1" role="dialog" id="batteryDetailExiting_CategoryOptionsModal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-square">
+            <div class="modal-header">
+                <h5 class="modal-title">Battery Detail - Category Options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ResetEditCategories">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @if (showErrors)
+                {
+                    <CustomFormErrors Errors="@errors" />
+                }
+                <div class="row px-5">
+                    <div class="col">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Icon</th>
+                                    <th>Name</th>
+                                    <th>Default?</th>
+                                    <th>Child Category?</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var category in Categories)
+                                {
+                                    <tr>
+                                        <td>@category.Id</td>
+                                        <td class="pl-2">
+                                            <IconCategory Category="@category"></IconCategory>
+                                        </td>
+                                        <td>@category.Name</td>
+                                        <td>@category.IsDefaultChargeCategory</td>
+                                        <td>@category.IsDefaultChildCategory</td>
+                                        <td>
+                                            <button class="btn btn-info btn-sm border-square"
+                                                    type="button"
+                                                    data-toggle="modal"
+                                                    data-target="#BatteryDetailAdvOptions_EditCategoryModal"
+                                                    @onclick="(() => SetEditCategory(category))">
+                                                Edit
+                                            </button>
+                                            <button class="btn btn-danger btn-sm border-square" type="button" @onclick="@(() => RemoveCategory(category))">X</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="row px-2 mb-3">
+                            <div class="col">
+                                <button type="button"
+                                        class="btn btn-info btn-sm border-square"
+                                        style="width: 32px;"
+                                        title="Reset"
+                                        @onclick="@ResetEditCategories">
+                                    <span class="oi oi-bookmark"></span>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-success btn-sm border-square"
+                                        data-toggle="modal"
+                                        data-target="#BatteryDetailAdvOptions_EditCategoryModal"
+                                        style="width: 32px;"
+                                        title="Add Category"
+                                        @onclick="@SetEditCategoryToNew">
+                                    <span class="oi oi-plus"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary border-square" @onclick="@HandleSubmit">Submit</button>
+                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="@ResetEditCategories">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal-->
+<BatteryDetailAdvOptions_EditCategoryModal Category="@editCategory" ParentStateChanged="@StateChanged"></BatteryDetailAdvOptions_EditCategoryModal>
+
+@code {
+
+    [Parameter]
+    public Battery Battery { get; set; }
+
+    [Parameter]
+    public List<Category> Categories { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    private Category editCategory = new();
+
+    private Dictionary<string, List<string>> errors = new();
+
+    private bool isNewCategory = false;
+    private bool showErrors = false;
+
+    private async void HandleSubmit()
+    {
+        showErrors = false;
+        errors.Clear();
+        errors = _validationService.Validate(Categories);
+
+        if (errors.Count() > 0)
+        {
+            showErrors = true;
+        }
+        else
+        {
+
+            foreach (var category in Categories)
+            {
+                if (category.Id == 0)
+                {
+                    category.BatteryId = Battery.Id;
+                    category.OwnerId = Battery.OwnerId;
+                    await _categoryService.Add(category);
+                }
+                else
+                {
+                    await _categoryService.Update(category);
+                }
+            }
+
+            var originalValueCategories = await _categoryService.Get(Battery);
+            var categoriesToBeDeleted = originalValueCategories.Where(o => !Categories.Any(c => c.Id == o.Id)).ToList();
+
+            if (categoriesToBeDeleted.Any())
+            {
+                var defaultCategory = Categories.Where(x => x.IsDefaultChargeCategory == true).FirstOrDefault();
+
+                var charges = await _chargeService.Get(Battery);
+
+                foreach (var category in categoriesToBeDeleted)
+                {
+                    var chargesToBeChanged = charges.Where(x => x.CategoryId == category.Id);
+
+                    foreach (var charge in chargesToBeChanged)
+                    {
+                        charge.CategoryId = defaultCategory.Id;
+                        await _chargeService.Update(charge);
+                    }
+
+                    await _categoryService.Delete(category.Id);
+                }
+            }
+
+            await CloseModal();
+
+            ParentStateChanged?.Invoke();
+        }
+    }
+
+    public async Task CloseModal()
+    {
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "batteryDetailExiting_CategoryOptionsModal");
+    }
+
+    private async void ResetEditCategories()
+    {
+        Categories = await _categoryService.Get(Battery);
+        StateHasChanged();
+    }
+
+    private void SetEditCategory(Category category)
+    {
+        editCategory = category;
+        isNewCategory = false;
+    }
+
+    private void SetEditCategoryToNew()
+    {
+        editCategory = new Category();
+        isNewCategory = true;
+    }
+
+    private void RemoveCategory(Category category)
+    {
+        Categories.Remove(category);
+    }
+
+    private void StateChanged()
+    {
+
+        if (isNewCategory)
+        {
+            Categories.Add(editCategory);
+            isNewCategory = false;
+        }
+
+        StateHasChanged();
+    }
+}
