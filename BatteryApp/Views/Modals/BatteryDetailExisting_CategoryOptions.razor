@@ -142,22 +142,7 @@
 
             if (categoriesToBeDeleted.Any())
             {
-                var defaultCategory = Categories.Where(x => x.IsDefaultChargeCategory == true).FirstOrDefault();
-
-                var charges = await _chargeService.Get(Battery);
-
-                foreach (var category in categoriesToBeDeleted)
-                {
-                    var chargesToBeChanged = charges.Where(x => x.CategoryId == category.Id);
-
-                    foreach (var charge in chargesToBeChanged)
-                    {
-                        charge.CategoryId = defaultCategory.Id;
-                        await _chargeService.Update(charge);
-                    }
-
-                    await _categoryService.Delete(category.Id);
-                }
+                await DeleteCategories(categoriesToBeDeleted);
             }
 
             await CloseModal();
@@ -204,5 +189,30 @@
         }
 
         StateHasChanged();
+    }
+
+    private async Task DeleteCategories(List<Category> categories)
+    {
+        var defaultCategory = Categories.Where(x => x.IsDefaultChargeCategory == true).FirstOrDefault();
+
+        var charges = await _chargeService.Get(Battery);
+
+        foreach (var category in categories)
+        {
+            var chargesToBeChanged = charges.Where(x => x.CategoryId == category.Id).ToList();
+
+            await UpdateCharges(chargesToBeChanged, defaultCategory);
+
+            await _categoryService.Delete(category.Id);
+        }
+    }
+
+    private async Task UpdateCharges(List<Charge> charges, Category category)
+    {
+        foreach (var charge in charges)
+        {
+            charge.CategoryId = category.Id;
+            await _chargeService.Update(charge);
+        }
     }
 }
