@@ -67,6 +67,13 @@ namespace BatteryApp.Models.ChargeModel
                           .ToList();
         }
 
+        public async Task<int> GetAllCount(Battery battery)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var charges = await context.Charges.ToListAsync();
+            return charges.Where(x => x.BatteryId == battery.Id).ToList().Count;
+        }
+
         public async Task<List<Charge>> GetChildren(Charge charge)
         {
             using var context = _contextFactory.CreateDbContext();

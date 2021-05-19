@@ -82,7 +82,7 @@
                                                 <div class="dropdown-divider"></div>
                                                 <button type="submit" class="dropdown-item" >Save Battery</button>
                                                 <div class="dropdown-divider"></div>
-                                                <button class="dropdown-item" type="button">Delete Battery</button>
+                                                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#deleteBatteryModal">Delete Battery</button>
                                             </div>
                                         </div>
                                     </div>
@@ -284,6 +284,12 @@
             <BatteryDetailExisting_CategoryOptionsModal Battery="@battery" Categories="@categories" ParentStateChanged="@StateChanged"></BatteryDetailExisting_CategoryOptionsModal>
             <BatteryDetailExisting_PriorityOptionsModal Battery="@battery" Priorities="@priorities" ParentStateChanged="@StateChanged"></BatteryDetailExisting_PriorityOptionsModal>
             <BatteryDetailExisting_StatusOptionsModal Battery="@battery" Statuses="@statuses" ParentStateChanged="@StateChanged"></BatteryDetailExisting_StatusOptionsModal>
+
+            <DeleteBatteryModal Battery="@battery"
+                                ChargesCount="@allChargesCount"
+                                CategoriesCount="@categories.Count"
+                                PrioritiesCount="@priorities.Count"
+                                StatusesCount="@statuses.Count"></DeleteBatteryModal>
         }
     </Authorized>
     <NotAuthorized>
@@ -316,6 +322,7 @@
     private bool showPriorityScoreCard = false;
     private bool showStatusScoreCard = false;
 
+    private int allChargesCount;
     private int minTextareaRows = 4;
     private int maxTextareaRows = 8;
     private int textareaRows;
@@ -341,6 +348,7 @@
         categories = await _categoryService.Get(battery);
         charges = await _chargeService.GetActive(battery);
         chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
+        allChargesCount = await _chargeService.GetAllCount(battery);
         priorities = await _priorityService.Get(battery);
         statuses = await _statusService.Get(battery);
 

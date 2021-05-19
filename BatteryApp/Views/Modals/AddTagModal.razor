@@ -78,6 +78,7 @@
             // Process the form
             tag = _tagController.SetDefaults(Charge, tag);
             await _tagController.AddTagFromChargeAsync(Charge.Id, tag);
+            tag = new();
             await CloseModal();
         }
 
