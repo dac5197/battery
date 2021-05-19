@@ -79,12 +79,12 @@ namespace BatteryApp.Internals.Validators
 
             List<string> tempMessages = new();
 
-            string tempMessage = "Name is too long.  Please modify Name to be 10 characters or less.";
+            string tempMessage = "Name is too long.  Please modify Name to be 20 characters or less.";
             tempMessages.Add(tempMessage);
 
             foreach (var status in statuses)
             {
-                if (status.Name?.Length > 10)
+                if (status.Name?.Length > 20)
                 {
                     string tempKey = $"Status '{status.Name}'";
                     AddToErrors(tempKey, tempMessages);
@@ -97,7 +97,7 @@ namespace BatteryApp.Internals.Validators
 
             List<string> tempMessages = new();
 
-            string tempMessage = "Name is invalid.  Please re-enter Name to be 10 characters or less.";
+            string tempMessage = "Name is invalid.  Please re-enter Name to be 20 characters or less.";
             tempMessages.Add(tempMessage);
 
             foreach (var status in statuses)

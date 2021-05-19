@@ -1,15 +1,15 @@
 ﻿@inject IBatteryAdvancedOptionsValidator _validationService
-@inject IPriorityService _priorityService
+@inject IStatusService _statusService
 @inject IChargeService _chargeService
 
 @inject IJSRuntime _jsRuntime
 
-<div class="modal fade" tabindex="-1" role="dialog" id="batteryDetailExiting_PriorityOptionsModal">
+<div class="modal fade" tabindex="-1" role="dialog" id="batteryDetailExiting_StatusOptionsModal">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content border-square">
             <div class="modal-header">
-                <h5 class="modal-title">Battery Detail - Priority Options</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ResetEditPriorities">
+                <h5 class="modal-title">Battery Detail - Status Options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ResetEditStatuses">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
@@ -23,34 +23,34 @@
                         <table class="table table-sm table-hover">
                             <thead>
                                 <tr>
-                                    <th>Display Name</th>
-                                    <th>Default?</th>
+                                    <th>Order</th>
+                                    <th>Name</th>
                                     <th>
                                         Actions
-                                        <QuestionMarkToolTip Text="When deleting an existing Priority, any charges set to that Priority will be reset to the default Priority."></QuestionMarkToolTip>
+                                        <QuestionMarkToolTip Text="When deleting an existing Status, any charges set to that Status will be reset to the default Status."></QuestionMarkToolTip>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var priority in Priorities.OrderBy(x => x.Severity))
+                                @foreach (var status in Statuses.OrderBy(x => x.Order))
                                 {
                                     <tr>
+                                        <td>@status.Order</td>
                                         <td>
                                             <span class="btn btn-sm border-square dopdown-toggle small mx-1 py-0 px-1"
-                                                  style="color: @priority.FontColor; background-color: @priority.BgColor">
-                                                @priority.DisplayName
+                                                  style="color: @status.FontColor; background-color: @status.BgColor">
+                                                @status.Name
                                             </span>
                                         </td>
-                                        <td>@priority.IsDefault</td>
                                         <td>
                                             <button class="btn btn-info btn-sm border-square"
                                                     type="button"
                                                     data-toggle="modal"
-                                                    data-target="#BatteryDetailAdvOptions_EditPriorityModal"
-                                                    @onclick="(() => SetEditPriority(priority))">
+                                                    data-target="#BatteryDetailAdvOptions_EditStatusModal"
+                                                    @onclick="(() => SetEditStatus(status))">
                                                 Edit
                                             </button>
-                                            <button class="btn btn-danger btn-sm border-square" type="button" @onclick="@(() => RemovePriority(priority))">X</button>
+                                            <button class="btn btn-danger btn-sm border-square" type="button" @onclick="@(() => RemoveStatus(status))">X</button>
                                         </td>
                                     </tr>
                                 }
@@ -62,16 +62,16 @@
                                         class="btn btn-info btn-sm border-square"
                                         style="width: 32px;"
                                         title="Reset"
-                                        @onclick="@ResetEditPriorities">
+                                        @onclick="@ResetEditStatuses">
                                     <span class="oi oi-action-undo"></span>
                                 </button>
                                 <button type="button"
                                         class="btn btn-success btn-sm border-square"
                                         data-toggle="modal"
-                                        data-target="#BatteryDetailAdvOptions_EditPriorityModal"
+                                        data-target="#BatteryDetailAdvOptions_EditStatusModal"
                                         style="width: 32px;"
                                         title="Add Category"
-                                        @onclick="@SetEditPriorityToNew">
+                                        @onclick="@SetEditStatusToNew">
                                     <span class="oi oi-plus"></span>
                                 </button>
                             </div>
@@ -81,7 +81,7 @@
                 <div class="row mt-4">
                     <div class="col">
                         <button type="submit" class="btn btn-primary border-square" @onclick="@HandleSubmit">Submit</button>
-                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="@ResetEditPriorities">Cancel</button>
+                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="@ResetEditStatuses">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -89,8 +89,8 @@
     </div>
 </div>
 
-<!-- Edit Priority Modal-->
-<BatteryDetailAdvOptions_EditPriorityModal Priority="@editPriority" ParentStateChanged="@StateChanged"></BatteryDetailAdvOptions_EditPriorityModal>
+<!-- Edit Status Modal-->
+<BatteryDetailAdvOptions_EditStatusModal Status="@editStatus" ParentStateChanged="@StateChanged"></BatteryDetailAdvOptions_EditStatusModal>
 
 @code {
 
@@ -98,23 +98,23 @@
     public Battery Battery { get; set; }
 
     [Parameter]
-    public List<Priority> Priorities { get; set; }
+    public List<Status> Statuses { get; set; }
 
     [Parameter]
     public Action ParentStateChanged { get; set; }
 
-    private Priority editPriority = new();
+    private Status editStatus = new();
 
     private Dictionary<string, List<string>> errors = new();
 
-    private bool isNewPriority = false;
+    private bool isNewStatus = false;
     private bool showErrors = false;
 
     private async void HandleSubmit()
     {
         showErrors = false;
         errors.Clear();
-        errors = _validationService.Validate(Priorities);
+        errors = _validationService.Validate(Statuses);
 
         if (errors.Count() > 0)
         {
@@ -123,29 +123,29 @@
         else
         {
 
-            foreach (var priority in Priorities)
+            foreach (var status in Statuses)
             {
-                // Add new Priority
-                if (priority.Id == 0)
+                // Add new Category
+                if (status.Id == 0)
                 {
-                    priority.BatteryId = Battery.Id;
-                    priority.OwnerId = Battery.OwnerId;
-                    await _priorityService.Add(priority);
+                    status.BatteryId = Battery.Id;
+                    status.OwnerId = Battery.OwnerId;
+                    await _statusService.Add(status);
                 }
-                // Update exsting Priority
+                // Update exsting Category
                 else
                 {
-                    await _priorityService.Update(priority);
+                    await _statusService.Update(status);
                 }
             }
 
             // Delete any Categories in DB but not in Categories list
-            var originalValuePriorities = await _priorityService.Get(Battery);
-            var prioritiesToBeDeleted = originalValuePriorities.Where(o => !Priorities.Any(c => c.Id == o.Id)).ToList();
+            var originalValueStatus = await _statusService.Get(Battery);
+            var statusesToBeDeleted = originalValueStatus.Where(o => !Statuses.Any(s => s.Id == o.Id)).ToList();
 
-            if (prioritiesToBeDeleted.Any())
+            if (statusesToBeDeleted.Any())
             {
-                await DeletePriorities(prioritiesToBeDeleted);
+                await DeleteStatuses(statusesToBeDeleted);
             }
 
             await CloseModal();
@@ -156,68 +156,67 @@
 
     public async Task CloseModal()
     {
-        await _jsRuntime.InvokeAsync<object>("CloseModal", "batteryDetailExiting_PriorityOptionsModal");
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "batteryDetailExiting_StatusOptionsModal");
     }
 
-    private async void ResetEditPriorities()
+    private async void ResetEditStatuses()
     {
-        Priorities = await _priorityService.Get(Battery);
+        Statuses = await _statusService.Get(Battery);
         _validationService.ClearErrors();
         StateHasChanged();
     }
 
-    private void SetEditPriority(Priority priority)
+    private void SetEditStatus(Status status)
     {
-        editPriority = priority;
-        isNewPriority = false;
+        editStatus = status;
+        isNewStatus = false;
     }
 
-    private void SetEditPriorityToNew()
+    private void SetEditStatusToNew()
     {
-        editPriority = new Priority();
-        isNewPriority = true;
+        editStatus = new Status();
+        isNewStatus = true;
     }
 
-    private void RemovePriority(Priority priority)
+    private void RemoveStatus(Status status)
     {
-        Priorities.Remove(priority);
+        Statuses.Remove(status);
     }
 
     private void StateChanged()
     {
 
-        if (isNewPriority)
+        if (isNewStatus)
         {
-            Priorities.Add(editPriority);
-            isNewPriority = false;
+            Statuses.Add(editStatus);
+            isNewStatus = false;
         }
 
         StateHasChanged();
     }
 
-    private async Task DeletePriorities(List<Priority> priorities)
+    private async Task DeleteStatuses(List<Status> statuses)
     {
-        var defaultPriority = Priorities.Where(x => x.IsDefault == true).FirstOrDefault();
+        var defaultStatus = Statuses.OrderBy(x => x.Order).FirstOrDefault();
 
         var charges = await _chargeService.Get(Battery);
 
-        foreach (var priority in priorities)
+        foreach (var status in statuses)
         {
-            var chargesToBeChanged = charges.Where(x => x.PriorityId == priority.Id).ToList();
+            var chargesToBeChanged = charges.Where(x => x.StatusId == status.Id).ToList();
 
-            await UpdateCharges(chargesToBeChanged, defaultPriority);
+            await UpdateCharges(chargesToBeChanged, defaultStatus);
 
-            await _priorityService.Delete(priority.Id);
+            await _statusService.Delete(status.Id);
         }
     }
 
-    private async Task UpdateCharges(List<Charge> charges, Priority priority)
+    private async Task UpdateCharges(List<Charge> charges, Status status)
     {
         foreach (var charge in charges)
         {
-            charge.PriorityId = priority.Id;
+            charge.StatusId = status.Id;
             await _chargeService.Update(charge);
         }
     }
 }
-
