@@ -1,6 +1,6 @@
 ﻿
 <div class="tooltip-wrapper">
-    <span class="tooltip-text-@Alignment.ToLower()">@Text</span>
+    <span class="tooltip-text-weight tooltip-text-@Alignment.ToLower()">@Text</span>
     <div class="m-1 question-mark-icon">
         <strong>?</strong>
     </div>
@@ -123,6 +123,10 @@
 
     .tooltip-wrapper:hover .tooltip-text-@Alignment.ToLower() {
         visibility: visible;
+    }
+
+    .tooltip-text-weight {
+        font-weight: normal;
     }
 </style>
 
