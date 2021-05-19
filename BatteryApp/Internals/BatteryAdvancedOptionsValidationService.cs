@@ -60,6 +60,8 @@ namespace BatteryApp.Internals
             messages.Add(ValidateCategories_DefaultChildCategory(categories));
 
             AddToErrors("Categories", messages);
+
+            ValidateCategories_NameLength(categories);
         }
 
         private static string ValidateCategories_EmptyList(List<Category> categories)
@@ -126,6 +128,24 @@ namespace BatteryApp.Internals
             }
 
             return tempMessage;
+        }
+
+        private void ValidateCategories_NameLength(List<Category> categories)
+        {
+
+            List<string> tempMessages = new();
+
+            string tempMessage = "Name is too long.  Please modify Name to be 10 characters or less.";
+            tempMessages.Add(tempMessage);
+
+            foreach (var category in categories)
+            {
+                if (category.Name.Length > 10)
+                {
+                    string tempKey = $"Category '{category.Name}'";
+                    AddToErrors(tempKey, tempMessages);
+                }
+            }
         }
 
         private void ValidatePriorities(List<Priority> priorities)
