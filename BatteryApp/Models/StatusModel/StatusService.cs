@@ -102,11 +102,27 @@ namespace BatteryApp.Models.StatusModel
         public async Task Delete(int id)
         {
             using var context = _contextFactory.CreateDbContext();
+                       
             var status = await context.Statuses.FindAsync(id);
+
+            await ReOrderStatuses(status);
+
             context.Statuses.Remove(status);
             await context.SaveChangesAsync();
         }
 
+        private async Task ReOrderStatuses(Status status)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var statuses = await context.Statuses.Where(x => x.BatteryId == status.BatteryId).ToListAsync();
+            var statuseToBeReOrdered = statuses.Where(x => x.Order > status.Order).ToList();
+
+            foreach (var statusToBeReOrdered in statuseToBeReOrdered)
+            {
+                statusToBeReOrdered.Order--;
+                await Update(statusToBeReOrdered);
+            }
+        }
     }
 }
 

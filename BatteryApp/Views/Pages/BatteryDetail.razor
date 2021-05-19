@@ -372,6 +372,8 @@
 
     private async void StateChanged()
     {
+        GetOptions();
+
         if (btnClassActiveCharges == btnActive)
         {
             await GetActiveCharges();
@@ -458,6 +460,13 @@
         chargeTable?.ResetSort();
 
         StateHasChanged();
+    }
+
+    private async void GetOptions()
+    {
+        categories = await _categoryService.Get(battery);
+        priorities = await _priorityService.Get(battery);
+        statuses = await _statusService.Get(battery);
     }
 
     private async void SetActiveChargesFilter()
