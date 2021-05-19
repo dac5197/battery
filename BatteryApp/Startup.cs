@@ -87,6 +87,7 @@ namespace BatteryApp
             // Add Project Validators
             services.AddTransient<ICategoryValidator, CategoryValidator>();
             services.AddTransient<IPriorityValidator, PriorityValidator>();
+            services.AddTransient<IStatusValidator, StatusValidator>();
 
             // Radzen Services
             services.AddScoped<DialogService>();
