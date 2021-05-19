@@ -1,6 +1,7 @@
 using BatteryApp.Areas.Identity;
 using BatteryApp.Data;
 using BatteryApp.Internals;
+using BatteryApp.Internals.Validators;
 using BatteryApp.Models.BatteryModel;
 using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.ChargeModel;
@@ -82,7 +83,10 @@ namespace BatteryApp
             services.AddTransient<ITableSort_Charges, TableSort_Charges>();
             services.AddScoped<IBreadcrumbManager, BreadcrumbManager>();
             services.AddScoped<IChargeOpenChildrenModalHelper, ChargeOpenChildrenModalHelper>();
-            
+
+            // Add Project Validators
+            services.AddTransient<ICategoryValidator, CategoryValidator>();
+            services.AddTransient<IPriorityValidator, PriorityValidator>();
 
             // Radzen Services
             services.AddScoped<DialogService>();

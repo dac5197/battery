@@ -162,6 +162,7 @@
     private async void ResetEditPriorities()
     {
         Priorities = await _priorityService.Get(Battery);
+        _validationService.ClearErrors();
         StateHasChanged();
     }
 

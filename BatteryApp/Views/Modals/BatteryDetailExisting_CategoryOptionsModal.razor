@@ -163,6 +163,7 @@
     private async void ResetEditCategories()
     {
         Categories = await _categoryService.Get(Battery);
+        _validationService.ClearErrors();
         StateHasChanged();
     }
 

@@ -1,4 +1,5 @@
-﻿using BatteryApp.Models.CategoryModel;
+﻿using BatteryApp.Internals.Validators;
+using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.PriorityModel;
 using BatteryApp.Models.StatusModel;
 using System;
@@ -11,13 +12,21 @@ namespace BatteryApp.Internals
     public class BatteryAdvancedOptionsValidationService : IBatteryAdvancedOptionsValidationService
     {
         private Dictionary<string, List<string>> _errors = new();
+        private readonly ICategoryValidator _categoryValidator;
+        private readonly IPriorityValidator _priorityValidator;
+
+        public BatteryAdvancedOptionsValidationService(ICategoryValidator categoryValidator, IPriorityValidator priorityValidator)
+        {
+            _categoryValidator = categoryValidator;
+            _priorityValidator = priorityValidator;
+        }
 
         public Dictionary<string, List<string>> Validate(List<Category> categories, List<Priority> priorities, List<Status> statuses)
         {
-            _errors.Clear();
+            ClearErrors();
 
-            ValidateCategories(categories);
-            ValidatePriorities(priorities);
+            AddToErrors(_categoryValidator.Validate(categories));
+            AddToErrors(_priorityValidator.Validate(priorities));
             ValidateStatuses(statuses);
 
             return _errors;
@@ -25,20 +34,28 @@ namespace BatteryApp.Internals
 
         public Dictionary<string, List<string>> Validate(List<Category> categories)
         {
-            _errors.Clear();
+            ClearErrors();
 
-            ValidateCategories(categories);
+            AddToErrors(_categoryValidator.Validate(categories));
 
             return _errors;
         }
 
         public Dictionary<string, List<string>> Validate(List<Priority> priorities)
         {
-            _errors.Clear();
+            ClearErrors();
 
-            ValidatePriorities(priorities);
+            AddToErrors(_priorityValidator.Validate(priorities));
 
             return _errors;
+        }
+
+        private void AddToErrors(Dictionary<string, List<string>> errorDict)
+        {
+            foreach (var item in errorDict)
+            {
+                _errors.Add(item.Key, item.Value);
+            }
         }
 
         private void AddToErrors(string key, List<string> messages)
@@ -51,208 +68,9 @@ namespace BatteryApp.Internals
             }
         }
 
-        private void ValidateCategories(List<Category> categories)
+        public void ClearErrors()
         {
-            List<string> messages = new();
-
-            messages.Add(ValidateCategories_EmptyList(categories));
-            messages.Add(ValidateCategories_DefaultChargeCategory(categories));
-            messages.Add(ValidateCategories_DefaultChildCategory(categories));
-
-            AddToErrors("Categories", messages);
-
-            ValidateCategories_NameLength(categories);
-        }
-
-        private static string ValidateCategories_EmptyList(List<Category> categories)
-        {
-            string tempMessage = "";
-
-            if (!categories.Any())
-            {
-                tempMessage = "List is empty.  Please enter a Category or reset defaults.";
-            }
-
-            return tempMessage;
-        }
-
-        private static string ValidateCategories_DefaultChargeCategory(List<Category> categories)
-        {
-            List<Category> defaultCategories = new();
-            
-            string tempMessage = "";
-
-            foreach (var category in categories)
-            {
-                if (category.IsDefaultChargeCategory)
-                {
-                    defaultCategories.Add(category);
-                }
-            }
-
-            if (defaultCategories.Count > 1)
-            {
-                tempMessage = "Multiple default charge categories.  Please set one category to be the default.";
-            }
-
-            if (defaultCategories.Count == 0)
-            {
-                tempMessage = "No categories set to be default charge category.  Please set one category to be the default.";
-            }
-
-            return tempMessage;
-        }
-
-        private static string ValidateCategories_DefaultChildCategory(List<Category> categories)
-        {
-            List<Category> defaultCategories = new();
-
-            string tempMessage = "";
-
-            foreach (var category in categories)
-            {
-                if (category.IsDefaultChildCategory)
-                {
-                    defaultCategories.Add(category);
-                }
-            }
-
-            if (defaultCategories.Count > 1)
-            {
-                tempMessage = "Multiple default child categories.  Please set one category to be the default.";
-            }
-
-            if (defaultCategories.Count == 0)
-            {
-                tempMessage = "No categories set to be default child category.  Please set one category to be the default.";
-            }
-
-            return tempMessage;
-        }
-
-        private void ValidateCategories_NameLength(List<Category> categories)
-        {
-
-            List<string> tempMessages = new();
-
-            string tempMessage = "Name is too long.  Please modify Name to be 10 characters or less.";
-            tempMessages.Add(tempMessage);
-
-            foreach (var category in categories)
-            {
-                if (category.Name.Length > 10)
-                {
-                    string tempKey = $"Category '{category.Name}'";
-                    AddToErrors(tempKey, tempMessages);
-                }
-            }
-        }
-
-        private void ValidatePriorities(List<Priority> priorities)
-        {
-            List<string> messages = new();
-
-            messages.Add(ValidatePriorities_EmptyList(priorities));
-            messages.Add(ValidatePriorities_DefaultPriority(priorities));
-            messages.Add(ValidatePriorities_DuplicateSeverity(priorities));
-            messages.Add(ValidatePriorities_NegativeSeverity(priorities));
-
-            AddToErrors("Priorities", messages);
-
-            ValidatePriorities_NameLength(priorities);
-        }
-
-        private static string ValidatePriorities_EmptyList(List<Priority> priorities)
-        {
-            string tempMessage = "";
-
-            if (!priorities.Any())
-            {
-                tempMessage = "List is empty.  Please enter a priority or reset defaults.";
-            }
-
-            return tempMessage;
-        }
-
-        private static string ValidatePriorities_DefaultPriority(List<Priority> priorities)
-        {
-            List<Priority> defaultPriorities = new();
-
-            string tempMessage = "";
-
-            foreach (var priority in priorities)
-            {
-                if (priority.IsDefault)
-                {
-                    defaultPriorities.Add(priority);
-                }
-            }
-
-            if (defaultPriorities.Count > 1)
-            {
-                tempMessage = "Multiple default priorities.  Please set one Priority to be the default.";
-            }
-
-            if (defaultPriorities.Count == 0)
-            {
-                tempMessage = "No priorities set to be default priority.  Please set one priority to be the default.";
-            }
-
-            return tempMessage;
-        }
-
-        private static string ValidatePriorities_DuplicateSeverity(List<Priority> priorities)
-        {
-            string tempMessage = "";
-
-            var hasDuplicateSeverityPriorities = priorities.GroupBy(x => x.Severity).Any(g => g.Count() > 1);
-
-            if (hasDuplicateSeverityPriorities)
-            {
-                tempMessage = "Duplicate Severity.  Please modify the severities to be unique.";
-            }
-
-            return tempMessage;
-        }
-
-        private static string ValidatePriorities_NegativeSeverity(List<Priority> priorities)
-        {
-            List<Priority> negativeSeverityPriorities = new();
-            
-            string tempMessage = "";
-
-            foreach (var priority in priorities)
-            {
-                if (priority.Severity < 0)
-                {
-                    negativeSeverityPriorities.Add(priority);
-                }
-            }
-
-            if (negativeSeverityPriorities.Count > 0)
-            {
-                tempMessage = "Negative Severity.  Please modify Severity value to be a positive integer.";
-            }
-
-            return tempMessage;
-        }
-
-        private void ValidatePriorities_NameLength(List<Priority> priorities)
-        {
-
-            List<string> tempMessages = new();
-
-            string tempMessage = "Name is too long.  Please modify Name to be 10 characters or less.";
-            tempMessages.Add(tempMessage);
-
-            foreach (var priority in priorities)
-            {
-                if (priority.Name.Length > 10)
-                {
-                    string tempKey = $"Priority '{priority.DisplayName}'";
-                    AddToErrors(tempKey, tempMessages);
-                }
-            }
+            _errors.Clear();
         }
 
         private void ValidateStatuses(List<Status> statuses)

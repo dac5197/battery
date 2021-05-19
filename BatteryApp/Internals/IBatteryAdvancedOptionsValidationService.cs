@@ -10,5 +10,7 @@ namespace BatteryApp.Internals
         Dictionary<string, List<string>> Validate(List<Category> categories, List<Priority> priorities, List<Status> statuses);
         Dictionary<string, List<string>> Validate(List<Category> categories);
         Dictionary<string, List<string>> Validate(List<Priority> priorities);
+
+        public void ClearErrors();
     }
 }
