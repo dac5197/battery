@@ -32,6 +32,15 @@ namespace BatteryApp.Internals
             return _errors;
         }
 
+        public Dictionary<string, List<string>> Validate(List<Priority> priorities)
+        {
+            _errors.Clear();
+
+            ValidatePriorities(priorities);
+
+            return _errors;
+        }
+
         private void AddToErrors(string key, List<string> messages)
         {
             List<string> filteredMessages = messages.Where(x => !String.IsNullOrWhiteSpace(x)).ToList();
@@ -129,6 +138,8 @@ namespace BatteryApp.Internals
             messages.Add(ValidatePriorities_NegativeSeverity(priorities));
 
             AddToErrors("Priorities", messages);
+
+            ValidatePriorities_NameLength(priorities);
         }
 
         private static string ValidatePriorities_EmptyList(List<Priority> priorities)
@@ -204,6 +215,24 @@ namespace BatteryApp.Internals
             }
 
             return tempMessage;
+        }
+
+        private void ValidatePriorities_NameLength(List<Priority> priorities)
+        {
+
+            List<string> tempMessages = new();
+
+            string tempMessage = "Name is too long.  Please modify Name to be 10 characters or less.";
+            tempMessages.Add(tempMessage);
+
+            foreach (var priority in priorities)
+            {
+                if (priority.Name.Length > 10)
+                {
+                    string tempKey = $"Priority '{priority.DisplayName}'";
+                    AddToErrors(tempKey, tempMessages);
+                }
+            }
         }
 
         private void ValidateStatuses(List<Status> statuses)

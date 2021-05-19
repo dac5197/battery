@@ -77,7 +77,7 @@
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right border-square" aria-labelledby="dropdownOptionsMenu">
                                                 <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_CategoryOptionsModal">Edit Categories</button>
-                                                <button class="dropdown-item" type="button">Edit Priorities</button>
+                                                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_PriorityOptionsModal">Edit Priorities</button>
                                                 <button class="dropdown-item" type="button">Edit Statuses</button>
                                                 <div class="dropdown-divider"></div>
                                                 <button type="submit" class="dropdown-item" >Save Battery</button>
@@ -281,7 +281,8 @@
                                         CompletedOpenChildren="@CompleteChargeWithChildren"
                                         OpenChildren="@_chargeOpenChildrenModalHelper.OpenChildren"></ChargeChildrenWarningModal>
 
-            <BatteryDetailExisting_CategoryOptions Battery="battery" Categories="@categories" ParentStateChanged="@StateChanged"></BatteryDetailExisting_CategoryOptions>
+            <BatteryDetailExisting_CategoryOptionsModal Battery="@battery" Categories="@categories" ParentStateChanged="@StateChanged"></BatteryDetailExisting_CategoryOptionsModal>
+            <BatteryDetailExisting_PriorityOptionsModal Battery="@battery" Priorities="@priorities" ParentStateChanged="@StateChanged"></BatteryDetailExisting_PriorityOptionsModal>
         }
     </Authorized>
     <NotAuthorized>

@@ -1,0 +1,222 @@
+﻿@inject IBatteryAdvancedOptionsValidationService _validationService
+@inject IPriorityService _priorityService
+@inject IChargeService _chargeService
+
+@inject IJSRuntime _jsRuntime
+
+<div class="modal fade" tabindex="-1" role="dialog" id="batteryDetailExiting_PriorityOptionsModal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-square">
+            <div class="modal-header">
+                <h5 class="modal-title">Battery Detail - Category Options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ResetEditPriorities">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @if (showErrors)
+                {
+                    <CustomFormErrors Errors="@errors" />
+                }
+                <div class="row px-5">
+                    <div class="col">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Display Name</th>
+                                    <th>Default?</th>
+                                    <th>
+                                        Actions
+                                        <QuestionMarkToolTip Text="When deleting an existing Priority, any charges set to that Priority will be reset to the default Priority."></QuestionMarkToolTip>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var priority in Priorities.OrderBy(x => x.Severity))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="btn btn-sm border-square dopdown-toggle small mx-1 py-0 px-1"
+                                                  style="color: @priority.FontColor; background-color: @priority.BgColor">
+                                                @priority.DisplayName
+                                            </span>
+                                        </td>
+                                        <td>@priority.IsDefault</td>
+                                        <td>
+                                            <button class="btn btn-info btn-sm border-square"
+                                                    type="button"
+                                                    data-toggle="modal"
+                                                    data-target="#BatteryDetailAdvOptions_EditPriorityModal"
+                                                    @onclick="(() => SetEditPriority(priority))">
+                                                Edit
+                                            </button>
+                                            <button class="btn btn-danger btn-sm border-square" type="button" @onclick="@(() => RemovePriority(priority))">X</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="row px-2 mb-3">
+                            <div class="col">
+                                <button type="button"
+                                        class="btn btn-info btn-sm border-square"
+                                        style="width: 32px;"
+                                        title="Reset"
+                                        @onclick="@ResetEditPriorities">
+                                    <span class="oi oi-action-undo"></span>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-success btn-sm border-square"
+                                        data-toggle="modal"
+                                        data-target="#BatteryDetailAdvOptions_EditPriorityModal"
+                                        style="width: 32px;"
+                                        title="Add Category"
+                                        @onclick="@SetEditPriorityToNew">
+                                    <span class="oi oi-plus"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary border-square" @onclick="@HandleSubmit">Submit</button>
+                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="@ResetEditPriorities">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Priority Modal-->
+<BatteryDetailAdvOptions_EditPriorityModal Priority="@editPriority" ParentStateChanged="@StateChanged"></BatteryDetailAdvOptions_EditPriorityModal>
+
+@code {
+
+    [Parameter]
+    public Battery Battery { get; set; }
+
+    [Parameter]
+    public List<Priority> Priorities { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    private Priority editPriority = new();
+
+    private Dictionary<string, List<string>> errors = new();
+
+    private bool isNewPriority = false;
+    private bool showErrors = false;
+
+    private async void HandleSubmit()
+    {
+        showErrors = false;
+        errors.Clear();
+        errors = _validationService.Validate(Priorities);
+
+        if (errors.Count() > 0)
+        {
+            showErrors = true;
+        }
+        else
+        {
+
+            foreach (var priority in Priorities)
+            {
+                // Add new Priority
+                if (priority.Id == 0)
+                {
+                    priority.BatteryId = Battery.Id;
+                    priority.OwnerId = Battery.OwnerId;
+                    await _priorityService.Add(priority);
+                }
+                // Update exsting Priority
+                else
+                {
+                    await _priorityService.Update(priority);
+                }
+            }
+
+            // Delete any Categories in DB but not in Categories list
+            var originalValuePriorities = await _priorityService.Get(Battery);
+            var prioritiesToBeDeleted = originalValuePriorities.Where(o => !Priorities.Any(c => c.Id == o.Id)).ToList();
+
+            if (prioritiesToBeDeleted.Any())
+            {
+                await DeletePriorities(prioritiesToBeDeleted);
+            }
+
+            await CloseModal();
+
+            ParentStateChanged?.Invoke();
+        }
+    }
+
+    public async Task CloseModal()
+    {
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "batteryDetailExiting_PriorityOptionsModal");
+    }
+
+    private async void ResetEditPriorities()
+    {
+        Priorities = await _priorityService.Get(Battery);
+        StateHasChanged();
+    }
+
+    private void SetEditPriority(Priority priority)
+    {
+        editPriority = priority;
+        isNewPriority = false;
+    }
+
+    private void SetEditPriorityToNew()
+    {
+        editPriority = new Priority();
+        isNewPriority = true;
+    }
+
+    private void RemovePriority(Priority priority)
+    {
+        Priorities.Remove(priority);
+    }
+
+    private void StateChanged()
+    {
+
+        if (isNewPriority)
+        {
+            Priorities.Add(editPriority);
+            isNewPriority = false;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task DeletePriorities(List<Priority> priorities)
+    {
+        var defaultPriority = Priorities.Where(x => x.IsDefault == true).FirstOrDefault();
+
+        var charges = await _chargeService.Get(Battery);
+
+        foreach (var priority in priorities)
+        {
+            var chargesToBeChanged = charges.Where(x => x.PriorityId == priority.Id).ToList();
+
+            await UpdateCharges(chargesToBeChanged, defaultPriority);
+
+            await _priorityService.Delete(priority.Id);
+        }
+    }
+
+    private async Task UpdateCharges(List<Charge> charges, Priority priority)
+    {
+        foreach (var charge in charges)
+        {
+            charge.PriorityId = priority.Id;
+            await _chargeService.Update(charge);
+        }
+    }
+}
+
