@@ -71,7 +71,7 @@ namespace BatteryApp
 
             // Add Project Internals
             services.AddTransient<IBatteryAdvancedOptionsSaveService, BatteryAdvancedOptionsSaveService>();
-            services.AddTransient<IBatteryAdvancedOptionsValidationService, BatteryAdvancedOptionsValidationService>();
+            
             services.AddTransient<IChargeChildController, ChargeChildController>();
             services.AddTransient<IChargeLifecycle, ChargeLifecycle>();
             services.AddTransient<IDeleteChargeController, DeleteChargeController>();
@@ -85,6 +85,7 @@ namespace BatteryApp
             services.AddScoped<IChargeOpenChildrenModalHelper, ChargeOpenChildrenModalHelper>();
 
             // Add Project Validators
+            services.AddTransient<IBatteryAdvancedOptionsValidator, BatteryAdvancedOptionsValidator>();
             services.AddTransient<ICategoryValidator, CategoryValidator>();
             services.AddTransient<IPriorityValidator, PriorityValidator>();
             services.AddTransient<IStatusValidator, StatusValidator>();

@@ -3,9 +3,9 @@ using BatteryApp.Models.PriorityModel;
 using BatteryApp.Models.StatusModel;
 using System.Collections.Generic;
 
-namespace BatteryApp.Internals
+namespace BatteryApp.Internals.Validators
 {
-    public interface IBatteryAdvancedOptionsValidationService
+    public interface IBatteryAdvancedOptionsValidator
     {
         Dictionary<string, List<string>> Validate(List<Category> categories, List<Priority> priorities, List<Status> statuses);
         Dictionary<string, List<string>> Validate(List<Category> categories);

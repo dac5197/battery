@@ -1,5 +1,4 @@
-﻿using BatteryApp.Internals.Validators;
-using BatteryApp.Models.CategoryModel;
+﻿using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.PriorityModel;
 using BatteryApp.Models.StatusModel;
 using System;
@@ -7,16 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BatteryApp.Internals
+namespace BatteryApp.Internals.Validators
 {
-    public class BatteryAdvancedOptionsValidationService : IBatteryAdvancedOptionsValidationService
+    public class BatteryAdvancedOptionsValidator : IBatteryAdvancedOptionsValidator
     {
         private Dictionary<string, List<string>> _errors = new();
         private readonly ICategoryValidator _categoryValidator;
         private readonly IPriorityValidator _priorityValidator;
         private readonly IStatusValidator _statusValidator;
 
-        public BatteryAdvancedOptionsValidationService(ICategoryValidator categoryValidator, IPriorityValidator priorityValidator, IStatusValidator statusValidator)
+        public BatteryAdvancedOptionsValidator(ICategoryValidator categoryValidator, IPriorityValidator priorityValidator, IStatusValidator statusValidator)
         {
             _categoryValidator = categoryValidator;
             _priorityValidator = priorityValidator;
