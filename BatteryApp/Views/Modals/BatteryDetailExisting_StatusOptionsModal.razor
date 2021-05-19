@@ -74,6 +74,13 @@
                                         @onclick="@SetEditStatusToNew">
                                     <span class="oi oi-plus"></span>
                                 </button>
+                                <button type="button"
+                                        class="btn btn-secondary btn-sm border-square"
+                                        title="Reorder"
+                                        @onclick="@ReOrderStatuses">
+                                    Reorder
+                                </button>
+                                <QuestionMarkToolTip Text="Reorder all statuses.  Start at 1 and increment by 1 for the next status."></QuestionMarkToolTip>
                             </div>
                         </div>
                     </div>
@@ -217,6 +224,17 @@
         {
             charge.StatusId = status.Id;
             await _chargeService.Update(charge);
+        }
+    }
+
+    private void ReOrderStatuses()
+    {
+        int order = 1;
+
+        foreach (var status in Statuses.OrderBy(x => x.Order))
+        {
+            status.Order = order;
+            order++;
         }
     }
 }
