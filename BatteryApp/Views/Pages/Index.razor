@@ -136,8 +136,18 @@
         categories = await _categoryService.Get(userId);
         priorities = await _priorityService.Get(userId);
         statuses = await _statusService.Get(userId);
+        SortChargesByStatus();
 
         // Hide the breadcrump nav
         _breadcrumb.Hide();
+    }
+
+    private void SortChargesByStatus()
+    {
+        charges = (from charge in charges
+                   join status in statuses
+                   on charge.StatusId equals status.Id
+                   orderby status.Order
+                   select charge).ToList();
     }
 }

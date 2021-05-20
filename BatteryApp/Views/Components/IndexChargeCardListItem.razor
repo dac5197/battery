@@ -1,39 +1,76 @@
 ﻿@inject IChargeService _chargeService
 
-<div class="card border-square shadow-sm p-2 mt-1 highlighted-index-@Charge.BatteryId-@Charge.Id">
-    <div class="row">
-        <div class="col-lg-6">
-            <NavLink href="@($"/charge/{Charge.Id}")" class="link-black">
-                <IconCategory Category="@Category"></IconCategory>
-                @Charge.Id | @Charge.Title
-            </NavLink>
-        </div>
-        <div class="col-lg-2">
-            <SpanDisplay BgColor="@Priority.BgColor"
-                         FontColor="@Priority.FontColor"
-                         Text="@Priority.DisplayName"
-                         Width="@PriorityDispalyWidth"></SpanDisplay>
-        </div>
-        <div class="col-lg-2">
-            <SpanDisplay BgColor="@Status.BgColor"
-                         FontColor="@Status.FontColor"
-                         Text="@Status.Name"
-                         Width="@StatusDispalyWidth"></SpanDisplay>
-        </div>
-        <div class="col-lg-2">
-            <BtnToggleChargeChildren Categories="@Categories"
-                                     Children="@children"
-                                     CompleteStatus="CompleteStatus"
-                                     ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
+@if (Charge.StatusId == CompleteStatus.Id)
+{
+    <div class="card bg-light border-square shadow-sm p-2 mt-1 completed highlighted-index-@Charge.BatteryId-@Charge.Id">
+        <div class="row">
+            <div class="col-lg-6">
+                <NavLink href="@($"/charge/{Charge.Id}")" class="link-black">
+                    <IconCategory Category="@Category"></IconCategory>
+                    @Charge.Id | @Charge.Title
+                </NavLink>
+            </div>
+            <div class="col-lg-2">
+                <SpanDisplay BgColor="@Priority.BgColor"
+                             FontColor="@Priority.FontColor"
+                             Text="@Priority.DisplayName"
+                             Width="@PriorityDispalyWidth"></SpanDisplay>
+            </div>
+            <div class="col-lg-2">
+                <SpanDisplay BgColor="@Status.BgColor"
+                             FontColor="@Status.FontColor"
+                             Text="@Status.Name"
+                             Width="@StatusDispalyWidth"></SpanDisplay>
+            </div>
+            <div class="col-lg-2">
+                <BtnToggleChargeChildren Categories="@Categories"
+                                         Children="@children"
+                                         CompleteStatus="CompleteStatus"
+                                         ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
+            </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <div class="card border-square shadow-sm p-2 mt-1 highlighted-index-@Charge.BatteryId-@Charge.Id">
+        <div class="row">
+            <div class="col-lg-6">
+                <NavLink href="@($"/charge/{Charge.Id}")" class="link-black">
+                    <IconCategory Category="@Category"></IconCategory>
+                    @Charge.Id | @Charge.Title
+                </NavLink>
+            </div>
+            <div class="col-lg-2">
+                <SpanDisplay BgColor="@Priority.BgColor"
+                             FontColor="@Priority.FontColor"
+                             Text="@Priority.DisplayName"
+                             Width="@PriorityDispalyWidth"></SpanDisplay>
+            </div>
+            <div class="col-lg-2">
+                <SpanDisplay BgColor="@Status.BgColor"
+                             FontColor="@Status.FontColor"
+                             Text="@Status.Name"
+                             Width="@StatusDispalyWidth"></SpanDisplay>
+            </div>
+            <div class="col-lg-2">
+                <BtnToggleChargeChildren Categories="@Categories"
+                                         Children="@children"
+                                         CompleteStatus="CompleteStatus"
+                                         ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
+            </div>
+        </div>
+    </div>
+}
+
 
 <style>
     .highlighted-index-@Charge.BatteryId-@Charge.Id:hover {
         outline: solid;
         outline-color: @Category.IconColor;
     }
+
+    
 </style>
 
 @code {
