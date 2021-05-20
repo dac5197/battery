@@ -57,7 +57,12 @@ namespace BatteryApp.Models.ChargeModel
             return charges.Where(x => x.BatteryId == battery.Id && (x.Completed is null || x.Completed >= DateTime.UtcNow.AddDays(-3))).ToList();
         }
 
-       
+        public async Task<List<Charge>> GetActive(string userId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var charges = await context.Charges.ToListAsync();
+            return charges.Where(x => x.OwnerId == userId && (x.Completed is null || x.Completed >= DateTime.UtcNow.AddDays(-3))).ToList();
+        }
 
         public async Task<List<Charge>> GetActiveParentsOnly(Battery battery)
         {
@@ -69,7 +74,15 @@ namespace BatteryApp.Models.ChargeModel
                           .ToList();
         }
 
-        
+        public async Task<List<Charge>> GetActiveParentsOnly(string userId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var charges = await context.Charges.ToListAsync();
+            return charges.Where(x => x.OwnerId == userId)
+                          .Where(x => x.Completed is null || x.Completed >= DateTime.UtcNow.AddDays(-3))
+                          .Where(x => x.ParentId is null)
+                          .ToList();
+        }
 
         public async Task<List<Charge>> GetChildren(Charge charge)
         {

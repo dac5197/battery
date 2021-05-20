@@ -1,0 +1,25 @@
+﻿<span class="btn btn-sm border-square dopdown-toggle small mx-1 py-0 px-1"
+      style="color: @FontColor; background-color: @BgColor; cursor: default; width: @chWidth">
+    @Text
+</span>
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string FontColor { get; set; }
+
+    [Parameter]
+    public string BgColor { get; set; }
+
+    [Parameter]
+    public int Width { get; set; }
+
+    private string chWidth;
+
+    protected override void OnInitialized()
+    {
+        chWidth = $"{Width}ch";
+    }
+}

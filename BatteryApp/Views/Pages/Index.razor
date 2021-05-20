@@ -1,53 +1,143 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@inject AuthenticationStateProvider _authStateProvider
+@inject IBatteryService _batteryService
+@inject IBreadcrumbManager _breadcrumb
+@inject IChargeService _chargeService
+@inject ICategoryService _categoryService
+@inject IPriorityService _priorityService
+@inject IStatusService _statusService
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Components.Authorization
-@inject AuthenticationStateProvider AuthenticationStateProvider
-
-<h3>ClaimsPrincipal Data</h3>
-
-<button @onclick="GetClaimsPrincipalData">Get ClaimsPrincipal Data</button>
-
-<p>@_authMessage</p>
-
-@if (_claims.Count() > 0)
-{
-    <ul>
-        @foreach (var claim in _claims)
+<AuthorizeView>
+    <Authorized>
+        @if (batteries == null)
         {
-            <li>@claim.Type: @claim.Value</li>
-        }
-    </ul>
-}
-
-<p>@_surnameMessage</p>
-
-@code {
-    private string _authMessage;
-    private string _surnameMessage;
-    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
-
-    private async Task GetClaimsPrincipalData()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        
-        if (user.Identity.IsAuthenticated)
-        {
-            _authMessage = $"{user.Identity.Name} is authenticated.";
-            _claims = user.Claims;
-            _surnameMessage =
-                $"Surname: {user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value}";
+            <p><em>Loading...</em></p>
         }
         else
         {
-            _authMessage = "The user is NOT authenticated.";
+            <div class="small mt-2">
+                <div class="row mb-3">
+                    <div class="col-lg-8">
+                        <div class="card border-square shadow-sm p-2 mt-2 h-100">
+                            <h1>DACME Battery</h1>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card border-square shadow-sm p-2 mt-2 h-100">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <h5>
+                                        Active Batteries: <span class="float-right">@batteries.Count()</span>
+                                    </h5>
+                                </li>
+                                <li class="list-group-item">
+                                    <h5>
+                                        Active Charges: <span class="float-right">@charges.Count()</span>
+                                    </h5>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Search Bar -->
+                <div class="row mb-2">
+                    <div class="col-lg-12">
+                        <div class="card border-square shadow-sm p-2 mt-2">
+                            <div class="row justify-content-center">
+
+                                <div class="col-lg-6">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text border-0 bg-transparent mr-n5">
+                                                <span class="oi oi-magnifying-glass"></span>
+                                            </div>
+                                        </div>
+                                        <input type="text"
+                                               class="form-control py-2 border-square bg-transparent pl-5"
+                                               id="searchChargesInput"
+                                               placeholder="Search" />
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-info border-square">Clear</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Active Battery List -->
+                @foreach (var battery in batteries)
+                {
+                    <div class="row mb-3">
+                        <div class="col-lg-12">
+                            <div class="card border-square shadow-sm p-2 mt-2">
+                                <div class="card-header px-4">
+                                    <NavLink href="@($"/battery/{battery.Id}")" class="link-black">
+                                        <span class="h3">
+                                            <IconBattery />
+                                            @battery.Id | @battery.Name
+                                        </span>
+                                    </NavLink>
+                                    <span class="h3 float-right">(@charges.Where(x => x.BatteryId == battery.Id).Count())</span>
+                                </div>
+                                <div class="card-body">
+                                    @foreach (var charge in charges.Where(x => x.BatteryId == battery.Id))
+                                    {
+                                        <IndexChargeCardListItem Charge="@charge"
+                                                                 Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
+                                                                 Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
+                                                                 Priority="@priorities.Where(x => x.Id == charge.PriorityId).FirstOrDefault()"
+                                                                 PriorityDispalyWidth="@priorities.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.DisplayName.Length).First().DisplayName.Length"
+                                                                 Status="@statuses.Where(x => x.Id == charge.StatusId).FirstOrDefault()"
+                                                                 CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
+                                                                 StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
+                                                                 ShowChildren="@false"></IndexChargeCardListItem>
+                                    }
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                }
+
+
+
+            </div>
         }
+    </Authorized>
+    <NotAuthorized>
+        <a href="Identity/Account/Register">Register</a>
+        <a href="Identity/Account/Login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private string userId;
+
+    private List<Battery> batteries = new();
+    private List<Charge> charges = new();
+    private List<Category> categories = new();
+    private List<Priority> priorities = new();
+    private List<Status> statuses = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get Id of logged in user
+        var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        // Get entities
+        batteries = await _batteryService.GetActive(userId);
+        charges = await _chargeService.GetActiveParentsOnly(userId);
+        categories = await _categoryService.Get(userId);
+        priorities = await _priorityService.Get(userId);
+        statuses = await _statusService.Get(userId);
+
+        // Hide the breadcrump nav
+        _breadcrumb.Hide();
     }
 }

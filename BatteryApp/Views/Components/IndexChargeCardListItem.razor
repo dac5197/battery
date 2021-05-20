@@ -1,0 +1,80 @@
+﻿@inject IChargeService _chargeService
+
+<div class="card border-square shadow-sm p-2 mt-1 highlighted-index-@Charge.BatteryId-@Charge.Id">
+    <div class="row">
+        <div class="col-lg-6">
+            <NavLink href="@($"/charge/{Charge.Id}")" class="link-black">
+                <IconCategory Category="@Category"></IconCategory>
+                @Charge.Id | @Charge.Title
+            </NavLink>
+        </div>
+        <div class="col-lg-2">
+            <SpanDisplay BgColor="@Priority.BgColor"
+                         FontColor="@Priority.FontColor"
+                         Text="@Priority.DisplayName"
+                         Width="@PriorityDispalyWidth"></SpanDisplay>
+        </div>
+        <div class="col-lg-2">
+            <SpanDisplay BgColor="@Status.BgColor"
+                         FontColor="@Status.FontColor"
+                         Text="@Status.Name"
+                         Width="@StatusDispalyWidth"></SpanDisplay>
+        </div>
+        <div class="col-lg-2">
+            <BtnToggleChargeChildren Categories="@Categories"
+                                     Children="@children"
+                                     CompleteStatus="CompleteStatus"
+                                     ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
+        </div>
+    </div>
+</div>
+
+<style>
+    .highlighted-index-@Charge.BatteryId-@Charge.Id:hover {
+        outline: solid;
+        outline-color: @Category.IconColor;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Charge Charge { get; set; }
+
+
+    [Parameter]
+    public Category Category { get; set; }
+
+    [Parameter]
+    public Priority Priority { get; set; }
+
+    [Parameter]
+    public Status Status { get; set; }
+
+    [Parameter]
+    public Status CompleteStatus { get; set; }
+
+    [Parameter]
+    public bool ShowChildren { get; set; }
+
+    [Parameter]
+    public int PriorityDispalyWidth { get; set; }
+
+    [Parameter]
+    public int StatusDispalyWidth { get; set; }
+
+    [Parameter]
+    public List<Category> Categories { get; set; }
+
+    private List<Charge> children = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        children = await _chargeService.GetChildren(Charge);
+    }
+
+    private void ToggleShowChildren()
+    {
+        ShowChildren = !ShowChildren;
+        StateHasChanged();
+    }
+}

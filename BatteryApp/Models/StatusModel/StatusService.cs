@@ -32,6 +32,13 @@ namespace BatteryApp.Models.StatusModel
             return statuses.Where(x => x.BatteryId == battery.Id).ToList();
         }
 
+        public async Task<List<Status>> Get(string userId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            var statuses = await context.Statuses.ToListAsync();
+            return statuses.Where(x => x.OwnerId == userId).ToList();
+        }
+
         public async Task<Status> Get(int id)
         {
             using var context = _contextFactory.CreateDbContext();
