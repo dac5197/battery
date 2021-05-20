@@ -39,9 +39,13 @@ namespace BatteryApp.Internals
         public async Task DeleteChargeOnlyAsync(Charge charge)
         {
             await DeleteTagRelationshipsAsync(charge.Id);
-            //await _noteService.RemoveChildParentHistoryNote(charge); TODO FIX ME
-            await _chargeService.Delete(charge.Id);
 
+            if (charge.ParentId is not null)
+            {
+                await _noteService.RemoveChildParentHistoryNote(charge);
+            }
+            
+            await _chargeService.Delete(charge.Id);
         }
 
         public async Task DeleteTagRelationshipsAsync(int chargeId)
