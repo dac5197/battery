@@ -9,6 +9,9 @@
                     @status.Name
                     (@Charges.Where(x => x.ParentId is null).Where(x => x.StatusId == status.Id).Count())
                 </h5>
+                <p class="text-center">
+                    Active: @chargesActiveCounts.Where(x => x.Key == status.Id).FirstOrDefault().Value Inactive: @chargesInactiveCounts.Where(x => x.Key == status.Id).FirstOrDefault().Value
+                </p>
                 @foreach (var charge in Charges
                                           .Where(x => x.ParentId is null)
                                           .Where(x => x.StatusId == status.Id)
@@ -36,6 +39,12 @@
     [Parameter]
     public EventCallback<Charge> ChildChanged { get; set; }
 
+    [Parameter]
+    public Dictionary<int,int> chargesActiveCounts { get; set; }
+
+    [Parameter]
+    public Dictionary<int,int> chargesInactiveCounts { get; set; }
+
     private Charge boundChild
     {
         get => Child;
@@ -59,5 +68,4 @@
 
     [CascadingParameter(Name = "ShowChildren")]
     private bool ShowChildren { get; set; }
-
 }

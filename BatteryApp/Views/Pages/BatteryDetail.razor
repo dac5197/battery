@@ -11,6 +11,7 @@
 @inject IChargeLifecycle _chargeLifecycle
 @inject IChargeOpenChildrenModalHelper _chargeOpenChildrenModalHelper
 @inject IChargeService _chargeService
+@inject IChargeCountService _chargeCountService
 @inject IPriorityService _priorityService
 @inject IStatusService _statusService
 @inject IJSRuntime _jsRuntime
@@ -241,6 +242,8 @@
                                     <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
                                         <ChargeCardList @bind-Child="@chargeObject"
                                                         Charges="@filteredCharges"
+                                                        chargesActiveCounts="@activeChargesCounts"
+                                                        chargesInactiveCounts="@inactiveChargesCounts"
                                                         ParentStateChanged="@StateChanged"></ChargeCardList>
                                     </CascadingValue>
                                 </CascadingValue>
@@ -317,6 +320,9 @@
     private ChargeDetailModal chargeDetailModal;
     private ChargeTable chargeTable;
 
+    private Dictionary<int, int> activeChargesCounts = new();
+    private Dictionary<int, int> inactiveChargesCounts = new();
+
     private bool showChargeCardChildren = false;
     private bool showChargeCardView = true;
     private bool showPriorityScoreCard = false;
@@ -347,10 +353,11 @@
         battery = await _batteryService.Get(Id);
         categories = await _categoryService.Get(battery);
         charges = await _chargeService.GetActive(battery);
-        chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
-        allChargesCount = await _chargeService.GetAllCount(battery);
         priorities = await _priorityService.Get(battery);
         statuses = await _statusService.Get(battery);
+
+        // Calculate charge counts
+        await GetChargeCounts();
 
         // Set filtered charge list
         filteredCharges = charges;
@@ -453,7 +460,7 @@
     private async Task GetAllCharges()
     {
         charges = await _chargeService.Get(battery);
-        chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
+        await GetChargeCounts();
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
         chargeTable?.ResetSort();
 
@@ -463,7 +470,7 @@
     private async Task GetActiveCharges()
     {
         charges = await _chargeService.GetActive(battery);
-        chargeChildrenCounts = await _chargeService.GetChildrenCount(charges);
+        await GetChargeCounts();
         filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
         chargeTable?.ResetSort();
 
@@ -529,5 +536,13 @@
         await _chargeService.Update(charge);
 
         StateChanged();
+    }
+
+    private async Task GetChargeCounts()
+    {
+        chargeChildrenCounts = await _chargeCountService.GetChildrenCount(charges);
+        allChargesCount = await _chargeCountService.GetAllCount(battery);
+        activeChargesCounts = await _chargeCountService.GetActiveCountsByStatus(battery);
+        inactiveChargesCounts = await _chargeCountService.GetInactiveCountsByStatus(battery);
     }
 }

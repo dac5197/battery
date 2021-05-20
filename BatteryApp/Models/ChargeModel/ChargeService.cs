@@ -57,6 +57,8 @@ namespace BatteryApp.Models.ChargeModel
             return charges.Where(x => x.BatteryId == battery.Id && (x.Completed is null || x.Completed >= DateTime.UtcNow.AddDays(-3))).ToList();
         }
 
+       
+
         public async Task<List<Charge>> GetActiveParentsOnly(Battery battery)
         {
             using var context = _contextFactory.CreateDbContext();
@@ -67,12 +69,7 @@ namespace BatteryApp.Models.ChargeModel
                           .ToList();
         }
 
-        public async Task<int> GetAllCount(Battery battery)
-        {
-            using var context = _contextFactory.CreateDbContext();
-            var charges = await context.Charges.ToListAsync();
-            return charges.Where(x => x.BatteryId == battery.Id).ToList().Count;
-        }
+        
 
         public async Task<List<Charge>> GetChildren(Charge charge)
         {
@@ -82,25 +79,7 @@ namespace BatteryApp.Models.ChargeModel
             return children;
         }
 
-        public async Task<List<ChargeChildrenCount>> GetChildrenCount(List<Charge> charges)
-        {
-            //using var context = _contextFactory.CreateDbContext();
-
-            List<ChargeChildrenCount> chargeChildrenCounts = new();
-
-            foreach (var charge in charges)
-            {
-                var children = await GetChildren(charge);
-                ChargeChildrenCount chargeChildrenCount = new()
-                { 
-                    ChargeId = charge.Id,
-                    ChildrenCount = children.Count
-                };
-                chargeChildrenCounts.Add(chargeChildrenCount);
-            }
-
-            return chargeChildrenCounts;
-        }
+        
 
         public async Task<Charge> GetParent(Charge charge)
         {

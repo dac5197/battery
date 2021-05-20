@@ -61,6 +61,7 @@ namespace BatteryApp
             services.AddTransient<IBatteryService, BatteryService>();
             services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<IChargeService, ChargeService>();
+            services.AddTransient<IChargeCountService, ChargeCountService>();
             services.AddTransient<IChargeTagRelationService, ChargeTagRelationService>();
             services.AddTransient<INoteService, NoteService>();
             services.AddTransient<INoteTypeService, NoteTypeService>();
@@ -71,7 +72,6 @@ namespace BatteryApp
 
             // Add Project Internals
             services.AddTransient<IBatteryAdvancedOptionsSaveService, BatteryAdvancedOptionsSaveService>();
-            
             services.AddTransient<IChargeChildController, ChargeChildController>();
             services.AddTransient<IChargeLifecycle, ChargeLifecycle>();
             services.AddTransient<IDeleteChargeController, DeleteChargeController>();

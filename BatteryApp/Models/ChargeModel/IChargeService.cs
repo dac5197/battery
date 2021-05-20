@@ -14,9 +14,7 @@ namespace BatteryApp.Models.ChargeModel
         Task<List<Charge>> GetActive();
         Task<List<Charge>> GetActive(Battery battery);
         Task<List<Charge>> GetActiveParentsOnly(Battery battery);
-        Task<int> GetAllCount(Battery battery);
         Task<List<Charge>> GetChildren(Charge charge);
-        Task<List<ChargeChildrenCount>> GetChildrenCount(List<Charge> charges);
         Task<Charge> GetParent(Charge charge);
         Task<Charge> SetUpdated(int chargeId);
         Task<Charge> Update(Charge charge);
