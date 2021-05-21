@@ -71,18 +71,21 @@
                 {
                     <div class="row mb-3">
                         <div class="col-lg-12">
-                            <div class="card border-square shadow-sm p-2 mt-2">
-                                <div class="card-header pr-4">
-                                    <button class="btn btn-secondary toggle-button mr-2" type="button" @onclick="@(() => ToggleShowBatteryCharges(battery))">
+                            <div class="card border-square shadow-sm mt-2">
+                                <div class="card-header p-1">
+                                    <button class="btn btn-sm btn-light toggle-button mr-2" type="button" @onclick="@(() => ToggleShowBatteryCharges(battery))">
                                         @if (showBatteryCharges[battery.Id])
                                         {
-                                            <span class="oi oi-collapse-up h4 m-0"></span>
+                                            <span class="oi oi-collapse-up m-0 small"></span>
                                         }
                                         else
                                         {
-                                            <span class="oi oi-expand-down h4 m-0"></span>
+                                            <span class="oi oi-expand-down m-0 small"></span>
                                         }
                                     </button>
+                                </div>
+                                <div class="card-header pr-4">
+                                    
                                     <NavLink href="@($"/battery/{battery.Id}")" class="link-black">
                                         <span class="h3">
                                             <IconBattery />
@@ -132,8 +135,8 @@
 
 <style>
     .toggle-button {
-        height: 49px;
-        width: 49px;
+        /*height: 39px;
+        width: 39px;*/
         border-radius: 0;
         text-align: center;
     }
