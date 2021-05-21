@@ -10,6 +10,7 @@ namespace BatteryApp.Models.TagModel
         Task Delete(int id);
         Task<List<Tag>> Get();
         Task<List<Tag>> Get(Battery battery);
+        Task<List<Tag>> Get(string userId);
         Task<Tag> Get(int id);
         Task<Tag> Update(Tag tag);
     }

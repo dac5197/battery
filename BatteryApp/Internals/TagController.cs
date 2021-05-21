@@ -95,5 +95,21 @@ namespace BatteryApp.Internals
 
             return tag;
         }
+
+        public async Task<Dictionary<int, int>> CountChargeTagRelationshipsForBatteryAsync(Battery battery)
+        {
+            Dictionary<int, int> counts = new();
+
+            var tags = await _tagService.Get(battery);
+
+            foreach (var tag in tags)
+            {
+                var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
+
+                counts.Add(tag.Id, relations.Count);
+            }
+
+            return counts;
+        }
     }
 }

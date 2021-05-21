@@ -1,5 +1,5 @@
 ﻿@inject IChargeService _chargeService
-
+@inject ITagController _tagController
 
 <div class="card border-square shadow-sm p-2 mt-1 highlighted-index-@Charge.BatteryId-@Charge.Id  @(Charge.StatusId == CompleteStatus.Id ? "bg-completed" : "")">
     <div class="row @(Charge.StatusId == CompleteStatus.Id ? "completed" : "")">
@@ -26,6 +26,14 @@
                                      Children="@children"
                                      CompleteStatus="CompleteStatus"
                                      ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
+        </div>
+    </div>
+    <div class="row mt-1">
+        <div class="col-lg-12">
+            @if (ShowTags && tags.Any())
+            {
+                <IndexTagList Tags="@tags" ShowBorder="@false" ShowManageTagsButton="@false"></IndexTagList>
+            }
         </div>
     </div>
     @if (ShowChildren)
@@ -72,7 +80,7 @@
     .bg-completed {
         background-color: #f2f2f2;
     }
-    
+
 </style>
 
 @code {
@@ -110,13 +118,18 @@
     public List<Status> Statuses { get; set; }
 
     [Parameter]
+    public bool ShowTags { get; set; }
+
+    [Parameter]
     public string SearchText { get; set; }
 
     private List<Charge> children = new();
+    private List<Tag> tags = new();
 
     protected override async Task OnInitializedAsync()
     {
         children = await _chargeService.GetChildren(Charge);
+        tags = await _tagController.GetAllTagsForChargeAsync(Charge.Id);
     }
 
     private void ToggleShowChildren()

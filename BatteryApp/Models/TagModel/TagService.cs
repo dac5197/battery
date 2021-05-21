@@ -29,6 +29,12 @@ namespace BatteryApp.Models.TagModel
             return await context.Tags.Where(x => x.BatteryId == battery.Id).ToListAsync();
         }
 
+        public async Task<List<Tag>> Get(string userId)
+        {
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tags.Where(x => x.OwnerId == userId).ToListAsync();
+        }
+
         public async Task<Tag> Get(int id)
         {
             using var context = _contextFactory.CreateDbContext();

@@ -1,0 +1,130 @@
+﻿@inject ITagController _tagController
+
+@inject IJSRuntime _jsRuntime
+
+<div class="modal fade" tabindex="-1" role="dialog" id="ManageTagsModal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-square">
+            <div class="modal-header">
+                <h5 class="modal-title">Battery Detail - Category Options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ResetEditTags">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row px-5">
+                    <div class="col">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>
+                                        Counts
+                                        <QuestionMarkToolTip Text="Count of Charges with this Tag."></QuestionMarkToolTip>
+                                    </th>
+                                    <th>
+                                        Actions
+                                        <QuestionMarkToolTip Text="When deleting an existing Tag, any all relations to charges will also be removed."></QuestionMarkToolTip>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var tag in Tags)
+                                {
+                                    <tr>
+                                        <td>
+                                            <TagIndexItem Tag="@tag"></TagIndexItem>
+                                        </td>
+                                        <td>
+                                            @(TagCounts.ContainsKey(tag.Id) ? TagCounts[tag.Id] : 0)
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info btn-sm border-square"
+                                                    type="button"
+                                                    data-toggle="modal"
+                                                    data-target="#BatteryDetailAdvOptions_EditCategoryModal"
+                                                    @onclick="(() => SetEditTag(tag))">
+                                                Edit
+                                            </button>
+                                            <button class="btn btn-danger btn-sm border-square" type="button">X</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="row px-2 mb-3">
+                            <div class="col">
+                                <button type="button"
+                                        class="btn btn-info btn-sm border-square"
+                                        style="width: 32px;"
+                                        title="Reset"
+                                        @onclick="@ResetEditTags">
+                                    <span class="oi oi-action-undo"></span>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-success btn-sm border-square"
+                                        data-toggle="modal"
+                                        data-target="#BatteryDetailAdvOptions_EditCategoryModal"
+                                        style="width: 32px;"
+                                        title="Add Category"
+                                        @onclick="@SetEditTagToNew">
+                                    <span class="oi oi-plus"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary border-square">Submit</button>
+                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="@ResetEditTags">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Tag Modal-->
+
+@code {
+    [Parameter]
+    public Battery Battery { get; set; }
+
+    [Parameter]
+    public List<Tag> Tags { get; set; }
+
+    [Parameter]
+    public Dictionary<int, int> TagCounts { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    private Tag editTag = new();
+
+    private bool isNewTag = false;
+
+    public async Task CloseModal()
+    {
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "ManageTagsModal");
+    }
+
+    private async void ResetEditTags()
+    {
+        Tags = await _tagController.GetAllTagsForBatteryAsync(Battery);
+
+        StateHasChanged();
+    }
+
+    private void SetEditTag(Tag tag)
+    {
+        editTag = tag;
+        isNewTag = false;
+    }
+
+    private void SetEditTagToNew()
+    {
+        editTag = new Tag();
+        isNewTag = true;
+    }
+}

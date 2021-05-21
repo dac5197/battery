@@ -7,6 +7,8 @@
 @inject ICategoryService _categoryService
 @inject IPriorityService _priorityService
 @inject IStatusService _statusService
+@inject ITagController _tagController
+@inject ITagService _tagService
 
 <AuthorizeView>
     <Authorized>
@@ -75,7 +77,10 @@
                         <div class="col-lg-12">
                             <div class="card border-square shadow-sm mt-2">
                                 <div class="card-header p-1">
-                                    <button class="btn btn-sm btn-light toggle-button mr-2" type="button" @onclick="@(() => ToggleShowBatteryCharges(battery))">
+                                    <button class="btn btn-sm btn-light toggle-button mx-1"
+                                            title="Toggle Charges"
+                                            type="button"
+                                            @onclick="@(() => ToggleShowBatteryCharges(battery))">
                                         @if (showBatteryCharges[battery.Id])
                                         {
                                             <span class="oi oi-collapse-up m-0 small"></span>
@@ -85,9 +90,18 @@
                                             <span class="oi oi-expand-down m-0 small"></span>
                                         }
                                     </button>
+                                    @if (showBatteryTags.ContainsKey(battery.Id))
+                                    {
+                                        <button class="btn btn-sm btn-light mx-1"
+                                                title="Toggle Tags"
+                                                type="button"
+                                                @onclick="@(() => ToggleShowBatteryTags(battery))">
+                                            <IconTags />
+                                        </button>
+                                    }
                                 </div>
                                 <div class="card-header pr-4">
-                                    
+
                                     <NavLink href="@($"/battery/{battery.Id}")" class="link-black">
                                         <span class="h3">
                                             <IconBattery />
@@ -96,6 +110,14 @@
                                     </NavLink>
                                     <span class="h3 float-right">(@charges.Where(x => x.BatteryId == battery.Id).Count())</span>
                                 </div>
+                                @if (showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)
+                                {
+                                    <IndexTagList Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
+                                                  SetManageTagsBattery="@SetManageTagsBattery"
+                                                  ShowBorder="@true"
+                                                  ShowManageTagsButton="@true"></IndexTagList>
+                                }
+
                                 @if (showBatteryCharges[battery.Id])
                                 {
                                     <div class="card-body">
@@ -113,7 +135,8 @@
                                                                      CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
                                                                      StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
                                                                      SearchText="@searchText"
-                                                                     ShowChildren="@showChargeChildren"></IndexChargeCardListItem>
+                                                                     ShowChildren="@showChargeChildren"
+                                                                     ShowTags="@(showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)"></IndexChargeCardListItem>
                                         }
                                     </div>
                                 }
@@ -129,6 +152,8 @@
 
 
             </div>
+
+            <ManageTagsModal Battery="@manageTagsBattery" Tags="@tags.Where(x => x.BatteryId == manageTagsBattery.Id).ToList()" TagCounts="@tagCounts"></ManageTagsModal>
         }
     </Authorized>
     <NotAuthorized>
@@ -154,13 +179,17 @@
     private List<Category> categories = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
+    private List<Tag> tags = new();
 
     private Dictionary<int, bool> showBatteryCharges = new();
+    private Dictionary<int, bool> showBatteryTags = new();
+    private Dictionary<int, int> tagCounts = new();
+
+    private Battery manageTagsBattery = new();
 
     private string searchText = "";
     private string userId;
 
-    private bool showCharges = false;
     private bool showChargeChildren = false;
 
     protected override async Task OnInitializedAsync()
@@ -175,9 +204,11 @@
         categories = await _categoryService.Get(userId);
         priorities = await _priorityService.Get(userId);
         statuses = await _statusService.Get(userId);
+        tags = await _tagService.Get(userId);
 
         // Initialize other values
         InitializeShowBatteryChargesDict();
+        InitializeShowBatteryTagsDict();
         SortChargesByStatus();
 
         // Initialize filtered lists
@@ -196,9 +227,27 @@
         }
     }
 
+    private void InitializeShowBatteryTagsDict()
+    {
+        foreach (var battery in batteries)
+        {
+            var batteryTags = tags.Where(x => x.BatteryId == battery.Id).ToList();
+
+            if (batteryTags.Any())
+            {
+                showBatteryTags.Add(battery.Id, false);
+            }
+        }
+    }
+
     private void ToggleShowBatteryCharges(Battery battery)
     {
         showBatteryCharges[battery.Id] = !showBatteryCharges[battery.Id];
+    }
+
+    private void ToggleShowBatteryTags(Battery battery)
+    {
+        showBatteryTags[battery.Id] = !showBatteryTags[battery.Id];
     }
 
     private void SortChargesByStatus()
@@ -270,5 +319,12 @@
             showBatteryCharges[charge.BatteryId] = true;
             filteredBatteries.Add(batteries.Where(x => x.Id == charge.BatteryId).FirstOrDefault());
         }
+    }
+
+    private async Task SetManageTagsBattery(int batteryId)
+    {
+        var battery = batteries.Where(x => x.Id == batteryId).FirstOrDefault();
+        manageTagsBattery = battery;
+        tagCounts = await _tagController.CountChargeTagRelationshipsForBatteryAsync(battery);
     }
 }
