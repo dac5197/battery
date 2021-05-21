@@ -56,9 +56,11 @@
                                         <input type="text"
                                                class="form-control py-2 border-square bg-transparent pl-5"
                                                id="searchChargesInput"
-                                               placeholder="Search" />
+                                               placeholder="Search"
+                                               value="@searchText"
+                                               @oninput="@(e => Search(e))" />
                                         <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-info border-square">Clear</button>
+                                            <button type="button" class="btn btn-outline-info border-square" @onclick="@ClearSearch">Clear</button>
                                         </div>
                                     </div>
                                 </div>
@@ -67,7 +69,7 @@
                     </div>
                 </div>
                 <!-- Active Battery List -->
-                @foreach (var battery in batteries)
+                @foreach (var battery in filteredBatteries)
                 {
                     <div class="row mb-3">
                         <div class="col-lg-12">
@@ -97,9 +99,10 @@
                                 @if (showBatteryCharges[battery.Id])
                                 {
                                     <div class="card-body">
-                                        @foreach (var charge in charges.Where(x => x.BatteryId == battery.Id))
+                                        @foreach (var charge in filteredCharges.Where(x => x.BatteryId == battery.Id).Where(x => x.ParentId is null))
                                         {
-                                            <IndexChargeCardListItem Charge="@charge"
+                                            <IndexChargeCardListItem @key="@charge"
+                                                                     Charge="@charge"
                                                                      Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
                                                                      Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
                                                                      Priority="@priorities.Where(x => x.Id == charge.PriorityId).FirstOrDefault()"
@@ -109,7 +112,8 @@
                                                                      Statuses="@statuses"
                                                                      CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
                                                                      StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
-                                                                     ShowChildren="@false"></IndexChargeCardListItem>
+                                                                     SearchText="@searchText"
+                                                                     ShowChildren="@showChargeChildren"></IndexChargeCardListItem>
                                         }
                                     </div>
                                 }
@@ -143,15 +147,21 @@
 </style>
 
 @code {
-    private string userId;
-
     private List<Battery> batteries = new();
+    private List<Battery> filteredBatteries = new();
     private List<Charge> charges = new();
+    private List<Charge> filteredCharges = new();
     private List<Category> categories = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
 
     private Dictionary<int, bool> showBatteryCharges = new();
+
+    private string searchText = "";
+    private string userId;
+
+    private bool showCharges = false;
+    private bool showChargeChildren = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -161,13 +171,18 @@
 
         // Get entities
         batteries = await _batteryService.GetActive(userId);
-        charges = await _chargeService.GetActiveParentsOnly(userId);
+        charges = await _chargeService.GetActive(userId);
         categories = await _categoryService.Get(userId);
         priorities = await _priorityService.Get(userId);
         statuses = await _statusService.Get(userId);
 
+        // Initialize other values
         InitializeShowBatteryChargesDict();
         SortChargesByStatus();
+
+        // Initialize filtered lists
+        filteredBatteries = new(batteries);
+        filteredCharges = new(charges);
 
         // Hide the breadcrump nav
         _breadcrumb.Hide();
@@ -193,5 +208,67 @@
                    on charge.StatusId equals status.Id
                    orderby status.Order
                    select charge).ToList();
+    }
+
+    private void ClearSearch()
+    {
+        searchText = "";
+
+        filteredBatteries = new(batteries);
+        filteredCharges = new(charges);
+
+        showChargeChildren = false;
+
+        StateHasChanged();
+    }
+
+    private void Search(ChangeEventArgs e)
+    {
+        searchText = e.Value.ToString();
+        FilterBatteriesBySearch();
+        FilterChargesBySearch();
+    }
+
+    private void FilterBatteriesBySearch()
+    {
+        filteredBatteries = batteries.Where(x => x.Name.ToLower().Contains(searchText.ToLower())).ToList();
+
+        StateHasChanged();
+    }
+
+    private void FilterChargesBySearch()
+    {
+        filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
+
+        var children = charges.Where(x => x.ParentId is not null).ToList();
+
+        foreach (var charge in charges)
+        {
+            var filterChildren = children.Where(x => x.Title.ToLower().Contains(searchText.ToLower()) && x.ParentId == charge.Id).ToList();
+
+            if (filterChildren?.Count > 0 && !filteredCharges.Contains(charge))
+            {
+                filteredCharges.Add(charge);
+                ShowBatteryByCharge(charge);
+            }
+        }
+
+        showChargeChildren = true;
+
+        foreach (var charge in filteredCharges)
+        {
+            ShowBatteryByCharge(charge);
+        }
+
+        StateHasChanged();
+    }
+
+    private void ShowBatteryByCharge(Charge charge)
+    {
+        if (!filteredBatteries.Any(x => x.Id == charge.BatteryId))
+        {
+            showBatteryCharges[charge.BatteryId] = true;
+            filteredBatteries.Add(batteries.Where(x => x.Id == charge.BatteryId).FirstOrDefault());
+        }
     }
 }
