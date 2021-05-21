@@ -72,7 +72,17 @@
                     <div class="row mb-3">
                         <div class="col-lg-12">
                             <div class="card border-square shadow-sm p-2 mt-2">
-                                <div class="card-header px-4">
+                                <div class="card-header pr-4">
+                                    <button class="btn btn-secondary toggle-button mr-2" type="button" @onclick="@(() => ToggleShowBatteryCharges(battery))">
+                                        @if (showBatteryCharges[battery.Id])
+                                        {
+                                            <span class="oi oi-collapse-up h4 m-0"></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="oi oi-expand-down h4 m-0"></span>
+                                        }
+                                    </button>
                                     <NavLink href="@($"/battery/{battery.Id}")" class="link-black">
                                         <span class="h3">
                                             <IconBattery />
@@ -81,20 +91,23 @@
                                     </NavLink>
                                     <span class="h3 float-right">(@charges.Where(x => x.BatteryId == battery.Id).Count())</span>
                                 </div>
-                                <div class="card-body">
-                                    @foreach (var charge in charges.Where(x => x.BatteryId == battery.Id))
-                                    {
-                                        <IndexChargeCardListItem Charge="@charge"
-                                                                 Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
-                                                                 Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
-                                                                 Priority="@priorities.Where(x => x.Id == charge.PriorityId).FirstOrDefault()"
-                                                                 PriorityDispalyWidth="@priorities.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.DisplayName.Length).First().DisplayName.Length"
-                                                                 Status="@statuses.Where(x => x.Id == charge.StatusId).FirstOrDefault()"
-                                                                 CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
-                                                                 StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
-                                                                 ShowChildren="@false"></IndexChargeCardListItem>
-                                    }
-                                </div>
+                                @if (showBatteryCharges[battery.Id])
+                                {
+                                    <div class="card-body">
+                                        @foreach (var charge in charges.Where(x => x.BatteryId == battery.Id))
+                                        {
+                                            <IndexChargeCardListItem Charge="@charge"
+                                                                     Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
+                                                                     Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
+                                                                     Priority="@priorities.Where(x => x.Id == charge.PriorityId).FirstOrDefault()"
+                                                                     PriorityDispalyWidth="@priorities.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.DisplayName.Length).First().DisplayName.Length"
+                                                                     Status="@statuses.Where(x => x.Id == charge.StatusId).FirstOrDefault()"
+                                                                     CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
+                                                                     StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
+                                                                     ShowChildren="@false"></IndexChargeCardListItem>
+                                        }
+                                    </div>
+                                }
                             </div>
 
 
@@ -115,6 +128,15 @@
     </NotAuthorized>
 </AuthorizeView>
 
+<style>
+    .toggle-button {
+        height: 49px;
+        width: 49px;
+        border-radius: 0;
+        text-align: center;
+    }
+</style>
+
 @code {
     private string userId;
 
@@ -123,6 +145,8 @@
     private List<Category> categories = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
+
+    private Dictionary<int, bool> showBatteryCharges = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -136,10 +160,25 @@
         categories = await _categoryService.Get(userId);
         priorities = await _priorityService.Get(userId);
         statuses = await _statusService.Get(userId);
+
+        InitializeShowBatteryChargesDict();
         SortChargesByStatus();
 
         // Hide the breadcrump nav
         _breadcrumb.Hide();
+    }
+
+    private void InitializeShowBatteryChargesDict()
+    {
+        foreach (var battery in batteries)
+        {
+            showBatteryCharges.Add(battery.Id, false);
+        }
+    }
+
+    private void ToggleShowBatteryCharges(Battery battery)
+    {
+        showBatteryCharges[battery.Id] = !showBatteryCharges[battery.Id];
     }
 
     private void SortChargesByStatus()
