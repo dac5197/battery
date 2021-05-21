@@ -100,8 +100,10 @@
                                                                      Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
                                                                      Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
                                                                      Priority="@priorities.Where(x => x.Id == charge.PriorityId).FirstOrDefault()"
+                                                                     Priorities="@priorities"
                                                                      PriorityDispalyWidth="@priorities.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.DisplayName.Length).First().DisplayName.Length"
                                                                      Status="@statuses.Where(x => x.Id == charge.StatusId).FirstOrDefault()"
+                                                                     Statuses="@statuses"
                                                                      CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
                                                                      StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
                                                                      ShowChildren="@false"></IndexChargeCardListItem>

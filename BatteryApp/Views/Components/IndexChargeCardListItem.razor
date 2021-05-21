@@ -1,67 +1,67 @@
 ﻿@inject IChargeService _chargeService
 
-@if (Charge.StatusId == CompleteStatus.Id)
-{
-    <div class="card bg-light border-square shadow-sm p-2 mt-1 completed highlighted-index-@Charge.BatteryId-@Charge.Id">
-        <div class="row">
-            <div class="col-lg-6">
-                <NavLink href="@($"/charge/{Charge.Id}")" class="link-black">
-                    <IconCategory Category="@Category"></IconCategory>
-                    @Charge.Id | @Charge.Title
-                </NavLink>
-            </div>
-            <div class="col-lg-2">
-                <SpanDisplay BgColor="@Priority.BgColor"
-                             FontColor="@Priority.FontColor"
-                             Text="@Priority.DisplayName"
-                             Width="@PriorityDispalyWidth"></SpanDisplay>
-            </div>
-            <div class="col-lg-2">
-                <SpanDisplay BgColor="@Status.BgColor"
-                             FontColor="@Status.FontColor"
-                             Text="@Status.Name"
-                             Width="@StatusDispalyWidth"></SpanDisplay>
-            </div>
-            <div class="col-lg-2">
-                <BtnToggleChargeChildren Categories="@Categories"
-                                         Children="@children"
-                                         CompleteStatus="CompleteStatus"
-                                         ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
-            </div>
+
+<div class="card border-square shadow-sm p-2 mt-1 highlighted-index-@Charge.BatteryId-@Charge.Id  @(Charge.StatusId == CompleteStatus.Id ? "bg-completed" : "")">
+    <div class="row @(Charge.StatusId == CompleteStatus.Id ? "completed" : "")">
+        <div class="col-lg-6">
+            <NavLink href="@($"/charge/{Charge.Id}")" class="link-black">
+                <IconCategory Category="@Category"></IconCategory>
+                @Charge.Id | @Charge.Title
+            </NavLink>
+        </div>
+        <div class="col-lg-2">
+            <SpanDisplay BgColor="@Priority.BgColor"
+                         FontColor="@Priority.FontColor"
+                         Text="@Priority.DisplayName"
+                         Width="@PriorityDispalyWidth"></SpanDisplay>
+        </div>
+        <div class="col-lg-2">
+            <SpanDisplay BgColor="@Status.BgColor"
+                         FontColor="@Status.FontColor"
+                         Text="@Status.Name"
+                         Width="@StatusDispalyWidth"></SpanDisplay>
+        </div>
+        <div class="col-lg-2">
+            <BtnToggleChargeChildren Categories="@Categories"
+                                     Children="@children"
+                                     CompleteStatus="CompleteStatus"
+                                     ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
         </div>
     </div>
-}
-else
-{
-    <div class="card border-square shadow-sm p-2 mt-1 highlighted-index-@Charge.BatteryId-@Charge.Id">
-        <div class="row">
-            <div class="col-lg-6">
-                <NavLink href="@($"/charge/{Charge.Id}")" class="link-black">
-                    <IconCategory Category="@Category"></IconCategory>
-                    @Charge.Id | @Charge.Title
-                </NavLink>
-            </div>
-            <div class="col-lg-2">
-                <SpanDisplay BgColor="@Priority.BgColor"
-                             FontColor="@Priority.FontColor"
-                             Text="@Priority.DisplayName"
-                             Width="@PriorityDispalyWidth"></SpanDisplay>
-            </div>
-            <div class="col-lg-2">
-                <SpanDisplay BgColor="@Status.BgColor"
-                             FontColor="@Status.FontColor"
-                             Text="@Status.Name"
-                             Width="@StatusDispalyWidth"></SpanDisplay>
-            </div>
-            <div class="col-lg-2">
-                <BtnToggleChargeChildren Categories="@Categories"
-                                         Children="@children"
-                                         CompleteStatus="CompleteStatus"
-                                         ToggleShowChildren="ToggleShowChildren"></BtnToggleChargeChildren>
+    @if (ShowChildren)
+    {
+        <div class="row mt-1">
+            <div class="col-lg-12">
+                @foreach (var child in children)
+                {
+                    <div class="card border-0 border-square bg-light p-2 @(child.StatusId == CompleteStatus.Id ? "completed" : "")">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <NavLink href="@($"/charge/{child.Id}")" class="link-black">
+                                    <IconCategory Category="@Categories.Where(x => x.Id == child.CategoryId).FirstOrDefault()"></IconCategory>
+                                    @child.Id | @child.Title
+                                </NavLink>
+                            </div>
+                            <div class="col-lg-2">
+                                <SpanDisplay BgColor="@Priorities.Where(x => x.Id == child.PriorityId).FirstOrDefault().BgColor"
+                                             FontColor="@Priorities.Where(x => x.Id == child.PriorityId).FirstOrDefault().FontColor"
+                                             Text="@Priorities.Where(x => x.Id == child.PriorityId).FirstOrDefault().DisplayName"
+                                             Width="@PriorityDispalyWidth"></SpanDisplay>
+                            </div>
+                            <div class="col-lg-2">
+                                <SpanDisplay BgColor="@Statuses.Where(x => x.Id == child.StatusId).FirstOrDefault().BgColor"
+                                             FontColor="@Statuses.Where(x => x.Id == child.StatusId).FirstOrDefault().FontColor"
+                                             Text="@Statuses.Where(x => x.Id == child.StatusId).FirstOrDefault().Name"
+                                             Width="@StatusDispalyWidth"></SpanDisplay>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
-    </div>
-}
+    }
+</div>
+
 
 
 <style>
@@ -69,7 +69,9 @@ else
         outline: solid;
         outline-color: @Category.IconColor;
     }
-
+    .bg-completed {
+        background-color: #f2f2f2;
+    }
     
 </style>
 
@@ -101,6 +103,12 @@ else
 
     [Parameter]
     public List<Category> Categories { get; set; }
+
+    [Parameter]
+    public List<Priority> Priorities { get; set; }
+
+    [Parameter]
+    public List<Status> Statuses { get; set; }
 
     private List<Charge> children = new();
 
