@@ -4,7 +4,7 @@
 
 <div class="modal fade" tabindex="-1" role="dialog" id="chargeModal">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-square">
             <div class="modal-header">
                 <h5 class="modal-title">Create New Charge</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -17,7 +17,7 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="title">Title</label>
-                                <InputText @bind-Value="@Charge.Title" id="title" class="form-control" />
+                                <InputText @bind-Value="@Charge.Title" id="title" class="form-control border-square" />
                             </div>
                         </div>
                     </div>
@@ -25,7 +25,7 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="desc">Description</label>
-                                <InputTextArea @bind-Value="@Charge.Description" @oninput="@(e => resizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control">@Charge.Description</InputTextArea>
+                                <InputTextArea @bind-Value="@Charge.Description" @oninput="@(e => resizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control border-square">@Charge.Description</InputTextArea>
                             </div>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                                 <div class="form-group row mb-2">
                                     <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="status-input">Status</label>
                                     <div class="col">
-                                        <InputSelect @bind-Value="@Charge.StatusId" class="form-control form-control-sm" id="status-input">
+                                        <InputSelect @bind-Value="@Charge.StatusId" class="form-control form-control-sm border-square" id="status-input">
                                             @foreach (var status in Statuses)
                                                 {
                                                 <option Value="@status.Id"> @status.Name</option>
@@ -66,7 +66,7 @@
                                 <div class="form-group row mb-2">
                                     <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="priority-input">Priority</label>
                                     <div class="col">
-                                        <InputSelect @bind-Value="@Charge.PriorityId" class="form-control form-control-sm" id="priority-input">
+                                        <InputSelect @bind-Value="@Charge.PriorityId" class="form-control form-control-sm border-square" id="priority-input">
                                             @foreach (var priority in Priorities)
                                                 {
                                                 <option Value="@priority.Id"> @priority.Name</option>
@@ -78,7 +78,7 @@
                                 <div class="form-group row mb-2">
                                     <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="priority-input">Category</label>
                                     <div class="col">
-                                        <InputSelect @bind-Value="@Charge.CategoryId" class="form-control form-control-sm" id="category-input">
+                                        <InputSelect @bind-Value="@Charge.CategoryId" class="form-control form-control-sm border-square" id="category-input">
                                             @foreach (var category in Categories.OrderBy(x => x.Name))
                                                 {
                                                 <option Value="@category.Id"> @category.Name</option>
@@ -92,8 +92,8 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary border-square">Submit</button>
+                            <button type="button" class="btn btn-secondary border-square" data-dismiss="modal">Cancel</button>
                         </div>
                     </div>
                 </EditForm>
