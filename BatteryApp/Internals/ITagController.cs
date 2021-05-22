@@ -17,6 +17,7 @@ namespace BatteryApp.Internals
         Task RemoveTagFromChargeAsync(int chargeId, Tag tag);
         Tag SetDefaults(Charge charge, Tag tag);
         Tag SetDefaults(Battery battery, Tag tag);
-        Task<Dictionary<int, int>> CountChargeTagRelationshipsForBatteryAsync(Battery battery);
+        Task<Dictionary<int, int>> CountChargeTagRelationshipsAsync(Battery battery);
+        Task<Dictionary<int, int>> CountChargeTagRelationshipsAsync(string userId);
     }
 }

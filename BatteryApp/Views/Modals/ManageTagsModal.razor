@@ -36,7 +36,7 @@
                                 {
                                     <tr>
                                         <td>
-                                            <TagIndexItem Tag="@tag"></TagIndexItem>
+                                            <TagIndexItem Tag="@tag" ShowTagCounts="@false"></TagIndexItem>
                                         </td>
                                         <td>
                                             @(TagCounts.ContainsKey(tag.Id) ? TagCounts[tag.Id] : 0)
@@ -104,8 +104,6 @@
 
     private Tag editTag = new();
 
-    private bool isNewTag = false;
-
     public async Task CloseModal()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "ManageTagsModal");
@@ -121,12 +119,10 @@
     private void SetEditTag(Tag tag)
     {
         editTag = tag;
-        isNewTag = false;
     }
 
     private void SetEditTagToNew()
     {
         editTag = new Tag();
-        isNewTag = true;
     }
 }

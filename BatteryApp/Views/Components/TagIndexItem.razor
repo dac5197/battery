@@ -1,5 +1,9 @@
 ﻿<div class="badge tag-badge-index border-square m-1">
     @Tag.Name
+    @if (ShowTagCounts)
+    {
+        <span class="badge badge-light border-square ml-1">@Count</span>
+    }
 </div>
 
 <style>
@@ -14,4 +18,10 @@
 @code {
     [Parameter]
     public Tag Tag { get; set; }
+
+    [Parameter]
+    public int Count { get; set; }
+
+    [Parameter]
+    public bool ShowTagCounts { get; set; }
 }
