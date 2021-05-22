@@ -96,6 +96,14 @@ namespace BatteryApp.Internals
             return tag;
         }
 
+        public Tag SetDefaults(Battery battery, Tag tag)
+        {
+            tag.BatteryId = battery.Id;
+            tag.OwnerId = battery.OwnerId;
+
+            return tag;
+        }
+
         public async Task<Dictionary<int, int>> CountChargeTagRelationshipsForBatteryAsync(Battery battery)
         {
             Dictionary<int, int> counts = new();

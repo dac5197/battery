@@ -298,9 +298,9 @@
 
 <AddTagModal Battery="@battery" Charge="@charge" ParentStateChanged="@TagStateChanged" Tags="batteryTags"></AddTagModal>
 
-<EditTagModal Tag="@tagToEdit" ParentStateChanged="@TagStateChanged"></EditTagModal>
+<EditTagModal Battery="@battery" Tag="@tagToEdit" ParentStateChanged="@TagStateChanged"></EditTagModal>
 
-<DeteteTagModal Delete="@DeleteTag"></DeteteTagModal>
+<DeteteTagModal Tag="@tagToDelete" ParentStateChanged="@TagStateChanged"></DeteteTagModal>
 
 <style>
     .cat-border {
@@ -462,13 +462,6 @@
     private void SetTagToDelete(Tag tagFromChild)
     {
         tagToDelete = tagFromChild;
-    }
-
-    private async void DeleteTag()
-    {
-        await _tagController.DeleteTagAndAllRelationshipsAsync(tagToDelete.Id);
-        await _jsRuntime.InvokeAsync<object>("CloseModal", "deleteTagModal");
-        TagStateChanged();
     }
 
     private async void SaveNote()

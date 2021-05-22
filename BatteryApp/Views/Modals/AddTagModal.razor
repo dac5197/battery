@@ -1,25 +1,30 @@
-﻿@inject IJSRuntime _jsRuntime
-@inject ITagController _tagController 
+﻿@inject ITagController _tagController
+@inject ITagService _tagService
+@inject ITagValidator _tagValidator
 
-<div class="modal fade" tabindex="-1" role="dialog" id="addTagModal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
+@inject IJSRuntime _jsRuntime
+
+<div class="modal modal-child fade" tabindex="-1" role="dialog" id="addTagModal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-square">
             <div class="modal-header">
                 <h6 class="modal-title">Add Tag</h6>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ClearErrors">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
             <div class="modal-body">
                 <EditForm Model="@tag" OnValidSubmit="@HandleValidSubmit">
                     <DataAnnotationsValidator />
-                    <CustomValidator @ref="@customValidator" />
+                    @if (showErrors)
+                    {
+                        <CustomFormErrors Errors="@errors" />
+                    }
                     <label for="tag-name mx-1">Tag Name</label>
                     <InputText @bind-Value="@tag.Name" @oninput="@(e => FilterTags(e))" id="tag-name" class="form-control border-square mx-1" />
-                    <ValidationMessage For="@(() => tag.Name)" />
                     <button type="submit" class="btn btn-primary mx-1 my-2 border-square">Submit</button>
                 </EditForm>
-                @if (nameInput is not null)
+                @if (nameInput is not null && Charge is not null)
                 {
                     <div class="list-group px-5 mt-3 small ">
                         @foreach (var filteredTag in filteredTags)
@@ -49,35 +54,41 @@
     [Parameter]
     public List<Tag> Tags { get; set; }
 
-    private CustomValidator customValidator;
     private Tag tag = new();
     private List<Tag> filteredTags = new();
+
+    private Dictionary<string, List<string>> errors = new();
+
+    private bool showErrors = false;
 
     private string nameInput;
 
     private async void HandleValidSubmit()
     {
-        customValidator.ClearErrors();
-
-        var errors = new Dictionary<string, List<string>>();
-
-        var duplicate = Tags.Where(x => x.Name == tag.Name).ToList();
-
-        if (duplicate.Count > 0)
-        {
-            errors.Add(nameof(tag.Name),
-                new List<string>() { "Duplicate Tag Name.  Please enter a new Name or select an existing Tag." });
-        }
+        showErrors = false;
+        errors.Clear();
+        ClearErrors();
+        errors = await _tagValidator.ValidateAsync(tag, Battery);
 
         if (errors.Count() > 0)
         {
-            customValidator.DisplayErrors(errors);
+            showErrors = true;
+            StateHasChanged();
         }
         else
         {
             // Process the form
-            tag = _tagController.SetDefaults(Charge, tag);
-            await _tagController.AddTagFromChargeAsync(Charge.Id, tag);
+            if (Charge is not null)
+            {
+                tag = _tagController.SetDefaults(Charge, tag);
+                await _tagController.AddTagFromChargeAsync(Charge.Id, tag);
+            }
+            else
+            {
+                tag = _tagController.SetDefaults(Battery, tag);
+                await _tagService.Add(tag);
+            }
+
             tag = new();
             await CloseModal();
         }
@@ -87,23 +98,26 @@
 
     private async void AddExistingTag(Tag existingTag)
     {
-        customValidator.ClearErrors();
+        ClearErrors();
         await _tagController.AddRelationshipAsync(Charge.Id, existingTag);
         await CloseModal();
     }
 
     private async Task CloseModal()
     {
-        customValidator.ClearErrors();
+        ClearErrors();
         await _jsRuntime.InvokeAsync<object>("CloseModal", "addTagModal");
         ParentStateChanged?.Invoke();
     }
 
     private void FilterTags(ChangeEventArgs e)
     {
-        customValidator.ClearErrors();
         nameInput = e.Value.ToString();
         filteredTags = Tags.Where(x => x.Name.ToLower().Contains(nameInput.ToLower())).ToList();
+    }
 
+    private void ClearErrors()
+    {
+        _tagValidator.ClearErrors();
     }
 }

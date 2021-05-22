@@ -153,7 +153,10 @@
 
             </div>
 
-            <ManageTagsModal Battery="@manageTagsBattery" Tags="@tags.Where(x => x.BatteryId == manageTagsBattery.Id).ToList()" TagCounts="@tagCounts"></ManageTagsModal>
+            <ManageTagsModal Battery="@manageTagsBattery" 
+                             Tags="@tags.Where(x => x.BatteryId == manageTagsBattery.Id).ToList()" 
+                             TagCounts="@tagCounts" 
+                             ParentStateChanged="@TagsChanged"></ManageTagsModal>
         }
     </Authorized>
     <NotAuthorized>
@@ -326,5 +329,11 @@
         var battery = batteries.Where(x => x.Id == batteryId).FirstOrDefault();
         manageTagsBattery = battery;
         tagCounts = await _tagController.CountChargeTagRelationshipsForBatteryAsync(battery);
+    }
+
+    private async void TagsChanged()
+    {
+        tags = await _tagService.Get(userId);
+        StateHasChanged();
     }
 }

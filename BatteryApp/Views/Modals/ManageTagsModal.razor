@@ -6,8 +6,11 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content border-square">
             <div class="modal-header">
-                <h5 class="modal-title">Battery Detail - Category Options</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ResetEditTags">
+                <h5 class="modal-title">
+                    <IconBattery />
+                    @Battery.Id - Manage Tags
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
@@ -29,7 +32,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var tag in Tags)
+                                @foreach (var tag in Tags.OrderBy(x => x.Name))
                                 {
                                     <tr>
                                         <td>
@@ -42,11 +45,15 @@
                                             <button class="btn btn-info btn-sm border-square"
                                                     type="button"
                                                     data-toggle="modal"
-                                                    data-target="#BatteryDetailAdvOptions_EditCategoryModal"
+                                                    data-target="#editTagModal"
                                                     @onclick="(() => SetEditTag(tag))">
                                                 Edit
                                             </button>
-                                            <button class="btn btn-danger btn-sm border-square" type="button">X</button>
+                                            <button class="btn btn-danger btn-sm border-square" 
+                                                    type="button"
+                                                    data-toggle="modal"
+                                                    data-target="#deleteTagModal"
+                                                    @onclick="(() => SetEditTag(tag))">X</button>
                                         </td>
                                     </tr>
                                 }
@@ -55,18 +62,11 @@
                         <div class="row px-2 mb-3">
                             <div class="col">
                                 <button type="button"
-                                        class="btn btn-info btn-sm border-square"
-                                        style="width: 32px;"
-                                        title="Reset"
-                                        @onclick="@ResetEditTags">
-                                    <span class="oi oi-action-undo"></span>
-                                </button>
-                                <button type="button"
                                         class="btn btn-success btn-sm border-square"
                                         data-toggle="modal"
-                                        data-target="#BatteryDetailAdvOptions_EditCategoryModal"
+                                        data-target="#addTagModal"
                                         style="width: 32px;"
-                                        title="Add Category"
+                                        title="Add Tag"
                                         @onclick="@SetEditTagToNew">
                                     <span class="oi oi-plus"></span>
                                 </button>
@@ -76,8 +76,7 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col">
-                        <button type="submit" class="btn btn-primary border-square">Submit</button>
-                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="@ResetEditTags">Cancel</button>
+                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -85,7 +84,10 @@
     </div>
 </div>
 
-<!-- Edit Tag Modal-->
+<!-- Tag Modals -->
+<AddTagModal Battery="@Battery" Tags="@Tags" ParentStateChanged="@TagsChanged"></AddTagModal>
+<EditTagModal Battery="@Battery" Tag="@editTag" ParentStateChanged="@TagsChanged"></EditTagModal>
+<DeteteTagModal Tag="@editTag" ParentStateChanged="@TagsChanged"></DeteteTagModal>
 
 @code {
     [Parameter]
@@ -109,10 +111,10 @@
         await _jsRuntime.InvokeAsync<object>("CloseModal", "ManageTagsModal");
     }
 
-    private async void ResetEditTags()
+    private async void TagsChanged()
     {
         Tags = await _tagController.GetAllTagsForBatteryAsync(Battery);
-
+        ParentStateChanged.Invoke();
         StateHasChanged();
     }
 
