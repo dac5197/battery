@@ -112,11 +112,9 @@
                                 </div>
                                 @if (showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)
                                 {
-                                    <IndexTagList Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
+                                    <IndexTagList_Battery Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
                                                   TagCounts="@tagCounts"
-                                                  SetManageTagsBattery="@SetManageTagsBattery"
-                                                  ShowBorder="@true"
-                                                  ShowManageTagsButton="@true"></IndexTagList>
+                                                  SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
                                 }
 
                                 @if (showBatteryCharges[battery.Id])

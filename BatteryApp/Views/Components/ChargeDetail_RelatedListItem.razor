@@ -4,8 +4,10 @@
 @inject IChargeChildController _chargeChildController
 @inject IChargeLifecycle _chargeLifecycle
 @inject IChargeService _chargeService
+@inject ITagController _tagController
 
-<li class="list-group-item border-0">
+
+<li class="list-group-item border-0 px-4">
     @if (IsParent is false)
     {
         <input @onchange="@(() => SetStatus())" type="checkbox" checked="@isCompleted" class="form-check-input" />
@@ -25,13 +27,20 @@
             <div class="d-inline">@Charge.Id | @Charge.Title</div>
         }
     </a>
+    @if (tags.Any())
+    {
+        @foreach (var tag in tags)
+        {
+            <TagListItem Charge="@Charge" Tag="@tag" IsReadonly="true"></TagListItem>
+        }
+    }
 </li>
 
 <style>
     .cat-child-icon-@Charge.Id {
         color: @category.IconColor;
     }
-    
+
 </style>
 
 @code {
@@ -46,12 +55,15 @@
 
     private Category category = new();
 
+    private List<Tag> tags = new();
+
     private bool isCompleted = false;
 
     protected override async Task OnInitializedAsync()
     {
         isCompleted = _chargeLifecycle.IsCompleted(Charge);
         category = await _categoryService.Get(Charge.CategoryId);
+        tags = await _tagController.GetAllTagsForChargeAsync(Charge.Id);
     }
 
     private void HandleClick()

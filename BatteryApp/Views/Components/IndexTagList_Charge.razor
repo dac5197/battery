@@ -1,0 +1,17 @@
+﻿<div class="card bg-light border-square px-2 border-0">
+    <div class="row">
+        <div class="col">
+            <IconTags />
+            @foreach (var tag in Tags.OrderBy(x => x.Name))
+            {
+                <TagIndexItem Tag="@tag"
+                              ShowTagCounts="@false"></TagIndexItem>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<Tag> Tags { get; set; }
+}

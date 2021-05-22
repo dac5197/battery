@@ -14,6 +14,9 @@
 @inject IChargeCountService _chargeCountService
 @inject IPriorityService _priorityService
 @inject IStatusService _statusService
+@inject ITagController _tagController
+@inject ITagService _tagService
+
 @inject IJSRuntime _jsRuntime
 
 <AuthorizeView Context="authContext">
@@ -81,7 +84,7 @@
                                                 <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_PriorityOptionsModal">Edit Priorities</button>
                                                 <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_StatusOptionsModal">Edit Statuses</button>
                                                 <div class="dropdown-divider"></div>
-                                                <button type="submit" class="dropdown-item" >Save Battery</button>
+                                                <button type="submit" class="dropdown-item">Save Battery</button>
                                                 <div class="dropdown-divider"></div>
                                                 <button class="dropdown-item" type="button" data-toggle="modal" data-target="#deleteBatteryModal">Delete Battery</button>
                                             </div>
@@ -92,6 +95,14 @@
                         </div>
                     </div>
                 </EditForm>
+                <div class="row mb-3">
+                    <div class="col-lg-12">
+                        <IndexTagList_Battery Tags="@tags"
+                                              TagCounts="@tagCounts"
+                                              SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
+                    </div>
+                </div>
+                
                 <!-- Status and Priority Score Cards -->
                 @*<div class="row mb-3">
                     <div class="col-lg-6">
@@ -188,7 +199,7 @@
                         <div class="card border-square shadow-sm p-2">
                             <div class="row justify-content-center">
                                 <div class="col-lg-3">
-                                    
+
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="input-group">
@@ -210,7 +221,7 @@
                                 </div>
                                 <div class="col-lg-3">
                                     <div class="float-right">
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -306,6 +317,11 @@
                                 CategoriesCount="@categories.Count"
                                 PrioritiesCount="@priorities.Count"
                                 StatusesCount="@statuses.Count"></DeleteBatteryModal>
+
+            <ManageTagsModal Battery="@battery"
+                             Tags="@tags"
+                             TagCounts="@tagCounts"
+                             ParentStateChanged="@TagsChanged"></ManageTagsModal>
         }
     </Authorized>
     <NotAuthorized>
@@ -328,6 +344,7 @@
     private List<ChargeChildrenCount> chargeChildrenCounts = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
+    private List<Tag> tags = new();
     //private PaginatedList<Charge> paginatedCharges = new();
 
     private ChargeDetailModal chargeDetailModal;
@@ -335,6 +352,7 @@
 
     private Dictionary<int, int> activeChargesCounts = new();
     private Dictionary<int, int> inactiveChargesCounts = new();
+    private Dictionary<int, int> tagCounts = new();
 
     private bool showChargeCardChildren = false;
     private bool showChargeCardView = true;
@@ -368,9 +386,11 @@
         charges = await _chargeService.GetActive(battery);
         priorities = await _priorityService.Get(battery);
         statuses = await _statusService.Get(battery);
+        tags = await _tagService.Get(battery);
 
-        // Calculate charge counts
+        // Calculate counts
         await GetChargeCounts();
+        await GetTagCounts();
 
         // Set filtered charge list
         filteredCharges = charges;
@@ -557,5 +577,21 @@
         allChargesCount = await _chargeCountService.GetAllCount(battery);
         activeChargesCounts = await _chargeCountService.GetActiveCountsByStatus(battery);
         inactiveChargesCounts = await _chargeCountService.GetInactiveCountsByStatus(battery);
+    }
+
+    private async Task SetManageTagsBattery(int batteryId)
+    {
+        await GetTagCounts();
+    }
+
+    private async void TagsChanged()
+    {
+        tags = await _tagService.Get(userId);
+        StateHasChanged();
+    }
+
+    private async Task GetTagCounts()
+    {
+        tagCounts = await _tagController.CountChargeTagRelationshipsAsync(userId);
     }
 }
