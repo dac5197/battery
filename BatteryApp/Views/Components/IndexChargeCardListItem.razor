@@ -132,6 +132,9 @@
     [Parameter]
     public string SearchText { get; set; }
 
+    [Parameter]
+    public EventCallback<Charge> AddChargeToSearchResults { get; set; }
+
     private List<Charge> children = new();
     private List<Tag> tags = new();
 
@@ -156,15 +159,26 @@
         }
     }
 
+    public void FilterChildren(List<Charge> filteredChildren)
+    {
+        children = new(filteredChildren);
+        StateHasChanged();
+    }
+
     public void FilterChildren(string searchText)
     {
         children = children.Where(x => x.Title.ToLower().Contains(SearchText.ToLower())).ToList();
+        if (children.Any())
+        {
+            StateHasChanged();
+            AddChargeToSearchResults.InvokeAsync(Charge);
+        }
     }
 
-    public void FilterChildren(List<Charge> chargesWithTag)
-    {
-        children = children.Where(ch => chargesWithTag.Any(c => c.Id == ch.Id)).ToList();
-    }
+    //public void FilterChildren(List<Charge> chargesWithTag)
+    //{
+    //    children = children.Where(ch => chargesWithTag.Any(c => c.Id == ch.Id)).ToList();
+    //}
 
     private void ToggleShowChildren()
     {

@@ -83,6 +83,7 @@ namespace BatteryApp
             services.AddTransient<ITableSort_Charges, TableSort_Charges>();
             services.AddScoped<IBreadcrumbManager, BreadcrumbManager>();
             services.AddScoped<IChargeOpenChildrenModalHelper, ChargeOpenChildrenModalHelper>();
+            services.AddScoped<ISearchUtil, SearchUtil>();
 
             // Add Project Validators
             services.AddTransient<IBatteryAdvancedOptionsValidator, BatteryAdvancedOptionsValidator>();
