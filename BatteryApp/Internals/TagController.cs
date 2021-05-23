@@ -24,17 +24,26 @@ namespace BatteryApp.Internals
             _tagService = tagService;
         }
 
-        public async Task<List<Tag>> GetAllTagsForBatteryAsync(Battery battery)
+        public async Task<List<Tag>> GetAllTagsAsync(Battery battery)
         {
             var tags = await _tagService.Get(battery);
             return tags;
         }
 
-        public async Task<List<Tag>> GetAllTagsForChargeAsync(int chargeId)
+        public async Task<List<Tag>> GetAllTagsAsync(int chargeId)
         {
             var relations = await _chargeTagRelationService.GetAllRelationsForCharge(chargeId);
             var tags = await _tagService.Get();
             var output = tags.Where(t => relations.Any(r => r.TagId == t.Id)).ToList();
+
+            return output;
+        }
+
+        public async Task<List<Charge>> GetAllChargesAsync(Tag tag, Battery battery)
+        {
+            var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
+            var charges = await _chargeService.GetActive(battery);
+            var output = charges.Where(c => relations.Any(r => r.ChargeId == c.Id)).ToList();
 
             return output;
         }

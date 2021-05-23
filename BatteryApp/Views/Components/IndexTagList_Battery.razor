@@ -4,9 +4,12 @@
             <IconTags />
             @foreach (var tag in Tags.OrderBy(x => x.Name))
             {
-                <TagIndexItem Tag="@tag" 
-                              Count="@(TagCounts.ContainsKey(tag.Id) ? TagCounts[tag.Id] : 0)"
-                              ShowTagCounts="@true"></TagIndexItem>
+                <span style="cursor: pointer" @onclick="@(() => FilterChargesByTag.InvokeAsync(tag))">
+                    <TagIndexItem Tag="@tag"
+                                  Count="@(TagCounts.ContainsKey(tag.Id) ? TagCounts[tag.Id] : 0)"
+                                  ShowTagCounts="@true"></TagIndexItem>
+                </span>
+                
             }
             <button class="btn btn-sm bg-transparent border-square " 
                     type="button" 
@@ -28,4 +31,7 @@
 
     [Parameter]
     public EventCallback<int> SetManageTagsBattery { get; set; }
+
+    [Parameter]
+    public EventCallback<Tag> FilterChargesByTag { get; set; }
 }

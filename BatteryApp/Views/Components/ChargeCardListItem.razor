@@ -128,7 +128,7 @@
     protected override async Task OnInitializedAsync()
     {
         children = await _chargeService.GetChildren(Charge);
-        tags = await _tagController.GetAllTagsForChargeAsync(Charge.Id);
+        tags = await _tagController.GetAllTagsAsync(Charge.Id);
 
         category = Categories.Where(x => x.Id == Charge.CategoryId).FirstOrDefault();
         priority = Priorities.Where(x => x.Id == Charge.PriorityId).FirstOrDefault();

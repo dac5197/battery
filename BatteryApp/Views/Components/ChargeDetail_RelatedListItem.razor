@@ -63,7 +63,7 @@
     {
         isCompleted = _chargeLifecycle.IsCompleted(Charge);
         category = await _categoryService.Get(Charge.CategoryId);
-        tags = await _tagController.GetAllTagsForChargeAsync(Charge.Id);
+        tags = await _tagController.GetAllTagsAsync(Charge.Id);
     }
 
     private void HandleClick()

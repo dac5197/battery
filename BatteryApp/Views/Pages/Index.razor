@@ -114,6 +114,7 @@
                                 {
                                     <IndexTagList_Battery Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
                                                   TagCounts="@tagActiveCounts"
+                                                  FilterChargesByTag="@FilterChargesByTag"
                                                   SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
                                 }
 
@@ -123,6 +124,7 @@
                                         @foreach (var charge in filteredCharges.Where(x => x.BatteryId == battery.Id).Where(x => x.ParentId is null))
                                         {
                                             <IndexChargeCardListItem @key="@charge"
+                                                                     @ref="@indexChargeCardListItem"
                                                                      Charge="@charge"
                                                                      Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
                                                                      Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
@@ -191,6 +193,8 @@
 
     private Battery manageTagsBattery = new();
 
+    private IndexChargeCardListItem indexChargeCardListItem;
+
     private string searchText = "";
     private string userId;
 
@@ -253,6 +257,7 @@
     private void ToggleShowBatteryTags(Battery battery)
     {
         showBatteryTags[battery.Id] = !showBatteryTags[battery.Id];
+        ClearSearch();
     }
 
     private void SortChargesByStatus()
@@ -300,6 +305,8 @@
         {
             var filterChildren = children.Where(x => x.Title.ToLower().Contains(searchText.ToLower()) && x.ParentId == charge.Id).ToList();
 
+            indexChargeCardListItem?.FilterChildren(searchText);
+
             if (filterChildren?.Count > 0 && !filteredCharges.Contains(charge))
             {
                 filteredCharges.Add(charge);
@@ -313,6 +320,34 @@
         {
             ShowBatteryByCharge(charge);
         }
+
+        StateHasChanged();
+    }
+
+    private async Task FilterChargesByTag(Tag tag)
+    {
+        var tagBattery = batteries.Where(x => x.Id == tag.BatteryId).FirstOrDefault();
+        var chargesWithTag = await _tagController.GetAllChargesAsync(tag, tagBattery);
+
+        showBatteryCharges[tagBattery.Id] = true;
+        filteredCharges = new(chargesWithTag);
+
+        var children = charges.Where(x => x.ParentId is not null).ToList();
+
+        foreach (var charge in charges)
+        {
+            var filterChildren = children.Where(ch => chargesWithTag.Any(c => c.Id == ch.Id) && ch.ParentId == charge.Id).ToList();
+
+            indexChargeCardListItem.FilterChildren(chargesWithTag);
+
+            if (filterChildren?.Count > 0 && !filteredCharges.Contains(charge))
+            {
+                filteredCharges.Add(charge);
+                ShowBatteryByCharge(charge);
+            }
+        }
+
+        showChargeChildren = true;
 
         StateHasChanged();
     }

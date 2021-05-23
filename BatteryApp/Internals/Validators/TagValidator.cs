@@ -22,7 +22,7 @@ namespace BatteryApp.Internals.Validators
 
             List<string> messages = new();
 
-            var existingTags = await _tagController.GetAllTagsForBatteryAsync(battery);
+            var existingTags = await _tagController.GetAllTagsAsync(battery);
 
             messages.Add(ValidateTag_DuplicateName(tag, existingTags));
 

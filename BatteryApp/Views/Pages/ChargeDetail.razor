@@ -381,8 +381,8 @@
         statuses = await _statusService.Get(battery);
 
         // Get tags
-        tags = await _tagController.GetAllTagsForChargeAsync(charge.Id);
-        batteryTags = await _tagController.GetAllTagsForBatteryAsync(battery);
+        tags = await _tagController.GetAllTagsAsync(charge.Id);
+        batteryTags = await _tagController.GetAllTagsAsync(battery);
 
         // Get notes
         notes = await _noteService.GetAllNotesForCharge(charge.Id);
@@ -441,8 +441,8 @@
     private async void TagStateChanged()
     {
 
-        tags = await _tagController.GetAllTagsForChargeAsync(charge.Id);
-        batteryTags = await _tagController.GetAllTagsForBatteryAsync(battery);
+        tags = await _tagController.GetAllTagsAsync(charge.Id);
+        batteryTags = await _tagController.GetAllTagsAsync(battery);
         await RefreshNotes();
         await ChargeStateChanged();
 
