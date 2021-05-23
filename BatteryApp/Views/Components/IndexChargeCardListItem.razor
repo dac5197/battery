@@ -41,7 +41,7 @@
     {
         <div class="row mt-1">
             <div class="col-lg-12">
-                @foreach (var child in children.Where(x => x.Title.ToLower().Contains(SearchText.ToLower())).ToList())
+                @foreach (var child in children)
                 {
                     <div class="card border-0 border-square bg-light p-2 @(child.StatusId == CompleteStatus.Id ? "completed" : "")">
                         <div class="row">
@@ -140,13 +140,13 @@
     protected override async Task OnInitializedAsync()
     {
         children = await _chargeService.GetChildren(Charge);
-        tags = await _tagController.GetAllTagsForChargeAsync(Charge.Id);
+        tags = await _tagController.GetAllTagsAsync(Charge.Id);
 
         if (children.Any())
         {
             foreach (var child in children)
             {
-                var childTags = await _tagController.GetAllTagsForChargeAsync(child.Id);
+                var childTags = await _tagController.GetAllTagsAsync(child.Id);
 
                 if (childTags.Any())
                 {
@@ -154,6 +154,16 @@
                 }
             }
         }
+    }
+
+    public void FilterChildren(string searchText)
+    {
+        children = children.Where(x => x.Title.ToLower().Contains(SearchText.ToLower())).ToList();
+    }
+
+    public void FilterChildren(List<Charge> chargesWithTag)
+    {
+        children = children.Where(ch => chargesWithTag.Any(c => c.Id == ch.Id)).ToList();
     }
 
     private void ToggleShowChildren()
