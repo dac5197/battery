@@ -2,7 +2,9 @@
 {
     @foreach (var message in error.Value)
     {
-        <p style="color: red">@error.Key - @message</p>
+        <div class="alert alert-danger" role="alert">
+            @error.Key - @message
+        </div>
     }
 }
 
