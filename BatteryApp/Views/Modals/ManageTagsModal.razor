@@ -22,40 +22,49 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>
-                                        Counts
-                                        <QuestionMarkToolTip Text="Count of Charges with this Tag."></QuestionMarkToolTip>
+                                        Active Counts
+                                        <QuestionMarkToolTip Text="Count of active Charges with this Tag."></QuestionMarkToolTip>
+                                    </th>
+                                    <th>
+                                        All Counts
+                                        <QuestionMarkToolTip Text="Count of all Charges with this Tag."></QuestionMarkToolTip>
                                     </th>
                                     <th>
                                         Actions
-                                        <QuestionMarkToolTip Text="When deleting an existing Tag, any all relations to charges will also be removed."></QuestionMarkToolTip>
+                                        <QuestionMarkToolTip Text="When deleting an existing Tag, all relations to charges will also be removed."></QuestionMarkToolTip>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var tag in Tags.OrderBy(x => x.Name))
                                 {
-                                    <tr>
-                                        <td>
-                                            <TagIndexItem Tag="@tag" ShowTagCounts="@false"></TagIndexItem>
-                                        </td>
-                                        <td>
-                                            @(TagCounts.ContainsKey(tag.Id) ? TagCounts[tag.Id] : 0)
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-info btn-sm border-square"
-                                                    type="button"
-                                                    data-toggle="modal"
-                                                    data-target="#editTagModal"
-                                                    @onclick="(() => SetEditTag(tag))">
-                                                Edit
-                                            </button>
-                                            <button class="btn btn-danger btn-sm border-square" 
-                                                    type="button"
-                                                    data-toggle="modal"
-                                                    data-target="#deleteTagModal"
-                                                    @onclick="(() => SetEditTag(tag))">X</button>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td>
+                                        <TagIndexItem Tag="@tag" ShowTagCounts="@false"></TagIndexItem>
+                                    </td>
+                                    <td>
+                                        @(TagActiveCounts.ContainsKey(tag.Id) ? TagActiveCounts[tag.Id] : 0)
+                                    </td>
+                                    <td>
+                                        @(TagAllCounts.ContainsKey(tag.Id) ? TagAllCounts[tag.Id] : 0)
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm border-square"
+                                                type="button"
+                                                data-toggle="modal"
+                                                data-target="#editTagModal"
+                                                @onclick="(() => SetEditTag(tag))">
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-danger btn-sm border-square"
+                                                type="button"
+                                                data-toggle="modal"
+                                                data-target="#deleteTagModal"
+                                                @onclick="(() => SetEditTag(tag))">
+                                            X
+                                        </button>
+                                    </td>
+                                </tr>
                                 }
                             </tbody>
                         </table>
@@ -97,7 +106,10 @@
     public List<Tag> Tags { get; set; }
 
     [Parameter]
-    public Dictionary<int, int> TagCounts { get; set; }
+    public Dictionary<int, int> TagActiveCounts { get; set; }
+
+    [Parameter]
+    public Dictionary<int, int> TagAllCounts { get; set; }
 
     [Parameter]
     public Action ParentStateChanged { get; set; }

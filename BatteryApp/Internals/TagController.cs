@@ -104,7 +104,7 @@ namespace BatteryApp.Internals
             return tag;
         }
 
-        public async Task<Dictionary<int, int>> CountChargeTagRelationshipsAsync(Battery battery)
+        public async Task<Dictionary<int, int>> CountAllChargeTagRelationshipsAsync(Battery battery)
         {
             Dictionary<int, int> counts = new();
 
@@ -120,7 +120,7 @@ namespace BatteryApp.Internals
             return counts;
         }
 
-        public async Task<Dictionary<int, int>> CountChargeTagRelationshipsAsync(string userId)
+        public async Task<Dictionary<int, int>> CountAllChargeTagRelationshipsAsync(string userId)
         {
             Dictionary<int, int> counts = new();
 
@@ -131,6 +131,50 @@ namespace BatteryApp.Internals
                 var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
 
                 counts.Add(tag.Id, relations.Count);
+            }
+
+            return counts;
+        }
+
+        public async Task<Dictionary<int, int>> CountActiveChargeTagRelationshipsAsync(Battery battery)
+        {
+            Dictionary<int, int> counts = new();
+            var tags = await _tagService.Get(battery);
+
+            var combinedCharges = await _chargeService.GetActiveParentsAndChildren(battery);
+
+            foreach (var tag in tags)
+            {
+                var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
+
+                var relationsCount = (from c in combinedCharges
+                                      join r in relations on c.Id equals r.ChargeId
+                                      select r
+                                      ).Count();
+
+                counts.Add(tag.Id, relationsCount);
+            }
+
+            return counts;
+        }
+
+        public async Task<Dictionary<int, int>> CountActiveChargeTagRelationshipsAsync(string userId)
+        {
+            Dictionary<int, int> counts = new();
+            var tags = await _tagService.Get(userId);
+
+            var combinedCharges = await _chargeService.GetActiveParentsAndChildren(userId);
+
+            foreach (var tag in tags)
+            {
+                var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
+
+                var relationsCount = (from c in combinedCharges
+                                      join r in relations on c.Id equals r.ChargeId
+                                      select r
+                                      ).Count();
+
+                counts.Add(tag.Id, relationsCount);
             }
 
             return counts;

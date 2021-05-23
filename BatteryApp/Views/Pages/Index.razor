@@ -113,7 +113,7 @@
                                 @if (showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)
                                 {
                                     <IndexTagList_Battery Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
-                                                  TagCounts="@tagCounts"
+                                                  TagCounts="@tagActiveCounts"
                                                   SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
                                 }
 
@@ -154,7 +154,8 @@
 
             <ManageTagsModal Battery="@manageTagsBattery" 
                              Tags="@tags.Where(x => x.BatteryId == manageTagsBattery.Id).ToList()" 
-                             TagCounts="@tagCounts" 
+                             TagAllCounts="@tagCounts"
+                             TagActiveCounts="@tagActiveCounts"
                              ParentStateChanged="@TagsChanged"></ManageTagsModal>
         }
     </Authorized>
@@ -186,6 +187,7 @@
     private Dictionary<int, bool> showBatteryCharges = new();
     private Dictionary<int, bool> showBatteryTags = new();
     private Dictionary<int, int> tagCounts = new();
+    private Dictionary<int, int> tagActiveCounts = new();
 
     private Battery manageTagsBattery = new();
 
@@ -339,7 +341,8 @@
 
     private async Task GetTagCounts()
     {
-        tagCounts = await _tagController.CountChargeTagRelationshipsAsync(userId);
+        tagCounts = await _tagController.CountAllChargeTagRelationshipsAsync(userId);
+        tagActiveCounts = await _tagController.CountActiveChargeTagRelationshipsAsync(userId);
     }
 
 }

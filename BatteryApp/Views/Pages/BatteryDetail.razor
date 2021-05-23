@@ -98,7 +98,7 @@
                 <div class="row mb-3">
                     <div class="col-lg-12">
                         <IndexTagList_Battery Tags="@tags"
-                                              TagCounts="@tagCounts"
+                                              TagCounts="@(btnClassActiveCharges == btnActive ? tagActiveCounts : tagAllCounts)"
                                               SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
                     </div>
                 </div>
@@ -320,7 +320,8 @@
 
             <ManageTagsModal Battery="@battery"
                              Tags="@tags"
-                             TagCounts="@tagCounts"
+                             TagActiveCounts="@tagActiveCounts"
+                             TagAllCounts="@tagAllCounts"
                              ParentStateChanged="@TagsChanged"></ManageTagsModal>
         }
     </Authorized>
@@ -352,7 +353,8 @@
 
     private Dictionary<int, int> activeChargesCounts = new();
     private Dictionary<int, int> inactiveChargesCounts = new();
-    private Dictionary<int, int> tagCounts = new();
+    private Dictionary<int, int> tagActiveCounts = new();
+    private Dictionary<int, int> tagAllCounts = new();
 
     private bool showChargeCardChildren = false;
     private bool showChargeCardView = true;
@@ -592,6 +594,7 @@
 
     private async Task GetTagCounts()
     {
-        tagCounts = await _tagController.CountChargeTagRelationshipsAsync(userId);
+        tagActiveCounts = await _tagController.CountActiveChargeTagRelationshipsAsync(battery);
+        tagAllCounts = await _tagController.CountAllChargeTagRelationshipsAsync(battery);
     }
 }

@@ -84,6 +84,48 @@ namespace BatteryApp.Models.ChargeModel
                           .ToList();
         }
 
+        public async Task<List<Charge>> GetActiveParentsAndChildren(Battery battery)
+        {
+            List<Charge> output = new();
+
+            var parentCharges = await GetActiveParentsOnly(battery);
+
+            foreach (var charge in parentCharges)
+            {
+                var childrenCharges = await GetChildren(charge);
+
+                if (childrenCharges.Any())
+                {
+                    output.AddRange(childrenCharges);
+                }
+            }
+
+            output.AddRange(parentCharges);
+
+            return output;
+        }
+
+        public async Task<List<Charge>> GetActiveParentsAndChildren(string userId)
+        {
+            List<Charge> output = new();
+
+            var parentCharges = await GetActiveParentsOnly(userId);
+
+            foreach (var charge in parentCharges)
+            {
+                var childrenCharges = await GetChildren(charge);
+
+                if (childrenCharges.Any())
+                {
+                    output.AddRange(childrenCharges);
+                }
+            }
+
+            output.AddRange(parentCharges);
+
+            return output;
+        }
+
         public async Task<List<Charge>> GetChildren(Charge charge)
         {
             using var context = _contextFactory.CreateDbContext();
