@@ -1,0 +1,13 @@
+﻿@if (ShowCollapse)
+{
+    <span class="oi oi-collapse-up m-0 small"></span>
+}
+else
+{
+    <span class="oi oi-expand-down m-0 small"></span>
+}
+
+@code {
+    [Parameter]
+    public bool ShowCollapse { get; set; }
+}
