@@ -15,6 +15,7 @@ namespace BatteryApp.Internals
         Task<List<Tag>> GetAllTagsAsync(Battery battery);
         Task<List<Tag>> GetAllTagsAsync(int chargeId);
         Task<List<Charge>> GetAllChargesAsync(Tag tag, Battery battery);
+        Task<List<ChargeTagRelation>> GetAllRelationsForBattery(Battery battery);
         Task RemoveTagFromChargeAsync(int chargeId, Tag tag);
         Tag SetDefaults(Charge charge, Tag tag);
         Tag SetDefaults(Battery battery, Tag tag);

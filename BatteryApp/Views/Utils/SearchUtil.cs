@@ -1,5 +1,6 @@
 ﻿using BatteryApp.Models.BatteryModel;
 using BatteryApp.Models.ChargeModel;
+using BatteryApp.Models.TagModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,12 +16,16 @@ namespace BatteryApp.Views.Utils
         private List<Charge> _searchedCharges = new();
         private Dictionary<int, List<Charge>> _chargeChildren = new();
         private Dictionary<int, List<Charge>> _searchedChargeChildren = new();
+        private List<ChargeTagRelation> _chargeTagRelations = new();
+        private List<ChargeTagRelation> _searchedChargeTagRelations = new();
+        private Tag _searchTag = new();
 
         public void Clear()
         {
             _searchedBatteries = new(_batteries);
             _searchedCharges = new(_charges);
             _searchedChargeChildren = new(_chargeChildren);
+            _searchedChargeTagRelations = new(_chargeTagRelations);
         }
 
         public void Initialize(List<Battery> batteries)
@@ -33,6 +38,12 @@ namespace BatteryApp.Views.Utils
         {
             _charges = new(charges.Where(x => x.ParentId is null).ToList());
             _searchedCharges = new(charges.Where(x => x.ParentId is null).ToList());
+        }
+
+        public void Initialize(List<ChargeTagRelation> relations)
+        {
+            _chargeTagRelations = new(relations);
+            _searchedChargeTagRelations = new(relations);
         }
 
         public void Initialize(List<Battery> batteries, List<Charge> charges)
@@ -88,6 +99,11 @@ namespace BatteryApp.Views.Utils
             return _searchedChargeChildren[parentId];
         }
 
+        public Tag GetTag()
+        {
+            return _searchTag;
+        }
+
         public bool HasChildren(int parentId)
         {
             if (_searchedChargeChildren.ContainsKey(parentId))
@@ -106,6 +122,29 @@ namespace BatteryApp.Views.Utils
         public void SearchCharges(string searchText)
         {
             _searchedCharges = _charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
+
+            foreach (var charge in _searchedCharges)
+            {
+                AddBatteryToResults(charge.BatteryId);
+            }
+        }
+
+        public void SearchCharges(Tag tag)
+        {
+            _searchedBatteries = new();
+            _searchedCharges = new();
+            _searchedChargeTagRelations = _chargeTagRelations.Where(x => x.TagId == tag.Id).ToList();
+            _searchTag = tag;
+
+            foreach (var rel in _searchedChargeTagRelations)
+            {
+                var charge = _charges.Where(x => x.Id == rel.ChargeId).FirstOrDefault();
+
+                if (charge is not null && !_searchedCharges.Any(x => x.Id == charge.Id))
+                {
+                    _searchedCharges.Add(charge);
+                }
+            }
 
             foreach (var charge in _searchedCharges)
             {

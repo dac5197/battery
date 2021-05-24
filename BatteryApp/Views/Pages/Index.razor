@@ -112,6 +112,7 @@
                         {
                             <IndexTagList_Battery Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
                                                   TagCounts="@tagActiveCounts"
+                                                  FilterChargesByTag="@SearchTags"
                                                   SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
                         }
 
@@ -199,11 +200,13 @@
         tags = await _tagService.Get(userId);
 
         // Initialize other values
-        await GetTagCounts();
+        SortChargesByStatus();
         InitializeShowBatteryChargesDict();
         InitializeShowBatteryTagsDict();
         await InitializeChargeChildren();
-        SortChargesByStatus();
+        await InitializeTagSearch();
+        await GetTagCounts();
+
 
         // Initialize filtered lists
         _search.Initialize(batteries, charges);
@@ -240,6 +243,19 @@
             var children = await _chargeService.GetChildren(charge);
             _search.AddChargeChildren(charge, children);
         }
+    }
+
+    private async Task InitializeTagSearch()
+    {
+        List<ChargeTagRelation> tagRelations = new();
+
+        foreach (var battery in batteries)
+        {
+            var relations = await _tagController.GetAllRelationsForBattery(battery);
+            tagRelations.AddRange(relations);
+        }
+
+        _search.Initialize(tagRelations);
     }
 
     private void ResetShowBatteryChargesDict()
@@ -285,6 +301,20 @@
         _search.SearchBatteries(searchText);
         _search.SearchCharges(searchText);
         _search.SearchChildren(searchText);
+
+        ResetShowBatteryChargesDict();
+
+        foreach (var battery in _search.GetBatteries())
+        {
+            ShowBatteryByBattery(battery);
+        }
+
+        showChargeChildren = true;
+    }
+
+    private void SearchTags(Tag tag)
+    {
+        _search.SearchCharges(tag);
 
         ResetShowBatteryChargesDict();
 
