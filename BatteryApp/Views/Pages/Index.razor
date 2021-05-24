@@ -71,7 +71,6 @@
                 </div>
             </div>
         </div>
-        <p>search text: @searchText</p>
         <!-- Active Battery List -->
         @foreach (var battery in _search.GetBatteries())
         {
@@ -113,7 +112,6 @@
                         {
                             <IndexTagList_Battery Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
                                                   TagCounts="@tagActiveCounts"
-                                                  FilterChargesByTag="@FilterChargesByTag"
                                                   SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
                         }
 
@@ -123,8 +121,6 @@
                                 @foreach (var charge in _search.GetCharges().Where(x => x.BatteryId == battery.Id).Where(x => x.ParentId is null))
                                 {
                                     <IndexChargeCardListItem @key="@charge"
-                                                             @ref="@indexChargeCardListItem"
-                                                             AddChargeToSearchResults="@AddParentToSearchResults"
                                                              Charge="@charge"
                                                              Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
                                                              Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
@@ -135,23 +131,15 @@
                                                              Statuses="@statuses"
                                                              CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
                                                              StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
-                                                             SearchText="@searchText"
                                                              ShowChildren="@showChargeChildren"
                                                              ShowTags="@(showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)"></IndexChargeCardListItem>
                                 }
                             </div>
                         }
                     </div>
-
-
-
-
                 </div>
             </div>
         }
-
-
-
     </div>
 
             <ManageTagsModal Battery="@manageTagsBattery" 
@@ -178,9 +166,7 @@
 
 @code {
     private List<Battery> batteries = new();
-    private List<Battery> filteredBatteries = new();
     private List<Charge> charges = new();
-    private List<Charge> filteredCharges = new();
     private List<Category> categories = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
@@ -192,8 +178,6 @@
     private Dictionary<int, int> tagActiveCounts = new();
 
     private Battery manageTagsBattery = new();
-
-    private IndexChargeCardListItem indexChargeCardListItem;
 
     private string searchText = "";
     private string userId;
@@ -218,12 +202,11 @@
         await GetTagCounts();
         InitializeShowBatteryChargesDict();
         InitializeShowBatteryTagsDict();
+        await InitializeChargeChildren();
         SortChargesByStatus();
 
         // Initialize filtered lists
         _search.Initialize(batteries, charges);
-        filteredBatteries = new(batteries);
-        filteredCharges = new(charges);
 
         // Hide the breadcrump nav
         _breadcrumb.Hide();
@@ -247,6 +230,15 @@
             {
                 showBatteryTags.Add(battery.Id, false);
             }
+        }
+    }
+
+    private async Task InitializeChargeChildren()
+    {
+        foreach (var charge in charges)
+        {
+            var children = await _chargeService.GetChildren(charge);
+            _search.AddChargeChildren(charge, children);
         }
     }
 
@@ -279,9 +271,7 @@
     {
         searchText = "";
 
-        //filteredBatteries = new(batteries);
         _search.Clear();
-        filteredCharges = new(charges);
 
         showChargeChildren = false;
 
@@ -291,18 +281,12 @@
     private void Search(ChangeEventArgs e)
     {
         searchText = e.Value.ToString();
-        //FilterBatteriesBySearch();
+
         _search.SearchBatteries(searchText);
         _search.SearchCharges(searchText);
         _search.SearchChildren(searchText);
 
         ResetShowBatteryChargesDict();
-
-        //foreach (var charge in _search.GetCharges())
-        //{
-        //    ShowBatteryByCharge(charge);
-        //}
-
 
         foreach (var battery in _search.GetBatteries())
         {
@@ -310,104 +294,6 @@
         }
 
         showChargeChildren = true;
-        //FilterChargesBySearch();
-    }
-
-    private void FilterBatteriesBySearch()
-    {
-        filteredBatteries = batteries.Where(x => x.Name.ToLower().Contains(searchText.ToLower())).ToList();
-
-        StateHasChanged();
-    }
-
-    private void FilterChargesBySearch()
-    {
-        filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
-
-        var children = charges.Where(x => x.ParentId is not null).ToList();
-
-        foreach (var charge in charges)
-        {
-            //var filterChildren = children.Where(x => x.Title.ToLower().Contains(searchText.ToLower()) && x.ParentId == charge.Id).ToList();
-
-            //indexChargeCardListItem?.FilterChildren(searchText);
-
-            //if (filterChildren?.Count > 0 && !filteredCharges.Contains(charge))
-            //{
-            //    filteredCharges.Add(charge);
-            //    ShowBatteryByCharge(charge);
-            //}
-            indexChargeCardListItem?.FilterChildren(searchText);
-
-            //if (filterChildren?.Count > 0)
-            //{
-
-            //    if (!filteredCharges.Contains(charge))
-            //    {
-            //        filteredCharges.Add(charge);
-            //        ShowBatteryByCharge(charge);
-            //    }
-            //}
-        }
-
-        showChargeChildren = true;
-
-        foreach (var charge in filteredCharges)
-        {
-            ShowBatteryByCharge(charge);
-        }
-
-        StateHasChanged();
-    }
-
-    private async Task FilterChargesByTag(Tag tag)
-    {
-        var tagBattery = batteries.Where(x => x.Id == tag.BatteryId).FirstOrDefault();
-        var chargesWithTag = await _tagController.GetAllChargesAsync(tag, tagBattery);
-
-        showBatteryCharges[tagBattery.Id] = true;
-        filteredCharges = new(chargesWithTag);
-
-        var children = charges.Where(x => x.ParentId is not null).ToList();
-
-        foreach (var charge in charges)
-        {
-            //var filterChildren = children.Where(ch => chargesWithTag.Any(c => c.Id == ch.Id) && ch.ParentId == charge.Id).ToList();
-            //var filterChildren = (from ch in children
-            //                      join cwt in chargesWithTag on ch.Id equals cwt.Id
-            //                      select ch).Where(ch => ch.ParentId == charge.Id).ToList();
-
-            List<Charge> filterChildren = new();
-
-            foreach (var child in chargesWithTag.Where(x => x.ParentId == charge.Id).ToList())
-            {
-                filterChildren.Add(child);
-            }
-
-            if (filterChildren?.Count > 0)
-            {
-                indexChargeCardListItem?.FilterChildren(filterChildren);
-
-                //if (!filteredCharges.Contains(charge))
-                //{
-                //    filteredCharges.Add(charge);
-                //    ShowBatteryByCharge(charge);
-                //}
-            }
-        }
-
-        showChargeChildren = true;
-
-        StateHasChanged();
-    }
-
-    private void AddParentToSearchResults(Charge charge)
-    {
-        if (!filteredCharges.Contains(charge))
-        {
-            filteredCharges.Add(charge);
-            ShowBatteryByCharge(charge);
-        }
     }
 
     private void ShowBatteryByBattery(Battery battery)

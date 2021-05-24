@@ -13,11 +13,8 @@ namespace BatteryApp.Views.Utils
         private List<Battery> _searchedBatteries = new();
         private List<Charge> _charges = new();
         private List<Charge> _searchedCharges = new();
-        private List<Charge> _children = new();
-        private List<Charge> _searchedChildren = new();
         private Dictionary<int, List<Charge>> _chargeChildren = new();
         private Dictionary<int, List<Charge>> _searchedChargeChildren = new();
-        //private string _searchText;
 
         public void Clear()
         {
@@ -44,12 +41,11 @@ namespace BatteryApp.Views.Utils
             Initialize(charges);
         }
 
-        public void InitializeChildren(List<Charge> children)
-        {
-            _children = new(children);
-            _searchedChildren = new(children);
+        //public void InitializeChildren(List<Charge> children)
+        //{
+        //    throw NotImplementedException;
             
-        }
+        //}
 
         public void AddChargeChildren(Charge parent, List<Charge> children)
         {
@@ -82,9 +78,9 @@ namespace BatteryApp.Views.Utils
             return _searchedCharges;
         }
 
-        public List<Charge> GetChildren()
+        public Dictionary<int, List<Charge>> GetChildren()
         {
-            return _searchedChildren;
+            return _searchedChargeChildren;
         }
 
         public List<Charge> GetChildren(int parentId)
@@ -119,21 +115,13 @@ namespace BatteryApp.Views.Utils
 
         public void SearchChildren(string searchText)
         {
-            //_searchedChildren = _children.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
-
-            //foreach (var child in _searchedChildren)
-            //{
-            //    AddBatteryToResults(child);
-            //    AddChargeToResults(child);
-            //}
-
-            _searchedChargeChildren = new();
+            //_searchedChargeChildren = new();
 
             foreach (var kvp in _chargeChildren)
             {
-                //_searchedChargeChildren[kvp.Key] = kvp.Value.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
+                _searchedChargeChildren[kvp.Key] = kvp.Value.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
 
-                _searchedChargeChildren.Add(kvp.Key, kvp.Value.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList());
+                //_searchedChargeChildren.Add(kvp.Key, kvp.Value.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList());
 
                 if (_searchedChargeChildren[kvp.Key].Any())
                 {
