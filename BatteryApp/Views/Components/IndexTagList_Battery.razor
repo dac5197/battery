@@ -1,4 +1,4 @@
-﻿@inject ISearchUtil _search
+﻿
 
 <div class="card bg-light border-square px-2">
     <div class="row">
@@ -7,7 +7,6 @@
             @foreach (var tag in Tags.OrderBy(x => x.Name))
             {
                 <span style="cursor: pointer"
-                      class="@(tag.Id == _search.GetTag().Id ? "searched-tag" : "")"
                       @onclick="@(() => FilterChargesByTag.InvokeAsync(tag))">
                     <TagIndexItem Tag="@tag"
                                   Count="@(TagCounts.ContainsKey(tag.Id) ? TagCounts[tag.Id] : 0)"
@@ -26,13 +25,6 @@
         </div>
     </div>
 </div>
-
-<style>
-    .searched-tag {
-        outline: #ff0000;
-        outline-style: solid;
-    }
-</style>
 
 @code {
     [Parameter]

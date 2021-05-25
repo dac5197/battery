@@ -322,14 +322,10 @@
 
         _search.Search(tag);
 
-        //ResetShowBatteryChargesDict();
-
-        //foreach (var battery in _search.GetBatteries())
-        //{
-        //    ShowBatteryByBattery(battery);
-        //}
-
+        ShowBatteryByBattery(batteries.Where(x => x.Id == tag.BatteryId).FirstOrDefault());
         showChargeChildren = true;
+
+        StateHasChanged();
     }
 
     private void ShowBatteryByBattery(Battery battery)

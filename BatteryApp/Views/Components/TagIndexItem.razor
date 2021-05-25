@@ -1,4 +1,6 @@
-﻿<div class="badge tag-badge-index border-square m-1">
+﻿@inject ISearchUtil _search
+
+<div class="badge tag-badge-index border-square m-1 @(Tag.Id == _search.GetTag().Id ? "searched-tag" : "")">
     @Tag.Name
     @if (ShowTagCounts)
     {
@@ -7,6 +9,11 @@
 </div>
 
 <style>
+    .searched-tag {
+        outline: #b3d6ff;
+        outline-style: solid;
+    }
+
     .tag-badge-index {
         color: black;
         background-color: #cce4ff;
