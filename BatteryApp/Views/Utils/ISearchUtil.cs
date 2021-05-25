@@ -19,9 +19,11 @@ namespace BatteryApp.Views.Utils
         List<Charge> GetChildren(int parentId);
         Tag GetTag();
         bool HasChildren(int parentId);
+        void Search(Tag tag);
         void SearchBatteries(string searchText);
         void SearchCharges(string searchText);
         void SearchCharges(Tag tag);
         void SearchChildren(string searchText);
+        void SearchChildren(Tag tag);
     }
 }

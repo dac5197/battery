@@ -314,14 +314,20 @@
 
     private void SearchTags(Tag tag)
     {
-        _search.SearchCharges(tag);
-
-        ResetShowBatteryChargesDict();
-
-        foreach (var battery in _search.GetBatteries())
+        if (tag == _search.GetTag())
         {
-            ShowBatteryByBattery(battery);
+            ClearSearch();
+            return;
         }
+
+        _search.Search(tag);
+
+        //ResetShowBatteryChargesDict();
+
+        //foreach (var battery in _search.GetBatteries())
+        //{
+        //    ShowBatteryByBattery(battery);
+        //}
 
         showChargeChildren = true;
     }

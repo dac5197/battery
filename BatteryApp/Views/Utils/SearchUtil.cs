@@ -26,6 +26,7 @@ namespace BatteryApp.Views.Utils
             _searchedCharges = new(_charges);
             _searchedChargeChildren = new(_chargeChildren);
             _searchedChargeTagRelations = new(_chargeTagRelations);
+            _searchTag = new();
         }
 
         public void Initialize(List<Battery> batteries)
@@ -114,6 +115,16 @@ namespace BatteryApp.Views.Utils
             return false;
         }
 
+        public void Search(Tag tag)
+        {
+            _searchedCharges = new();
+            _searchedChargeTagRelations = _chargeTagRelations.Where(x => x.TagId == tag.Id).ToList();
+            _searchTag = tag;
+
+            SearchCharges(tag);
+            SearchChildren(tag);
+        }
+
         public void SearchBatteries(string searchText)
         {
             _searchedBatteries = _batteries.Where(x => x.Name.ToLower().Contains(searchText.ToLower())).ToList();
@@ -131,11 +142,6 @@ namespace BatteryApp.Views.Utils
 
         public void SearchCharges(Tag tag)
         {
-            _searchedBatteries = new();
-            _searchedCharges = new();
-            _searchedChargeTagRelations = _chargeTagRelations.Where(x => x.TagId == tag.Id).ToList();
-            _searchTag = tag;
-
             foreach (var rel in _searchedChargeTagRelations)
             {
                 var charge = _charges.Where(x => x.Id == rel.ChargeId).FirstOrDefault();
@@ -146,21 +152,39 @@ namespace BatteryApp.Views.Utils
                 }
             }
 
-            foreach (var charge in _searchedCharges)
-            {
-                AddBatteryToResults(charge.BatteryId);
-            }
+            _searchedCharges.AddRange(_charges.Where(x => x.BatteryId != tag.BatteryId).ToList());
         }
 
         public void SearchChildren(string searchText)
         {
-            //_searchedChargeChildren = new();
-
             foreach (var kvp in _chargeChildren)
             {
                 _searchedChargeChildren[kvp.Key] = kvp.Value.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
 
-                //_searchedChargeChildren.Add(kvp.Key, kvp.Value.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList());
+                if (_searchedChargeChildren[kvp.Key].Any())
+                {
+                    AddChargeToResults(kvp.Key);
+                }
+            }
+        }
+
+        public void SearchChildren(Tag tag)
+        {
+            foreach (var kvp in _chargeChildren)
+            {
+                List<Charge> children = new();
+
+                foreach (var rel in _searchedChargeTagRelations)
+                {
+                    var child = kvp.Value.Where(x => x.Id == rel.ChargeId).Where(x => x.ParentId is not null).FirstOrDefault();
+
+                    if (child is not null && !children.Contains(child))
+                    {
+                        children.Add(child);
+                    }
+                }
+
+                _searchedChargeChildren[kvp.Key] = new(children);
 
                 if (_searchedChargeChildren[kvp.Key].Any())
                 {
