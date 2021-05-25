@@ -103,7 +103,7 @@
                             <NavLink href="@($"/battery/{battery.Id}")" class="link-black">
                                 <span class="h3">
                                     <IconBattery />
-                                    @battery.Id | @battery.Name
+                                    @battery.Id | @_search.HighlightSearchText(searchText, battery.Name)
                                 </span>
                             </NavLink>
                             <span class="h3 float-right">(@charges.Where(x => x.BatteryId == battery.Id).Count())</span>
@@ -133,7 +133,8 @@
                                                              CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
                                                              StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
                                                              ShowChildren="@showChargeChildren"
-                                                             ShowTags="@(showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)"></IndexChargeCardListItem>
+                                                             ShowTags="@(showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)"
+                                                             SearchText="@searchText"></IndexChargeCardListItem>
                                 }
                             </div>
                         }

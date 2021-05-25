@@ -1,6 +1,7 @@
 ﻿using BatteryApp.Models.BatteryModel;
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.TagModel;
+using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 
 namespace BatteryApp.Views.Utils
@@ -19,6 +20,7 @@ namespace BatteryApp.Views.Utils
         List<Charge> GetChildren(int parentId);
         Tag GetTag();
         bool HasChildren(int parentId);
+        MarkupString HighlightSearchText(string searchText, string text);
         void Search(Tag tag);
         void SearchBatteries(string searchText);
         void SearchCharges(string searchText);

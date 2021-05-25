@@ -9,7 +9,7 @@
                 <a href="@($"/charge/{Charge.Id}")">
                     <h6 class="charge-detail">
                         <IconCategory Category="@category"></IconCategory>
-                        @Charge.Id | @Charge.Title
+                        @Charge.Id | @_search.HighlightSearchText(SearchText, Charge.Title)
                     </h6>
                 </a>
                 <hr class="mt-0 mb-2" />
@@ -95,7 +95,7 @@
     private List<Status> Statuses { get; set; }
 
     [CascadingParameter(Name = "SearchText")]
-    private string SearchChildTitle { get; set; }
+    private string SearchText { get; set; }
 
     [CascadingParameter(Name = "ShowChildren")]
     private bool ShowChildren { get; set; }

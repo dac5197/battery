@@ -7,7 +7,7 @@
         <div class="col-lg-6">
             <NavLink href="@($"/charge/{Charge.Id}")" class="link-black">
                 <IconCategory Category="@Category"></IconCategory>
-                @Charge.Id | @Charge.Title
+                @Charge.Id | @_search.HighlightSearchText(SearchText, Charge.Title)
             </NavLink>
         </div>
         <div class="col-lg-2">
@@ -49,7 +49,7 @@
                             <div class="col-lg-6">
                                 <NavLink href="@($"/charge/{child.Id}")" class="link-black">
                                     <IconCategory Category="@Categories.Where(x => x.Id == child.CategoryId).FirstOrDefault()"></IconCategory>
-                                    @child.Id | @child.Title
+                                    @child.Id | @_search.HighlightSearchText(SearchText, child.Title)
                                 </NavLink>
                             </div>
                             <div class="col-lg-2">
@@ -130,6 +130,9 @@
     [Parameter]
     public bool ShowTags { get; set; }
 
+    [Parameter]
+    public string SearchText { get; set; }
+
     private List<Charge> children = new();
     private List<Tag> tags = new();
 
@@ -140,18 +143,21 @@
         children = await _chargeService.GetChildren(Charge);
         tags = await _tagController.GetAllTagsAsync(Charge.Id);
 
-        //_search.AddChargeChildren(Charge, children);
-
         if (children.Any())
         {
-            foreach (var child in children)
-            {
-                var childTags = await _tagController.GetAllTagsAsync(child.Id);
+            await GetChildrenTags();
+        }
+    }
 
-                if (childTags.Any())
-                {
-                    childrenTags.Add(child.Id, childTags);
-                }
+    private async Task GetChildrenTags()
+    {
+        foreach (var child in children)
+        {
+            var childTags = await _tagController.GetAllTagsAsync(child.Id);
+
+            if (childTags.Any())
+            {
+                childrenTags.Add(child.Id, childTags);
             }
         }
     }

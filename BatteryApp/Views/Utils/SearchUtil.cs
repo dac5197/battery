@@ -1,9 +1,11 @@
 ﻿using BatteryApp.Models.BatteryModel;
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.TagModel;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace BatteryApp.Views.Utils
@@ -119,6 +121,20 @@ namespace BatteryApp.Views.Utils
             }
 
             return false;
+        }
+
+        public MarkupString HighlightSearchText(string searchText, string text)
+        {
+            if (String.IsNullOrWhiteSpace(searchText) || String.IsNullOrWhiteSpace(text))
+            {
+                return (MarkupString)text;
+            }
+
+            var rx = new Regex(searchText, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+            var highlightText = rx.Replace(text, "<span style=\"background-color: yellow\">$&</span>");
+
+            return (MarkupString)highlightText;
         }
 
         public void Search(Tag tag)
