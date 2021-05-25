@@ -97,7 +97,13 @@ namespace BatteryApp.Views.Utils
 
         public List<Charge> GetChildren(int parentId)
         {
-            return _searchedChargeChildren[parentId];
+            if (_searchedChargeChildren.ContainsKey(parentId))
+            {
+                return _searchedChargeChildren[parentId];
+            }
+
+            List<Charge> emptyList = new();
+            return emptyList;
         }
 
         public Tag GetTag()
@@ -206,9 +212,12 @@ namespace BatteryApp.Views.Utils
             if (!_searchedCharges.Any(x => x.Id == parentId))
             {
                 var parent = _charges.Where(x => x.Id == parentId).FirstOrDefault();
-                _searchedCharges.Add(parent);
 
-                AddBatteryToResults(parent.BatteryId);
+                if (parent is not null)
+                {
+                    _searchedCharges.Add(parent);
+                    AddBatteryToResults(parent.BatteryId);
+                }
             }
         }
     }

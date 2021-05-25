@@ -13,6 +13,7 @@
 @inject INoteService _noteService
 @inject INoteTypeService _noteTypeService
 @inject IPriorityService _priorityService
+@inject ISearchUtil _search
 @inject IStatusService _statusService
 @inject ITagController _tagController
 @inject IUserProfileService _userProfileService
@@ -394,8 +395,10 @@
         hasOpenChildren = await _chargeChildController.HasOpenChildren(charge);
         userProfile = await _userProfileService.Get(charge.OwnerId);
 
+        // Set defaults
         dateTimeFormat = _configuration["Configurations:DateTimeFormat"];
         textareaRows = _calcTextareaRows.CalculateRows(charge.Description);
+        _search.Clear();
 
         // Get breadcrumb nav links
         await _breadcrumb.Initialize(charge);

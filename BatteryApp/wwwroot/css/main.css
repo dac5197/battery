@@ -78,3 +78,8 @@
 .modal-child.modal-backdrop.show {
     z-index: 1051 !important;
 }
+
+.searched-tag {
+    outline: #b3d6ff;
+    outline-style: solid;
+}

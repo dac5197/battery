@@ -1,6 +1,7 @@
 ﻿@inject IConfiguration _configuration
 
 @inject IChargeService _chargeService
+@inject ISearchUtil _search
 @inject ITableSort_Charges _tableSort
 
 <tr>
@@ -42,43 +43,43 @@
     <td class="small">@Charge.Completed?.ToLocalTime().ToString(dateTimeFormat)</td>
 </tr>
 
-@if (ShowChildren)
+@if (ShowChildren && _search.GetChildren(Charge.Id).Any())
 {
     @if (Charge.ParentId is null)
     {
         <tr>
-            <td colspan="8">
-                <table class="table table-hover table-sm px-5">
+            <td colspan="9">
+                <table class="table table-light table-hover table-sm px-5">
                     <thead>
                         <tr>
-                            <th>
+                            <th class="small">
                                 <TableHeaderSort FieldNameOverride="Type" FieldName="Category" SortIcon="@(_tableSort.GetIcon("Category"))" SortMethod="SortTableByCategory"></TableHeaderSort>
                             </th>
-                            <th>
+                            <th class="small">
                                 <TableHeaderSort FieldNameOverride="#" FieldName="Id" SortIcon="@(_tableSort.GetIcon("Id"))" SortMethod="SortTable"></TableHeaderSort>
                             </th>
-                            <th>
+                            <th class="small">
                                 <TableHeaderSort FieldName="Title" SortIcon="@(_tableSort.GetIcon("Title"))" SortMethod="SortTable"></TableHeaderSort>
                             </th>
-                            <th>
+                            <th class="small">
                                 <TableHeaderSort FieldName="Priority" SortIcon="@(_tableSort.GetIcon("Priority"))" SortMethod="SortTableByPriority"></TableHeaderSort>
                             </th>
-                            <th>
+                            <th class="small">
                                 <TableHeaderSort FieldName="Status" SortIcon="@(_tableSort.GetIcon("Status"))" SortMethod="SortTableByStatus"></TableHeaderSort>
                             </th>
-                            <th>
+                            <th class="small">
                                 <TableHeaderSort FieldName="Created" SortIcon="@(_tableSort.GetIcon("Created"))" SortMethod="SortTable"></TableHeaderSort>
                             </th>
-                            <th>
+                            <th class="small">
                                 <TableHeaderSort FieldName="Updated" SortIcon="@(_tableSort.GetIcon("Updated"))" SortMethod="SortTable"></TableHeaderSort>
                             </th>
-                            <th>
+                            <th class="small">
                                 <TableHeaderSort FieldName="Completed" SortIcon="@(_tableSort.GetIcon("Completed"))" SortMethod="SortTable"></TableHeaderSort>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var child in children.Where(x => x.Title.ToLower().Contains(SearchText.ToLower())).ToList())
+                        @foreach (var child in _search.GetChildren(Charge.Id))
                         {
                             <ChargeTableItem @key="@child"
                                              Charge="@child"

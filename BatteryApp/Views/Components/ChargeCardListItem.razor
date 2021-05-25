@@ -1,4 +1,5 @@
 ﻿@inject IChargeService _chargeService
+@inject ISearchUtil _search 
 @inject ITagController _tagController
 
 <div class="card bg-light shadow-sm my-2 pb-1 pt-2 px-2 border-square border-transparent highlighted-@Charge.BatteryId-@Charge.Id">
@@ -53,7 +54,7 @@
         @if (ShowChildren)
         {
             <ul class="list-group list-group-flush mt-2">
-                @foreach (var child in children.Where(x => x.Title.ToLower().Contains(SearchChildTitle.ToLower())).ToList())
+                @foreach (var child in _search.GetChildren(Charge.Id))
                 {
                     <ChargeDetail_RelatedListItem Charge="child" IsParent="false" ParentStateChanged="@ChargeCardStateChanged"></ChargeDetail_RelatedListItem>
                 }

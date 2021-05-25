@@ -13,6 +13,7 @@
 @inject IChargeService _chargeService
 @inject IChargeCountService _chargeCountService
 @inject IPriorityService _priorityService
+@inject ISearchUtil _search 
 @inject IStatusService _statusService
 @inject ITagController _tagController
 @inject ITagService _tagService
@@ -99,6 +100,7 @@
                     <div class="col-lg-12">
                         <IndexTagList_Battery Tags="@tags"
                                               TagCounts="@(btnClassActiveCharges == btnActive ? tagActiveCounts : tagAllCounts)"
+                                              FilterChargesByTag="@SearchTags"
                                               SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
                     </div>
                 </div>
@@ -213,7 +215,7 @@
                                                id="searchChargesInput"
                                                placeholder="Search"
                                                value="@searchText"
-                                               @oninput="@(e => FilterChargesBySearch(e))" />
+                                               @oninput="@(e => Search(e))" />
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-info border-square" @onclick="@ClearSearch">Clear</button>
                                         </div>
@@ -265,7 +267,7 @@
                                 <CascadingValue Name="SearchText" Value="@searchText">
                                     <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
                                         <ChargeCardList @bind-Child="@chargeObject"
-                                                        Charges="@filteredCharges"
+                                                        Charges="@_search.GetCharges()"
                                                         chargesActiveCounts="@activeChargesCounts"
                                                         chargesInactiveCounts="@inactiveChargesCounts"
                                                         ParentStateChanged="@StateChanged"></ChargeCardList>
@@ -285,7 +287,7 @@
                                     <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
                                         <ChargeTable @bind-Child="@chargeObject"
                                                      @ref="@chargeTable"
-                                                     Charges="@filteredCharges"
+                                                     Charges="@_search.GetCharges()"
                                                      ChargeChildrenCounts="@chargeChildrenCounts"
                                                      ParentStateChanged="@StateChanged"></ChargeTable>
                                     </CascadingValue>
@@ -341,7 +343,6 @@
     private List<Category> categories = new();
     private List<Charge> charges = new();
     private List<Charge> chargeObjectChildren = new();
-    private List<Charge> filteredCharges = new();
     private List<ChargeChildrenCount> chargeChildrenCounts = new();
     private List<Priority> priorities = new();
     private List<Status> statuses = new();
@@ -394,8 +395,10 @@
         await GetChargeCounts();
         await GetTagCounts();
 
-        // Set filtered charge list
-        filteredCharges = charges;
+        // Initialize search entities
+        _search.Initialize(charges);
+        await InitializeChargeChildren();
+        await InitializeTagSearch();
 
         // Set filter button bootstrap classes
         btnClassActiveCharges = btnActive;
@@ -413,11 +416,27 @@
         _breadcrumb.Hide();
     }
 
+    private async Task InitializeChargeChildren()
+    {
+        foreach (var charge in charges)
+        {
+            var children = await _chargeService.GetChildren(charge);
+            _search.AddChargeChildren(charge, children);
+        }
+    }
+
     private async void InitializeChargeObject()
     {
         chargeObject = new Charge();
         chargeObject = await _chargeLifecycle.SetDefaultValuesAsync(battery, chargeObject);
         chargeDetailModal.StateChanged();
+    }
+
+    private async Task InitializeTagSearch()
+    {
+        var relations = await _tagController.GetAllRelationsForBattery(battery);
+
+        _search.Initialize(relations);
     }
 
     private async void StateChanged()
@@ -462,51 +481,58 @@
         showStatusScoreCard = !showStatusScoreCard;
     }
 
-    private void FilterChargesBySearch(ChangeEventArgs e)
-    {
-
-        searchText = e.Value.ToString();
-        filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
-
-        var children = charges.Where(x => x.ParentId is not null).ToList();
-
-        foreach (var charge in charges)
-        {
-            var filterChildren = children.Where(x => x.Title.ToLower().Contains(searchText.ToLower()) && x.ParentId == charge.Id).ToList();
-
-            if (filterChildren?.Count > 0 && !filteredCharges.Contains(charge))
-            {
-                filteredCharges.Add(charge);
-            }
-        }
-
-        showChargeCardChildren = true;
-        StateHasChanged();
-    }
-
     private void ClearSearch()
     {
         searchText = "";
         showChargeCardChildren = false;
-        filteredCharges = charges;
+        _search.Clear();
+        StateHasChanged();
+    }
+
+    private void Search(ChangeEventArgs e)
+    {
+        searchText = e.Value.ToString();
+
+        _search.SearchCharges(searchText);
+        _search.SearchChildren(searchText);
+
+        showChargeCardChildren = true;
+    }
+
+    private void SearchTags(Tag tag)
+    {
+        if (tag == _search.GetTag())
+        {
+            ClearSearch();
+            return;
+        }
+
+        _search.Search(tag);
+
+        showChargeCardChildren = true;
+
         StateHasChanged();
     }
 
     private async Task GetAllCharges()
     {
         charges = await _chargeService.Get(battery);
-        await GetChargeCounts();
-        filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
-        chargeTable?.ResetSort();
-
-        StateHasChanged();
+        await GetCharges();
     }
 
     private async Task GetActiveCharges()
     {
         charges = await _chargeService.GetActive(battery);
+        await GetCharges();
+    }
+
+    private async Task GetCharges()
+    {
         await GetChargeCounts();
-        filteredCharges = charges.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
+        _search.Initialize(charges);
+        await InitializeChargeChildren();
+        _search.SearchCharges(searchText);
+        _search.SearchChildren(searchText);
         chargeTable?.ResetSort();
 
         StateHasChanged();
