@@ -9,6 +9,8 @@ namespace BatteryApp.Views.Utils
     public interface ISearchUtil
     {
         void Clear();
+
+        void Initialize(Battery battery);
         void Initialize(List<Battery> batteries);
         void Initialize(List<Charge> charges);
         void Initialize(List<Battery> batteries, List<Charge> charges);

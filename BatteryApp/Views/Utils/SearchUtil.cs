@@ -31,6 +31,12 @@ namespace BatteryApp.Views.Utils
             _searchTag = new();
         }
 
+        public void Initialize(Battery battery)
+        {
+            _batteries = new() { battery };
+            _searchedBatteries = new() { battery };
+        }
+
         public void Initialize(List<Battery> batteries)
         {
             _batteries = new(batteries);

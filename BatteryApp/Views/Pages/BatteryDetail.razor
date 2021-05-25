@@ -396,6 +396,7 @@
         await GetTagCounts();
 
         // Initialize search entities
+        _search.Initialize(battery);
         _search.Initialize(charges);
         await InitializeChargeChildren();
         await InitializeTagSearch();
