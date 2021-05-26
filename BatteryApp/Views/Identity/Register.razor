@@ -1,0 +1,49 @@
+﻿@page "/login"
+
+@layout CenteredCardLayout
+
+@inject AuthenticationStateProvider _authStateProvider
+@inject NavigationManager _navManager
+
+<div class="row mb-3">
+    <div class="col">
+        <h3 class="text-center">Battery Login</h3>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col">
+        <input class="form-control border-square" placeholder="Email Address" />
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col">
+        <input class="form-control border-square" type="password" placeholder="Password" />
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col pl-4">
+        <div class="form-check">
+            <input class="form-check-input border-square" type="checkbox" value="" id="rememberMeCheck">
+            <label class="form-check-label" for="rememberMeCheck">
+                Remember Me?
+            </label>
+        </div>
+    </div>
+</div>
+<div class="row mb-1">
+    <div class="col">
+        <button class="btn btn-primary btn-block border-square">Login</button>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col pl-4">
+        <a href="">Forgot Password</a>
+        <span> | </span>
+        <a href="">Register</a>
+    </div>
+</div>
+
+
+@code {
+
+}

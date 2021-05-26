@@ -1,0 +1,42 @@
+﻿@page "/register"
+
+@layout CenteredCardLayout
+
+@inject AuthenticationStateProvider _authStateProvider
+@inject NavigationManager _navManager
+
+<div class="row mb-3">
+    <div class="col">
+        <h3 class="text-center">Register</h3>
+        <h5 class="text-center">Create a new account</h5>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col">
+        <input class="form-control border-square" placeholder="Email Address" />
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col">
+        <input class="form-control border-square" type="password" placeholder="Password" />
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col">
+        <input class="form-control border-square" type="password" placeholder=" Confirm Password" />
+    </div>
+</div>
+<div class="row mb-1">
+    <div class="col">
+        <button class="btn btn-primary btn-block border-square">Submit</button>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col pl-4">
+    </div>
+</div>
+
+
+@code {
+
+}
