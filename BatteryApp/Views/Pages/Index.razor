@@ -19,133 +19,148 @@
         }
         else
         {
-    <div class="small mt-2">
-        <div class="row mb-3">
-            <div class="col-lg-8">
-                <div class="card border-square shadow-sm p-2 mt-2 h-100">
-                    <h1>DACME Battery</h1>
+            <div class="small mt-2">
+                <div class="row mb-3">
+                    <div class="col-lg-8">
+                        <div class="card border-square shadow-sm p-2 mt-2 h-100">
+                            <h1>DACME Battery</h1>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card border-square shadow-sm p-2 mt-2 h-100">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <h5>
+                                        Active Batteries: <span class="float-right">@batteries.Count()</span>
+                                    </h5>
+                                </li>
+                                <li class="list-group-item">
+                                    <h5>
+                                        Active Charges: <span class="float-right">@charges.Count()</span>
+                                    </h5>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card border-square shadow-sm p-2 mt-2 h-100">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <h5>
-                                Active Batteries: <span class="float-right">@batteries.Count()</span>
-                            </h5>
-                        </li>
-                        <li class="list-group-item">
-                            <h5>
-                                Active Charges: <span class="float-right">@charges.Count()</span>
-                            </h5>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <!-- Search Bar -->
-        <div class="row mb-2">
-            <div class="col-lg-12">
-                <div class="card border-square shadow-sm p-2 mt-2">
-                    <div class="row justify-content-center">
-
-                        <div class="col-lg-6">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text border-0 bg-transparent mr-n5">
-                                        <span class="oi oi-magnifying-glass"></span>
+                <!-- Search Bar -->
+                <div class="row mb-2">
+                    <div class="col-lg-12">
+                        <div class="card border-square shadow-sm p-2 mt-2">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-3">
+                                    <button class="btn btn-success border-square" data-toggle="modal" data-target="#batteryDetailModal" value="Add Battery">Add Battery</button>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text border-0 bg-transparent mr-n5">
+                                                <span class="oi oi-magnifying-glass"></span>
+                                            </div>
+                                        </div>
+                                        <input type="text"
+                                               class="form-control py-2 border-square bg-transparent pl-5"
+                                               id="searchChargesInput"
+                                               placeholder="Search"
+                                               value="@searchText"
+                                               @oninput="@(e => Search(e))" />
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-info border-square" @onclick="@ClearSearch">Clear</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <input type="text"
-                                       class="form-control py-2 border-square bg-transparent pl-5"
-                                       id="searchChargesInput"
-                                       placeholder="Search"
-                                       value="@searchText"
-                                       @oninput="@(e => Search(e))" />
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-outline-info border-square" @onclick="@ClearSearch">Clear</button>
+                                <div class="col-lg-3">
+                                    <div class="float-right">
+                                        <BtnGroup_TwoButtons BtnOneClass="@btnClassActiveBatteries"
+                                                             BtnOneText="Active"
+                                                             BtnOneAction="@GetActiveBatteries_Button"
+                                                             BtnTwoClass="@btnClassAllBatteries"
+                                                             BtnTwoText="All"
+                                                             BtnTwoAction="@GetAllBatteries_Button"
+                                                             QuestionToolTipAlignment="Right"
+                                                             QuestionToolTipText="Toggle between Active Batteries and All Batteries"></BtnGroup_TwoButtons>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- Active Battery List -->
-        @foreach (var battery in _search.GetBatteries())
-        {
-            <div class="row mb-3">
-                <div class="col-lg-12">
-                    <div class="card border-square shadow-sm mt-2">
-                        <div class="card-header p-1">
-                            <button class="btn btn-sm btn-light toggle-button mx-1"
-                                    title="Toggle Charges"
-                                    type="button"
-                                    @onclick="@(() => ToggleShowBatteryCharges(battery))">
-                                @if (showBatteryCharges.ContainsKey(battery.Id))
+                <!-- Active Battery List -->
+                @foreach (var battery in _search.GetBatteries())
+                {
+                    <div class="row mb-3">
+                        <div class="col-lg-12">
+                            <div class="card border-square shadow-sm mt-2">
+                                <div class="card-header p-1">
+                                    <button class="btn btn-sm btn-light toggle-button mx-1"
+                                            title="Toggle Charges"
+                                            type="button"
+                                            @onclick="@(() => ToggleShowBatteryCharges(battery))">
+                                        @if (showBatteryCharges.ContainsKey(battery.Id))
+                                        {
+                                            <BtnToggleCollapseExpand ShowCollapse="@showBatteryCharges[battery.Id]" />
+                                        }
+
+                                    </button>
+                                    @if (showBatteryTags.ContainsKey(battery.Id))
+                                    {
+                                        <button class="btn btn-sm btn-light mx-1"
+                                                title="Toggle Tags"
+                                                type="button"
+                                                @onclick="@(() => ToggleShowBatteryTags(battery))">
+                                            <IconTags />
+                                        </button>
+                                    }
+                                </div>
+                                <div class="card-header pr-4">
+
+                                    <NavLink href="@($"/battery/{battery.Id}")" class="link-black">
+                                        <span class="h3 @(battery.IsActive == false ? "completed" : "")">
+                                            <IconBattery />
+                                            @battery.Id | @_search.HighlightSearchText(searchText, battery.Name)
+                                        </span>
+                                    </NavLink>
+                                    <span class="h3 float-right">(@charges.Where(x => x.BatteryId == battery.Id).Count())</span>
+                                </div>
+                                @if (showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)
                                 {
-                                    <BtnToggleCollapseExpand ShowCollapse="@showBatteryCharges[battery.Id]" />
+                                    <IndexTagList_Battery Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
+                                                          TagCounts="@tagActiveCounts"
+                                                          FilterChargesByTag="@SearchTags"
+                                                          SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
                                 }
-                               
-                            </button>
-                            @if (showBatteryTags.ContainsKey(battery.Id))
-                            {
-                                <button class="btn btn-sm btn-light mx-1"
-                                        title="Toggle Tags"
-                                        type="button"
-                                        @onclick="@(() => ToggleShowBatteryTags(battery))">
-                                    <IconTags />
-                                </button>
-                            }
-                        </div>
-                        <div class="card-header pr-4">
 
-                            <NavLink href="@($"/battery/{battery.Id}")" class="link-black">
-                                <span class="h3">
-                                    <IconBattery />
-                                    @battery.Id | @_search.HighlightSearchText(searchText, battery.Name)
-                                </span>
-                            </NavLink>
-                            <span class="h3 float-right">(@charges.Where(x => x.BatteryId == battery.Id).Count())</span>
-                        </div>
-                        @if (showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)
-                        {
-                            <IndexTagList_Battery Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
-                                                  TagCounts="@tagActiveCounts"
-                                                  FilterChargesByTag="@SearchTags"
-                                                  SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
-                        }
-
-                        @if (showBatteryCharges.ContainsKey(battery.Id) ? showBatteryCharges[battery.Id] : false)
-                        {
-                            <div class="card-body">
-                                @foreach (var charge in _search.GetCharges().Where(x => x.BatteryId == battery.Id).Where(x => x.ParentId is null))
+                                @if (showBatteryCharges.ContainsKey(battery.Id) ? showBatteryCharges[battery.Id] : false)
                                 {
-                                    <IndexChargeCardListItem @key="@charge"
-                                                             Charge="@charge"
-                                                             Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
-                                                             Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
-                                                             Priority="@priorities.Where(x => x.Id == charge.PriorityId).FirstOrDefault()"
-                                                             Priorities="@priorities"
-                                                             PriorityDispalyWidth="@priorities.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.DisplayName.Length).First().DisplayName.Length"
-                                                             Status="@statuses.Where(x => x.Id == charge.StatusId).FirstOrDefault()"
-                                                             Statuses="@statuses"
-                                                             CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
-                                                             StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
-                                                             ShowChildren="@showChargeChildren"
-                                                             ShowTags="@(showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)"
-                                                             SearchText="@searchText"></IndexChargeCardListItem>
+                                    <div class="card-body">
+                                        @foreach (var charge in _search.GetCharges().Where(x => x.BatteryId == battery.Id).Where(x => x.ParentId is null))
+                                        {
+                                            <IndexChargeCardListItem @key="@charge"
+                                                                     Charge="@charge"
+                                                                     Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
+                                                                     Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
+                                                                     Priority="@priorities.Where(x => x.Id == charge.PriorityId).FirstOrDefault()"
+                                                                     Priorities="@priorities"
+                                                                     PriorityDispalyWidth="@priorities.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.DisplayName.Length).First().DisplayName.Length"
+                                                                     Status="@statuses.Where(x => x.Id == charge.StatusId).FirstOrDefault()"
+                                                                     Statuses="@statuses"
+                                                                     CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
+                                                                     StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
+                                                                     ShowChildren="@showChargeChildren"
+                                                                     ShowTags="@(showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)"
+                                                                     SearchText="@searchText"></IndexChargeCardListItem>
+                                        }
+                                    </div>
                                 }
                             </div>
-                        }
+                        </div>
                     </div>
-                </div>
+                }
             </div>
-        }
-    </div>
-
-            <ManageTagsModal Battery="@manageTagsBattery" 
-                             Tags="@tags.Where(x => x.BatteryId == manageTagsBattery.Id).ToList()" 
+            <!-- Modals -->
+            <BatteryDetailModal ParentStateChanged="@BatteriesChanged" UserId="@userId"></BatteryDetailModal>
+            <ManageTagsModal Battery="@manageTagsBattery"
+                             Tags="@tags.Where(x => x.BatteryId == manageTagsBattery.Id).ToList()"
                              TagAllCounts="@tagCounts"
                              TagActiveCounts="@tagActiveCounts"
                              ParentStateChanged="@TagsChanged"></ManageTagsModal>
@@ -181,6 +196,10 @@
 
     private Battery manageTagsBattery = new();
 
+    private string btnActive = "btn-secondary";
+    private string btnInactive = "btn-outline-secondary";
+    private string btnClassActiveBatteries;
+    private string btnClassAllBatteries;
     private string searchText = "";
     private string userId;
 
@@ -192,8 +211,65 @@
         var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
-        // Get entities
+
         batteries = await _batteryService.GetActive(userId);
+        charges = await _chargeService.GetActive(userId);
+        categories = await _categoryService.Get(userId);
+        priorities = await _priorityService.Get(userId);
+        statuses = await _statusService.Get(userId);
+        tags = await _tagService.Get(userId);
+
+        btnClassActiveBatteries = btnActive;
+        btnClassAllBatteries = btnInactive;
+        await GetActiveBatteries();
+
+        // Hide the breadcrump nav
+        _breadcrumb.Hide();
+    }
+
+    private async Task GetActiveBatteries()
+    {
+        batteries = await _batteryService.GetActive(userId);
+        await Initialize();
+    }
+
+    private async Task GetAllBatteries()
+    {
+        batteries = await _batteryService.Get(userId);
+        await Initialize();
+    }
+
+    private async void GetActiveBatteries_Button()
+    {
+        btnClassActiveBatteries = btnActive;
+        btnClassAllBatteries = btnInactive;
+
+        await GetActiveBatteries();
+        StateHasChanged();
+    }
+
+    private async void GetAllBatteries_Button()
+    {
+        btnClassActiveBatteries = btnInactive;
+        btnClassAllBatteries = btnActive;
+
+        await GetAllBatteries();
+        StateHasChanged();
+    }
+
+    private async void BatteriesChanged()
+    {
+        batteries = await _batteryService.GetActive(userId);
+        _search.Initialize(batteries);
+        InitializeShowBatteryChargesDict();
+        InitializeShowBatteryTagsDict();
+
+        StateHasChanged();
+    }
+
+    private async Task Initialize()
+    {
+        // Get entities
         charges = await _chargeService.GetActive(userId);
         categories = await _categoryService.Get(userId);
         priorities = await _priorityService.Get(userId);
@@ -211,13 +287,12 @@
 
         // Initialize filtered lists
         _search.Initialize(batteries, charges);
-
-        // Hide the breadcrump nav
-        _breadcrumb.Hide();
     }
 
     private void InitializeShowBatteryChargesDict()
     {
+        showBatteryCharges.Clear();
+
         foreach (var battery in batteries)
         {
             showBatteryCharges.Add(battery.Id, false);
@@ -226,6 +301,8 @@
 
     private void InitializeShowBatteryTagsDict()
     {
+        showBatteryTags.Clear();
+
         foreach (var battery in batteries)
         {
             var batteryTags = tags.Where(x => x.BatteryId == battery.Id).ToList();
@@ -340,11 +417,6 @@
     private void ShowBatteryByCharge(Charge charge)
     {
         showBatteryCharges[charge.BatteryId] = true;
-
-        //if (!filteredBatteries.Any(x => x.Id == charge.BatteryId))
-        //{
-        //    filteredBatteries.Add(batteries.Where(x => x.Id == charge.BatteryId).FirstOrDefault());
-        //}
     }
 
     private async Task SetManageTagsBattery(int batteryId)
