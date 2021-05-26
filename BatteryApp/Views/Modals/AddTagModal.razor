@@ -24,22 +24,31 @@
                     <InputText @bind-Value="@tag.Name" @oninput="@(e => FilterTags(e))" id="tag-name" class="form-control border-square mx-1" />
                     <button type="submit" class="btn btn-primary mx-1 my-2 border-square">Submit</button>
                 </EditForm>
-                @if (nameInput is not null && Charge is not null)
+                <br />
+                <label>Existing Tags</label>
+                <br />
+                @foreach (var tag in filteredTags)
                 {
-                    <div class="list-group px-5 mt-3 small ">
-                        @foreach (var filteredTag in filteredTags)
-                        {
-                            <a class="list-group-item list-group-item-action border-square py-1 px-2" href="" @onclick="@(() => AddExistingTag(filteredTag))" @onclick:preventDefault="true">
-                                @filteredTag.Name
-                            </a>
-                        }
+
+                    <div class="badge tag-badge-charge existing-tag border-square m-1" @onclick="@(() => AddExistingTag(tag))">
+                        @tag.Name
                     </div>
                 }
-
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .existing-tag {
+        cursor: pointer;
+    }
+
+    .existing-tag:hover {
+        outline: #b3d6ff;
+        outline-style: solid;
+    }
+</style>
 
 @code {
     [Parameter]
@@ -62,6 +71,14 @@
     private bool showErrors = false;
 
     private string nameInput;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        {
+            filteredTags = new(Tags);
+        }
+    }
 
     private async void HandleValidSubmit()
     {
