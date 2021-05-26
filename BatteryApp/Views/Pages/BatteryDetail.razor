@@ -1,5 +1,7 @@
 ﻿@page "/battery/{id:int}"
 
+@attribute [Authorize]
+
 @inject AuthenticationStateProvider _authStateProvider
 @inject NavigationManager _navManager
 @inject IConfiguration _configuration
@@ -21,318 +23,311 @@
 
 @inject IJSRuntime _jsRuntime
 
-<AuthorizeView Context="authContext">
-    <Authorized>
-        @if (charges == null)
+@if (charges == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="small mt-2">
+        <EditForm Context="formContext" Model="battery" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <!-- Battery Details -->
+            <div class="row mb-3">
+                <div class="col-lg-12">
+                    <div class="card border-square shadow-sm p-2 mt-2">
+                        <div class="row">
+                            <div class="col-lg-10">
+                                <div class="form-group row px-4">
+                                    <label for="battery-name-input" class="col-sm-1 col-form-label pr-0" style="font-size: 1.5rem">
+                                        <IconBattery />
+                                        @battery.Id
+                                    </label>
+                                    <div class="col-sm-11 p-0">
+                                        <InputText @bind-Value="@battery.Name" id="battery-name-input" class="form-control transparent-input strong-input-text" />
+                                        <ValidationMessage For="@(() => battery.Name)" />
+                                    </div>
+                                </div>
+                                <div class="row px-4">
+                                    <div class="col-sm-8">
+                                        <InputTextArea @bind-Value="@battery.Description" @oninput="@(e => ResizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control form-control-sm">@battery.Description</InputTextArea>
+                                        <ValidationMessage For="@(() => battery.Description)" />
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group row mb-2">
+                                            <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="created-input">Created: </label>
+                                            <div class="col">
+                                                <input type="text" value="@battery.Created.ToLocalTime().ToString(dateTimeFormat)" class="form-control form-control-sm" id="created-input" readonly />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-2">
+                                            <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="updated-input">Updated:</label>
+                                            <div class="col">
+                                                <input type="text" value="@battery.Updated.ToLocalTime().ToString(dateTimeFormat)" class="form-control form-control-sm" id="updated-input" readonly />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-2">
+                                            <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="battery-actvie-input">Active:</label>
+                                            <div class="col">
+                                                <InputCheckbox @bind-Value="@battery.IsActive" class="form-control form-control-sm form-check-inline" />
+                                                <ValidationMessage For="@(() => battery.IsActive)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="dropdown my-2 float-right">
+                                    <button class="btn btn-info border-square dropdown-toggle" type="button" id="dropdownOptionsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="oi oi-menu"></span>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right border-square" aria-labelledby="dropdownOptionsMenu">
+                                        <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_CategoryOptionsModal">Edit Categories</button>
+                                        <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_PriorityOptionsModal">Edit Priorities</button>
+                                        <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_StatusOptionsModal">Edit Statuses</button>
+                                        <div class="dropdown-divider"></div>
+                                        <button type="submit" class="dropdown-item">Save Battery</button>
+                                        <div class="dropdown-divider"></div>
+                                        <button class="dropdown-item" type="button" data-toggle="modal" data-target="#deleteBatteryModal">Delete Battery</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+        <div class="row mb-3">
+            <div class="col-lg-12">
+                <IndexTagList_Battery Tags="@tags"
+                                        TagCounts="@(btnClassActiveCharges == btnActive ? tagActiveCounts : tagAllCounts)"
+                                        FilterChargesByTag="@SearchTags"
+                                        SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
+            </div>
+        </div>
+
+        <!-- Status and Priority Score Cards -->
+        @*<div class="row mb-3">
+                <div class="col-lg-6">
+                    <div class="card border-square shadow-sm px-2 pt-2 pb-0">
+                        <div class="row mb-2">
+                            <div class="col-lg-12">
+                                <a class="link-black" role="button" href="" @onclick="@ToggleStatusScoreCard" @onclick:preventDefault="true">
+                                    <h6>
+                                        @if (showStatusScoreCard)
+                                        {
+                                            <span class="oi oi-caret-bottom"></span>
+
+                                        }
+                                        else
+                                        {
+                                            <span class="oi oi-caret-right"></span>
+                                        }
+                                        Status
+                                    </h6>
+                                </a>
+                            </div>
+                        </div>
+                        @if (showStatusScoreCard)
+                        {
+                            @foreach (var status in statuses.OrderBy(x => x.Order))
+                            {
+                                <div class="row mb-2">
+                                    <div class="col-lg-3 pl-4 d-flex align-items-center">
+                                        <p class="text-center">@status.Name</p>
+                                    </div>
+                                    <div class="col-lg-9">
+                                        <div class="card-deck px-2">
+                                            @foreach (var category in categories)
+                                            {
+                                                <CategoryCardCount Category="@category"
+                                                                    Count="charges.Where(x => x.CategoryId == category.Id && x.StatusId == status.Id).Count()"
+                                                                    FilterCharges="FilterChargesByStatus"
+                                                                    FilterId="@status.Id"></CategoryCardCount>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-square shadow-sm px-2 pt-2 pb-0">
+                        <div class="row mb-2">
+                            <div class="col-lg-12">
+                                <a class="link-black" role="button" href="" @onclick="@TogglePriorityScoreCard" @onclick:preventDefault="true">
+                                    <h6>
+                                        @if (showPriorityScoreCard)
+                                        {
+                                            <span class="oi oi-caret-bottom"></span>
+
+                                        }
+                                        else
+                                        {
+                                            <span class="oi oi-caret-right"></span>
+                                        }
+                                        Priority
+                                    </h6>
+                                </a>
+                            </div>
+                        </div>
+                        @if (showPriorityScoreCard)
+                        {
+                            @foreach (var priority in priorities.OrderBy(x => x.Severity))
+                            {
+                                <div class="row mb-2">
+                                    <div class="col-lg-3 pl-4">
+                                        <p class="align-self-center">@priority.DisplayName</p>
+                                    </div>
+                                    <div class="col-lg-9">
+                                        <div class="card-deck px-2">
+                                            @foreach (var category in categories)
+                                            {
+                                                <CategoryCardCount Category="@category"
+                                                                    Count="charges.Where(x => x.CategoryId == category.Id && x.PriorityId == priority.Id).Count()"></CategoryCardCount>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>*@
+        <!-- Search -->
+        <div class="row mb-3">
+            <div class="col-lg-12">
+                <div class="card border-square shadow-sm p-2">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-3">
+
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text border-0 bg-transparent mr-n5">
+                                        <span class="oi oi-magnifying-glass"></span>
+                                    </div>
+                                </div>
+                                <input type="text"
+                                        class="form-control py-2 border-square bg-transparent pl-5"
+                                        id="searchChargesInput"
+                                        placeholder="Search"
+                                        value="@searchText"
+                                        @oninput="@(e => Search(e))" />
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-info border-square" @onclick="@ClearSearch">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="float-right">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Buttons Card -->
+        <div class="row mb-3">
+            <div class="col-lg-12">
+                <div class="card border-square shadow-sm p-2">
+                    <div class="row justify-content-center">
+                        <div class="col-sm-12">
+                            <button data-toggle="modal" data-target="#chargeModal" class="btn btn-success btn-sm mx-2 px-3 border-square" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
+                            <BtnGroup_TwoButtons BtnOneClass="@btnClassActiveCharges"
+                                                    BtnOneText="Active"
+                                                    BtnOneAction="@SetActiveChargesFilter"
+                                                    BtnTwoClass="@btnClassAllCharges"
+                                                    BtnTwoText="All"
+                                                    BtnTwoAction="@SetAllChargesFilter"
+                                                    QuestionToolTipAlignment="Center"
+                                                    QuestionToolTipText="Toggle between Active Items (Open items or items completed within the last 3 days) and All Items"></BtnGroup_TwoButtons>
+                            <BtnGroup_TwoButtons BtnOneClass="@btnClassChargeCardView"
+                                                    BtnOneText="Card View"
+                                                    BtnOneAction="@ShowChargeCardView"
+                                                    BtnTwoClass="@btnClassChargeTableView"
+                                                    BtnTwoText="Table View"
+                                                    BtnTwoAction="@ShowChargeTableView"
+                                                    QuestionToolTipAlignment="Right"
+                                                    QuestionToolTipText="Toggle between displaying Charges in lanes with cards or in a table."></BtnGroup_TwoButtons>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (showChargeCardView)
         {
-            <p><em>Loading...</em></p>
+            <!-- Charge Item List by Status -->
+            <CascadingValue Name="Categories" Value="@categories">
+                <CascadingValue Name="Priorities" Value="@priorities">
+                    <CascadingValue Name="Statuses" Value="@statuses">
+                        <CascadingValue Name="SearchText" Value="@searchText">
+                            <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
+                                <ChargeCardList @bind-Child="@chargeObject"
+                                                Charges="@_search.GetCharges()"
+                                                chargesActiveCounts="@activeChargesCounts"
+                                                chargesInactiveCounts="@inactiveChargesCounts"
+                                                ParentStateChanged="@StateChanged"></ChargeCardList>
+                            </CascadingValue>
+                        </CascadingValue>
+                    </CascadingValue>
+                </CascadingValue>
+            </CascadingValue>
         }
         else
         {
-            <div class="small mt-2">
-                <EditForm Context="formContext" Model="battery" OnValidSubmit="@HandleValidSubmit">
-                    <DataAnnotationsValidator />
-                    <!-- Battery Details -->
-                    <div class="row mb-3">
-                        <div class="col-lg-12">
-                            <div class="card border-square shadow-sm p-2 mt-2">
-                                <div class="row">
-                                    <div class="col-lg-10">
-                                        <div class="form-group row px-4">
-                                            <label for="battery-name-input" class="col-sm-1 col-form-label pr-0" style="font-size: 1.5rem">
-                                                <IconBattery />
-                                                @battery.Id
-                                            </label>
-                                            <div class="col-sm-11 p-0">
-                                                <InputText @bind-Value="@battery.Name" id="battery-name-input" class="form-control transparent-input strong-input-text" />
-                                                <ValidationMessage For="@(() => battery.Name)" />
-                                            </div>
-                                        </div>
-                                        <div class="row px-4">
-                                            <div class="col-sm-8">
-                                                <InputTextArea @bind-Value="@battery.Description" @oninput="@(e => ResizeTextarea(e))" rows="@textareaRows" id="desc" class="form-control form-control-sm">@battery.Description</InputTextArea>
-                                                <ValidationMessage For="@(() => battery.Description)" />
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <div class="form-group row mb-2">
-                                                    <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="created-input">Created: </label>
-                                                    <div class="col">
-                                                        <input type="text" value="@battery.Created.ToLocalTime().ToString(dateTimeFormat)" class="form-control form-control-sm" id="created-input" readonly />
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row mb-2">
-                                                    <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="updated-input">Updated:</label>
-                                                    <div class="col">
-                                                        <input type="text" value="@battery.Updated.ToLocalTime().ToString(dateTimeFormat)" class="form-control form-control-sm" id="updated-input" readonly />
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row mb-2">
-                                                    <label class="col-form-label col-form-label-sm align-items-center w-10ch" for="battery-actvie-input">Active:</label>
-                                                    <div class="col">
-                                                        <InputCheckbox @bind-Value="@battery.IsActive" class="form-control form-control-sm form-check-inline" />
-                                                        <ValidationMessage For="@(() => battery.IsActive)" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <div class="dropdown my-2 float-right">
-                                            <button class="btn btn-info border-square dropdown-toggle" type="button" id="dropdownOptionsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span class="oi oi-menu"></span>
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-right border-square" aria-labelledby="dropdownOptionsMenu">
-                                                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_CategoryOptionsModal">Edit Categories</button>
-                                                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_PriorityOptionsModal">Edit Priorities</button>
-                                                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#batteryDetailExiting_StatusOptionsModal">Edit Statuses</button>
-                                                <div class="dropdown-divider"></div>
-                                                <button type="submit" class="dropdown-item">Save Battery</button>
-                                                <div class="dropdown-divider"></div>
-                                                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#deleteBatteryModal">Delete Battery</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </EditForm>
-                <div class="row mb-3">
-                    <div class="col-lg-12">
-                        <IndexTagList_Battery Tags="@tags"
-                                              TagCounts="@(btnClassActiveCharges == btnActive ? tagActiveCounts : tagAllCounts)"
-                                              FilterChargesByTag="@SearchTags"
-                                              SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
-                    </div>
-                </div>
-
-                <!-- Status and Priority Score Cards -->
-                @*<div class="row mb-3">
-                        <div class="col-lg-6">
-                            <div class="card border-square shadow-sm px-2 pt-2 pb-0">
-                                <div class="row mb-2">
-                                    <div class="col-lg-12">
-                                        <a class="link-black" role="button" href="" @onclick="@ToggleStatusScoreCard" @onclick:preventDefault="true">
-                                            <h6>
-                                                @if (showStatusScoreCard)
-                                                {
-                                                    <span class="oi oi-caret-bottom"></span>
-
-                                                }
-                                                else
-                                                {
-                                                    <span class="oi oi-caret-right"></span>
-                                                }
-                                                Status
-                                            </h6>
-                                        </a>
-                                    </div>
-                                </div>
-                                @if (showStatusScoreCard)
-                                {
-                                    @foreach (var status in statuses.OrderBy(x => x.Order))
-                                    {
-                                        <div class="row mb-2">
-                                            <div class="col-lg-3 pl-4 d-flex align-items-center">
-                                                <p class="text-center">@status.Name</p>
-                                            </div>
-                                            <div class="col-lg-9">
-                                                <div class="card-deck px-2">
-                                                    @foreach (var category in categories)
-                                                    {
-                                                        <CategoryCardCount Category="@category"
-                                                                           Count="charges.Where(x => x.CategoryId == category.Id && x.StatusId == status.Id).Count()"
-                                                                           FilterCharges="FilterChargesByStatus"
-                                                                           FilterId="@status.Id"></CategoryCardCount>
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                }
-
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="card border-square shadow-sm px-2 pt-2 pb-0">
-                                <div class="row mb-2">
-                                    <div class="col-lg-12">
-                                        <a class="link-black" role="button" href="" @onclick="@TogglePriorityScoreCard" @onclick:preventDefault="true">
-                                            <h6>
-                                                @if (showPriorityScoreCard)
-                                                {
-                                                    <span class="oi oi-caret-bottom"></span>
-
-                                                }
-                                                else
-                                                {
-                                                    <span class="oi oi-caret-right"></span>
-                                                }
-                                                Priority
-                                            </h6>
-                                        </a>
-                                    </div>
-                                </div>
-                                @if (showPriorityScoreCard)
-                                {
-                                    @foreach (var priority in priorities.OrderBy(x => x.Severity))
-                                    {
-                                        <div class="row mb-2">
-                                            <div class="col-lg-3 pl-4">
-                                                <p class="align-self-center">@priority.DisplayName</p>
-                                            </div>
-                                            <div class="col-lg-9">
-                                                <div class="card-deck px-2">
-                                                    @foreach (var category in categories)
-                                                    {
-                                                        <CategoryCardCount Category="@category"
-                                                                           Count="charges.Where(x => x.CategoryId == category.Id && x.PriorityId == priority.Id).Count()"></CategoryCardCount>
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                }
-                            </div>
-                        </div>
-                    </div>*@
-                <!-- Search -->
-                <div class="row mb-3">
-                    <div class="col-lg-12">
-                        <div class="card border-square shadow-sm p-2">
-                            <div class="row justify-content-center">
-                                <div class="col-lg-3">
-
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <div class="input-group-text border-0 bg-transparent mr-n5">
-                                                <span class="oi oi-magnifying-glass"></span>
-                                            </div>
-                                        </div>
-                                        <input type="text"
-                                               class="form-control py-2 border-square bg-transparent pl-5"
-                                               id="searchChargesInput"
-                                               placeholder="Search"
-                                               value="@searchText"
-                                               @oninput="@(e => Search(e))" />
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-info border-square" @onclick="@ClearSearch">Clear</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <div class="float-right">
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Buttons Card -->
-                <div class="row mb-3">
-                    <div class="col-lg-12">
-                        <div class="card border-square shadow-sm p-2">
-                            <div class="row justify-content-center">
-                                <div class="col-sm-12">
-                                    <button data-toggle="modal" data-target="#chargeModal" class="btn btn-success btn-sm mx-2 px-3 border-square" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
-                                    <BtnGroup_TwoButtons BtnOneClass="@btnClassActiveCharges"
-                                                         BtnOneText="Active"
-                                                         BtnOneAction="@SetActiveChargesFilter"
-                                                         BtnTwoClass="@btnClassAllCharges"
-                                                         BtnTwoText="All"
-                                                         BtnTwoAction="@SetAllChargesFilter"
-                                                         QuestionToolTipAlignment="Center"
-                                                         QuestionToolTipText="Toggle between Active Items (Open items or items completed within the last 3 days) and All Items"></BtnGroup_TwoButtons>
-                                    <BtnGroup_TwoButtons BtnOneClass="@btnClassChargeCardView"
-                                                         BtnOneText="Card View"
-                                                         BtnOneAction="@ShowChargeCardView"
-                                                         BtnTwoClass="@btnClassChargeTableView"
-                                                         BtnTwoText="Table View"
-                                                         BtnTwoAction="@ShowChargeTableView"
-                                                         QuestionToolTipAlignment="Right"
-                                                         QuestionToolTipText="Toggle between displaying Charges in lanes with cards or in a table."></BtnGroup_TwoButtons>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @if (showChargeCardView)
-                {
-                    <!-- Charge Item List by Status -->
-                    <CascadingValue Name="Categories" Value="@categories">
-                        <CascadingValue Name="Priorities" Value="@priorities">
-                            <CascadingValue Name="Statuses" Value="@statuses">
-                                <CascadingValue Name="SearchText" Value="@searchText">
-                                    <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
-                                        <ChargeCardList @bind-Child="@chargeObject"
-                                                        Charges="@_search.GetCharges()"
-                                                        chargesActiveCounts="@activeChargesCounts"
-                                                        chargesInactiveCounts="@inactiveChargesCounts"
-                                                        ParentStateChanged="@StateChanged"></ChargeCardList>
-                                    </CascadingValue>
-                                </CascadingValue>
+            <!-- Charge Table View-->
+            <CascadingValue Name="Categories" Value="@categories">
+                <CascadingValue Name="Priorities" Value="@priorities">
+                    <CascadingValue Name="Statuses" Value="@statuses">
+                        <CascadingValue Name="SearchText" Value="@searchText">
+                            <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
+                                <ChargeTable @bind-Child="@chargeObject"
+                                                @ref="@chargeTable"
+                                                Charges="@_search.GetCharges()"
+                                                ChargeChildrenCounts="@chargeChildrenCounts"
+                                                ParentStateChanged="@StateChanged"></ChargeTable>
                             </CascadingValue>
                         </CascadingValue>
                     </CascadingValue>
-                }
-                else
-                {
-                    <!-- Charge Table View-->
-                    <CascadingValue Name="Categories" Value="@categories">
-                        <CascadingValue Name="Priorities" Value="@priorities">
-                            <CascadingValue Name="Statuses" Value="@statuses">
-                                <CascadingValue Name="SearchText" Value="@searchText">
-                                    <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
-                                        <ChargeTable @bind-Child="@chargeObject"
-                                                     @ref="@chargeTable"
-                                                     Charges="@_search.GetCharges()"
-                                                     ChargeChildrenCounts="@chargeChildrenCounts"
-                                                     ParentStateChanged="@StateChanged"></ChargeTable>
-                                    </CascadingValue>
-                                </CascadingValue>
-                            </CascadingValue>
-                        </CascadingValue>
-                    </CascadingValue>
-                }
-
-            </div>
-            <!-- Modals -->
-            <ChargeDetailModal @ref="@chargeDetailModal"
-                               Charge="@chargeObject"
-                               Categories="@categories"
-                               Priorities="@priorities"
-                               Statuses="@statuses"
-                               ParentStateChanged="@StateChanged"></ChargeDetailModal>
-
-            <ChargeChildrenWarningModal Charge="@_chargeOpenChildrenModalHelper.Charge"
-                                        CompletedOpenChildren="@CompleteChargeWithChildren"
-                                        OpenChildren="@_chargeOpenChildrenModalHelper.OpenChildren"></ChargeChildrenWarningModal>
-
-            <BatteryDetailExisting_CategoryOptionsModal Battery="@battery" Categories="@categories" ParentStateChanged="@StateChanged"></BatteryDetailExisting_CategoryOptionsModal>
-            <BatteryDetailExisting_PriorityOptionsModal Battery="@battery" Priorities="@priorities" ParentStateChanged="@StateChanged"></BatteryDetailExisting_PriorityOptionsModal>
-            <BatteryDetailExisting_StatusOptionsModal Battery="@battery" Statuses="@statuses" ParentStateChanged="@StateChanged"></BatteryDetailExisting_StatusOptionsModal>
-
-            <DeleteBatteryModal Battery="@battery"
-                                ChargesCount="@allChargesCount"
-                                CategoriesCount="@categories.Count"
-                                PrioritiesCount="@priorities.Count"
-                                StatusesCount="@statuses.Count"></DeleteBatteryModal>
-
-            <ManageTagsModal Battery="@battery"
-                             Tags="@tags"
-                             TagActiveCounts="@tagActiveCounts"
-                             TagAllCounts="@tagAllCounts"
-                             ParentStateChanged="@TagsChanged"></ManageTagsModal>
+                </CascadingValue>
+            </CascadingValue>
         }
-    </Authorized>
-    <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Log in</a>
-    </NotAuthorized>
-</AuthorizeView>
+
+    </div>
+    <!-- Modals -->
+    <ChargeDetailModal @ref="@chargeDetailModal"
+                        Charge="@chargeObject"
+                        Categories="@categories"
+                        Priorities="@priorities"
+                        Statuses="@statuses"
+                        ParentStateChanged="@StateChanged"></ChargeDetailModal>
+
+    <ChargeChildrenWarningModal Charge="@_chargeOpenChildrenModalHelper.Charge"
+                                CompletedOpenChildren="@CompleteChargeWithChildren"
+                                OpenChildren="@_chargeOpenChildrenModalHelper.OpenChildren"></ChargeChildrenWarningModal>
+
+    <BatteryDetailExisting_CategoryOptionsModal Battery="@battery" Categories="@categories" ParentStateChanged="@StateChanged"></BatteryDetailExisting_CategoryOptionsModal>
+    <BatteryDetailExisting_PriorityOptionsModal Battery="@battery" Priorities="@priorities" ParentStateChanged="@StateChanged"></BatteryDetailExisting_PriorityOptionsModal>
+    <BatteryDetailExisting_StatusOptionsModal Battery="@battery" Statuses="@statuses" ParentStateChanged="@StateChanged"></BatteryDetailExisting_StatusOptionsModal>
+
+    <DeleteBatteryModal Battery="@battery"
+                        ChargesCount="@allChargesCount"
+                        CategoriesCount="@categories.Count"
+                        PrioritiesCount="@priorities.Count"
+                        StatusesCount="@statuses.Count"></DeleteBatteryModal>
+
+    <ManageTagsModal Battery="@battery"
+                        Tags="@tags"
+                        TagActiveCounts="@tagActiveCounts"
+                        TagAllCounts="@tagAllCounts"
+                        ParentStateChanged="@TagsChanged"></ManageTagsModal>
+}
+
 
 @code {
     [Parameter]
@@ -390,7 +385,7 @@
         RedirectUnAuthUser();
 
         // Get entities
-            categories = await _categoryService.Get(battery);
+        categories = await _categoryService.Get(battery);
         charges = await _chargeService.GetActive(battery);
         priorities = await _priorityService.Get(battery);
         statuses = await _statusService.Get(battery);
