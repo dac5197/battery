@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BatteryApp</title>
+    <title>@ViewData["Title"] - DACME Battery</title>
     <link rel="stylesheet" href="~/Identity/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/Identity/css/site.css" />
     <link rel="stylesheet" href="~/css/main.css" />
@@ -46,24 +46,30 @@
     <div class="container-fluid d-flex align-items-center justify-content-center h-100">
         <main role="main" class="pb-3" >
 
-                    <div class="card border-square shadow-sm p-4" style="width: 450px">
-                        <div class="row">
-                            <div class="col">
-                                <img src="/images/LogoBattery.png" class="img-fluid" />
-                                <h1 class="text-center" style="color: steelblue">DACME Battery</h1>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <hr />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                @RenderBody()
-                            </div>
-                        </div>
+            <div class="card border-square shadow-sm p-4" style="width: 450px">
+                <div class="row">
+                    <div class="col">
+                        <img src="/images/LogoBatteryBolt.png" class="img-fluid" />
+                        <h1 class="text-center" style="color: steelblue">DACME Battery</h1>
+                        <h6 class="text-center m-0">A To Do Web App</h6>
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <hr />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        @RenderBody()
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <p class="text-center text-muted m-0">&#64;2021 - DACME Battery - Donald Chaney</p>
+                    </div>
+                </div>
+            </div>
 
             
         </main>
