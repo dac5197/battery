@@ -83,3 +83,7 @@
     outline: #b3d6ff;
     outline-style: solid;
 }
+
+.min-fullscreen {
+    height: 100vh;
+}

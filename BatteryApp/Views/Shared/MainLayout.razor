@@ -2,22 +2,31 @@
 
 <div class="page">
     @*<div class="sidebar">
-        <NavMenu />
-    </div>*@
-    
-    <div class="main">
+            <NavMenu />
+        </div>*@
+
+    <div class="main min-fullscreen">
         <TopNavbar />
         @*<div class="top-row px-4 auth">
-            <LoginDisplay />
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>*@
+                <LoginDisplay />
+                <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            </div>*@
         @*<BreadcrumbNav />*@
         <div class="container no-padding">
             <BreadcrumbNav />
             @Body
         </div>
+
+        @*<nav class="navbar fixed-bottom navbar-light bg-light text-muted">
+                <div class="container">
+                    &copy; 2021 - BatteryApp - <a asp-area="" asp-page="Privacy">Privacy</a>
+                </div>
+            </nav>*@
+
     </div>
 </div>
+
+
 
 <style>
     .no-padding {
