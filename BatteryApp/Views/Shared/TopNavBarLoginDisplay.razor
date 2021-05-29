@@ -1,0 +1,15 @@
+﻿<AuthorizeView>
+    <Authorized>
+        <a class="dropdown-item" href="Identity/Account/Manage">Manage Identity</a>
+        <a class="dropdown-item" href="/profile">Manage Profile</a>
+        <div class="dropdown-divider"></div>
+        <form method="post" action="Identity/Account/LogOut">
+            <button type="submit" class="dropdown-item btn btn-link link-black link-no-underline">Logout</button>
+        </form>
+    </Authorized>
+    <NotAuthorized>
+        <a class="dropdown-item mx-2" href="Identity/Account/Register">Register</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item mx-2" href="Identity/Account/Login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
