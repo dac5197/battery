@@ -2,8 +2,75 @@
 
 @layout AdminLayout
 
-<h3>Admin Roles</h3>
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Identity;
+@inject AuthenticationStateProvider _authStateProvider
+@inject UserManager<IdentityUser> _UserManager
+@inject RoleManager<IdentityRole> _RoleManager
 
-@code {
 
+
+<div class="row">
+    <div class="col">
+        <h3>Admin - Roles</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <table class="table table-hover table-sm">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var role in roles)
+                {
+                    <tr>
+                        <td>@role.Name</td>
+                        <td>
+                            <button class="btn btn-info btn-sm border-square" type="button">
+                                Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm border-square" type="button">X</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="button"
+                class="btn btn-success btn-sm border-square"
+                data-toggle="modal"
+                data-target="#identityRoleModal"
+                style="width: 32px;"
+                title="Add Role"
+                @onclick="@SetEditRoleToNew">
+            <span class="oi oi-plus"></span>
+        </button>
+    </div>
+</div>
+
+<IdentityRoleDetailModal Role="@editRole" ParentStateChanged="@GetRoles"></IdentityRoleDetailModal>
+
+@code {        
+    private List<IdentityRole> roles = new();
+
+    private IdentityRole editRole = new();
+
+    protected override void OnInitialized()
+    {
+        GetRoles();
+    }
+
+    private void SetEditRoleToNew()
+    {
+        editRole = new();
+    }
+
+    protected void GetRoles()
+    {
+        roles = _RoleManager.Roles.ToList();
+        StateHasChanged();
+    }
 }
