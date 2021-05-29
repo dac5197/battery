@@ -1,0 +1,99 @@
+﻿@page "/admin/users"
+
+@layout AdminLayout
+
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Identity;
+@inject AuthenticationStateProvider _authStateProvider
+@inject UserManager<IdentityUser> _UserManager
+@inject RoleManager<IdentityRole> _RoleManager
+
+
+
+<div class="row">
+    <div class="col">
+        <h3>Admin - Users</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <table class="table table-hover table-sm">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>EmailConfirmed?</th>
+                    <th>Roles</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in users)
+                {
+                    <tr>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+                        <td>@user.EmailConfirmed</td>
+                        <td>
+                            @if (userRoles.ContainsKey(user.Id))
+                            {
+                                @foreach (var roleStr in userRoles[user.Id])
+                                {
+                                    @roleStr
+                                }
+                            }
+                        </td>
+                        <td>
+                            <button class="btn btn-info btn-sm border-square"type="button">
+                                Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm border-square" type="button">X</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        
+    </div>
+</div>
+
+@code {
+    private Dictionary<string, string> userRoles = new();
+
+    //private List<IdentityRole> roles = new();
+    private List<IdentityUser> users = new();
+
+
+    private IdentityUser editUser = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = _UserManager.Users.ToList();
+        await GetUserRoles();
+    }
+
+    private async Task GetUserRoles()
+    {
+        userRoles = new();
+
+        foreach (var user in users)
+        {
+            var roles = await _UserManager.GetRolesAsync(user);
+
+            string strRoles = "";
+
+            foreach (var role in roles)
+            {
+                strRoles = strRoles + role;
+            }
+
+            if (String.IsNullOrWhiteSpace(strRoles))
+            {
+                strRoles = "N/A";
+            }
+
+            userRoles.Add(user.Id, strRoles);
+        }
+    }
+
+}

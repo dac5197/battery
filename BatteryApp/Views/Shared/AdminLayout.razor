@@ -1,0 +1,44 @@
+﻿@inherits LayoutComponentBase
+
+@layout MainLayout
+
+@inject NavigationManager _navManager
+
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card border-square shadow-sm p-2 mt-2 h-100">
+            <h1>Admin</h1>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-2">
+        <div class="card border-square shadow-sm p-2 mt-2 h-100">
+            <h1>Menu</h1>
+            @*<NavLink class="btn btn-outline-primary border-square my-1" href="/admin">
+                Overview
+            </NavLink>*@
+            <NavLink class="btn btn-outline-primary border-square my-1" href="/admin/users">
+                Users
+            </NavLink>
+            <NavLink class="btn btn-outline-primary border-square my-1" href="/admin/roles">
+                Roles
+            </NavLink>
+            <NavLink class="btn btn-outline-primary border-square my-1">
+                Batteries
+            </NavLink>
+            <NavLink class="btn btn-outline-primary border-square my-1">
+                Charges
+            </NavLink>
+        </div>
+    </div>
+    <div class="col-md-10">
+        <div class="card border-square shadow-sm p-2 mt-2 h-100">
+            @Body
+        </div>
+    </div>
+</div>
+
+@code {
+
+}
