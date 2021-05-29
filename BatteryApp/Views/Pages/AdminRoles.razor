@@ -25,12 +25,16 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var role in roles)
+                @foreach (var role in roles.OrderBy(x => x.Name))
                 {
                     <tr>
                         <td>@role.Name</td>
                         <td>
-                            <button class="btn btn-info btn-sm border-square" type="button">
+                            <button type="button" 
+                                    class="btn btn-info btn-sm border-square" 
+                                    data-toggle="modal"
+                                    data-target="#identityRoleModal"
+                                    @onclick="@(() => SetEditRoleToExisting(role))">
                                 Edit
                             </button>
                             <button class="btn btn-danger btn-sm border-square" type="button">X</button>
@@ -51,12 +55,13 @@
     </div>
 </div>
 
-<IdentityRoleDetailModal Role="@editRole" ParentStateChanged="@GetRoles"></IdentityRoleDetailModal>
+<IdentityRoleDetailModal Role="@editRole" RoleName="@editRole.Name" ParentStateChanged="@GetRoles"></IdentityRoleDetailModal>
 
 @code {        
     private List<IdentityRole> roles = new();
 
     private IdentityRole editRole = new();
+
 
     protected override void OnInitialized()
     {
@@ -68,9 +73,21 @@
         editRole = new();
     }
 
-    protected void GetRoles()
+    private void GetRoles()
     {
-        roles = _RoleManager.Roles.ToList();
+        editRole = new();
+        
+        roles = new(_RoleManager.Roles.ToList());
         StateHasChanged();
+    }
+
+    private void SetEditRoleToExisting(IdentityRole role)
+    {
+        editRole = role;
+    }
+
+    private async void DeleteRole(IdentityRole role)
+    {
+        await _RoleManager.DeleteAsync(role);
     }
 }
