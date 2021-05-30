@@ -37,7 +37,11 @@
                                     @onclick="@(() => SetEditRoleToExisting(role))">
                                 Edit
                             </button>
-                            <button class="btn btn-danger btn-sm border-square" type="button">X</button>
+                            <button type="button" 
+                                    class="btn btn-danger btn-sm border-square" 
+                                    data-toggle="modal"
+                                    data-target="#confirmDeleteModal"
+                                    @onclick="@(() => SetEditRoleToExisting(role))">X</button>
                         </td>
                     </tr>
                 }
@@ -55,7 +59,16 @@
     </div>
 </div>
 
+<!-- Modals -->
 <IdentityRoleDetailModal Role="@editRole" RoleName="@editRole.Name" ParentStateChanged="@GetRoles"></IdentityRoleDetailModal>
+<ConfirmDeleteModal ModalTitle="Confirm Delete" ParentDeleteAction="@DeleteRole">
+    <ModalBody>
+        <p>Role: @editRole.Name</p>
+        <br />
+        <p>Deleting this Role will delete it and all associations with Users.</p>
+        <p>Do you want to continue?</p>
+    </ModalBody>
+</ConfirmDeleteModal>
 
 @code {        
     private List<IdentityRole> roles = new();
@@ -76,7 +89,7 @@
     private void GetRoles()
     {
         editRole = new();
-        
+
         roles = new(_RoleManager.Roles.ToList());
         StateHasChanged();
     }
@@ -86,8 +99,9 @@
         editRole = role;
     }
 
-    private async void DeleteRole(IdentityRole role)
+    private async void DeleteRole()
     {
-        await _RoleManager.DeleteAsync(role);
+        await _RoleManager.DeleteAsync(editRole);
+        GetRoles();
     }
 }

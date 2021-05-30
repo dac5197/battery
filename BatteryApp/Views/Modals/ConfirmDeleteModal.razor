@@ -1,0 +1,47 @@
+﻿
+@inject IJSRuntime _jsRuntime
+
+<div class="modal fade" tabindex="-1" role="dialog" id="confirmDeleteModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content border-square">
+            <div class="modal-header">
+                <h5 class="modal-title">@ModalTitle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @ModalBody
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger border-square" @onclick="@Delete">Delete</button>
+                <button type="button" class="btn btn-secondary border-square" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public Action ParentDeleteAction { get; set; }
+
+    [Parameter]
+    public string ModalTitle { get; set; }
+
+    [Parameter]
+    public RenderFragment ModalBody { get; set; }
+
+    private async void Delete()
+    {
+        ParentDeleteAction.Invoke();
+
+        await CloseModal();
+    }
+
+    private async Task CloseModal()
+    {
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "confirmDeleteModal");
+    }
+
+}
