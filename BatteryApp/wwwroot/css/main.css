@@ -87,3 +87,10 @@
 .min-fullscreen {
     height: 100vh;
 }
+
+.tag-badge {
+    color: black;
+    background-color: #cce4ff;
+    font-weight: normal;
+    font-size: small;
+}

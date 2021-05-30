@@ -1,7 +1,7 @@
 ﻿@inject ISearchUtil _search
 @inject ITagController _tagController
 
-<div class="badge tag-badge-charge border-square m-1 @(Tag.Id == _search.GetTag().Id ? "searched-tag" : "")">
+<div class="badge tag-badge border-square m-1 @(Tag.Id == _search.GetTag().Id ? "searched-tag" : "")">
     @Tag.Name
     @if (IsReadonly == false)
     {

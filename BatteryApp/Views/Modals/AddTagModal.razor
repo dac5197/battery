@@ -30,7 +30,7 @@
                 @foreach (var tag in filteredTags)
                 {
 
-                    <div class="badge tag-badge-charge existing-tag border-square m-1" @onclick="@(() => AddExistingTag(tag))">
+                    <div class="badge tag-badge existing-tag border-square m-1" @onclick="@(() => AddExistingTag(tag))">
                         @tag.Name
                     </div>
                 }
