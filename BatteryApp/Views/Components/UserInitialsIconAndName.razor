@@ -1,0 +1,15 @@
+﻿@if (UserProfile is not null)
+{
+    <IconUserInitials UserProfile="@UserProfile"></IconUserInitials>@($"{UserProfile.FirstName} {UserProfile.LastName}") 
+}
+else
+{
+    <NavLink href="profile">Create User Profile</NavLink>
+}
+
+@code {
+
+    [Parameter]
+    public UserProfile UserProfile { get; set; }
+
+}

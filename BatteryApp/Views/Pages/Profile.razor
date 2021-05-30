@@ -1,6 +1,7 @@
 ﻿@page "/profile"
 
 @inject AuthenticationStateProvider _authStateProvider
+@inject IBreadcrumbManager _breadcrumb
 @inject IUserProfileService _userProfileService
 
 
@@ -45,7 +46,8 @@
                 <div class="row mb-3">
                     <div class="col">
                         <h6 class="mb-3">Preview</h6>
-                        <p><IconUserInitials UserProfile="@userProfile"></IconUserInitials>@userProfile.FirstName @userProfile.LastName</p>
+                        @*<p><IconUserInitials UserProfile="@userProfile"></IconUserInitials>@userProfile.FirstName @userProfile.LastName</p>*@
+                        <p><UserInitialsIconAndName UserProfile="@userProfile"></UserInitialsIconAndName></p>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -76,6 +78,9 @@
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
         await GetUserProfile();
+
+        // Hide the breadcrump nav
+        _breadcrumb.Hide();
     }
 
     private async void HandleValidSumbit()

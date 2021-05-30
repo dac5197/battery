@@ -161,8 +161,15 @@
                 </div>
                 <div class="col-lg-3">
                     <h6>Owner</h6>
-
-                    <p><IconUserInitials UserProfile="@userProfile"></IconUserInitials>@userProfile.FirstName @userProfile.LastName</p>
+                    @*@if (userProfile is null)
+                    {
+                        <NavLink href="profile">Create User Profile</NavLink>
+                    }
+                     else
+	                {
+                        <p><IconUserInitials UserProfile="@userProfile"></IconUserInitials>@userProfile.FirstName @userProfile.LastName</p>
+	                }*@
+                    <p><UserInitialsIconAndName UserProfile="@userProfile"></UserInitialsIconAndName></p>
                 </div>
                 <div class="col-lg-3 align-items-center">
                     <h6>Collaborators</h6>
