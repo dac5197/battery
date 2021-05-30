@@ -1,17 +1,113 @@
 ﻿@page "/profile"
 
-@inject IUserProfileService _profileService
+@inject AuthenticationStateProvider _authStateProvider
+@inject IUserProfileService _userProfileService
 
 
 <div class="row">
-    <div class="col-md-8">
-        <div class="card border-square shadow-sm p-2 mt-2">
-            <h3>UserProfile</h3>
+    <div class="col">
+
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-square shadow-sm px-3 py-2 mt-2">
+            <div class="row mt-3 mb-4">
+                <div class="col">
+                    <h3>My Profile</h3>
+                </div>
+            </div>
+            <EditForm Model="@userProfile" OnValidSubmit="HandleValidSumbit">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="userprofile-email-input">Email</label>
+                        <InputText @bind-Value="@userProfile.Email" id="userprofile-email-input" class="form-control border-square" />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="userprofile-firstname-input">First Name</label>
+                        <InputText @bind-Value="@userProfile.FirstName" id="userprofile-firstname-input" class="form-control border-square" />
+                    </div>
+                    <div class="col">
+                        <label for="userprofile-firstname-input">Last Name</label>
+                        <InputText @bind-Value="@userProfile.LastName" id="userprofile-lastname-input" class="form-control border-square" />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="userprofile-firstname-input">Font Color</label>
+                        <InputText @bind-Value="@userProfile.FontColor" id="userprofile-firstname-input" class="form-control border-square" type="color" />
+                    </div>
+                    <div class="col">
+                        <label for="userprofile-firstname-input">BG Color</label>
+                        <InputText @bind-Value="@userProfile.BgColor" id="userprofile-lastname-input" class="form-control border-square" type="color" />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <h6 class="mb-3">Preview</h6>
+                        <p><IconUserInitials UserProfile="@userProfile"></IconUserInitials>@userProfile.FirstName @userProfile.LastName</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary border-square">@(isNewProfile ? "Create": "Save")</button>
+                    </div>
+                </div>
+            </EditForm>
         </div>
+    </div>
+    <div class="col">
+
     </div>
 </div>
 
 
 @code {
+    private UserProfile userProfile = new();
+
+    private bool isNewProfile;
+
+    private string userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get User Id
+        var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
+        userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        await GetUserProfile();
+    }
+
+    private async void HandleValidSumbit()
+    {
+        if (isNewProfile)
+        {
+            await _userProfileService.Add(userProfile);
+        }
+        else
+        {
+            await _userProfileService.Update(userProfile);
+        }
+
+        await GetUserProfile();
+        StateHasChanged();
+    }
+
+    private async Task GetUserProfile()
+    {
+        userProfile = await _userProfileService.Get(userId);
+
+        isNewProfile = false;
+
+        if (userProfile is null)
+        {
+            isNewProfile = true;
+            userProfile = new();
+            userProfile.Id = userId;
+            var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
+            userProfile.Email = user.FindFirst(c => c.Type.Contains("emailaddress"))?.Value;
+        }
+    }
+
 
 }

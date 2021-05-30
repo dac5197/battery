@@ -381,7 +381,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Get User Profile
+        // Get User Id
         var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
