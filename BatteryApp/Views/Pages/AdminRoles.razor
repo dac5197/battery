@@ -21,6 +21,7 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Assignment Count</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -29,6 +30,7 @@
                 {
                     <tr>
                         <td>@role.Name</td>
+                        <td>@roleAssignmentCount[role.Name]</td>
                         <td>
                             <button type="button" 
                                     class="btn btn-info btn-sm border-square" 
@@ -71,19 +73,31 @@
 </ConfirmDeleteModal>
 
 @code {        
+    private Dictionary<string, int> roleAssignmentCount = new();
+
     private List<IdentityRole> roles = new();
 
     private IdentityRole editRole = new();
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         GetRoles();
+        await CountUsersAssignedToRole();
     }
 
-    private void SetEditRoleToNew()
+    private async Task CountUsersAssignedToRole()
     {
-        editRole = new();
+        var users = _UserManager.Users.ToList();
+
+        InitializeRoleAssignmentCountDictionary();
+
+        foreach (var user in users)
+        {
+            var userRoles = await _UserManager.GetRolesAsync(user);
+
+            CountRoles(userRoles);
+        }
     }
 
     private void GetRoles()
@@ -99,9 +113,33 @@
         editRole = role;
     }
 
+    private void SetEditRoleToNew()
+    {
+        editRole = new();
+    }
+
     private async void DeleteRole()
     {
         await _RoleManager.DeleteAsync(editRole);
         GetRoles();
+    }
+
+    private void InitializeRoleAssignmentCountDictionary()
+    {
+        foreach (var role in roles)
+        {
+            roleAssignmentCount.Add(role.Name, 0);
+        }
+    }
+
+    private void CountRoles(IList<string> userRoles)
+    {
+        foreach (var role in userRoles)
+        {
+            if (roleAssignmentCount.ContainsKey(role))
+            {
+                roleAssignmentCount[role]++;
+            }
+        }
     }
 }

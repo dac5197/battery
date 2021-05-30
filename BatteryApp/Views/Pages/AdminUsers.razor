@@ -17,13 +17,15 @@
 </div>
 <div class="row">
     <div class="col">
-        <table class="table table-hover table-sm">
+        <table class="table table-hover table-sm small">
             <thead>
                 <tr>
                     <th>Username</th>
                     <th>Email</th>
                     <th>EmailConfirmed?</th>
                     <th>Roles</th>
+                    <th>Battery Count</th>
+                    <th>Charge Count</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -43,11 +45,19 @@
                                 }
                             }
                         </td>
+                        <td></td>
+                        <td></td>
                         <td>
-                            <button class="btn btn-info btn-sm border-square"type="button">
+                            <button type="button"
+                                    class="btn btn-info btn-sm border-square"
+                                    data-toggle="modal"
+                                    data-target="#identityUserModal"
+                                    @onclick="@(() => SetEditUserToExisting(user))">
                                 Edit
                             </button>
-                            <button class="btn btn-danger btn-sm border-square" type="button">X</button>
+                            <button type="button" 
+                                    class="btn btn-danger btn-sm border-square" 
+                                    @onclick="@(() => SetEditUserToExisting(user))">X</button>
                         </td>
                     </tr>
                 }
@@ -57,19 +67,34 @@
     </div>
 </div>
 
-@code {
-    private Dictionary<string, string> userRoles = new();
+<!-- Modals -->
+<IdentityUserDetailModal User="editUser" UserRoles="@editUserRoles" AllRoles="@allRoles" ParentStateChanged="@GetUsers"></IdentityUserDetailModal>
 
-    //private List<IdentityRole> roles = new();
+
+@code {
+    private Dictionary<string, List<string>> userRoles = new();
+
     private List<IdentityUser> users = new();
 
+    private List<string> allRoles = new();
+
+    private List<string> editUserRoles = new();
 
     private IdentityUser editUser = new();
 
     protected override async Task OnInitializedAsync()
     {
         users = _UserManager.Users.ToList();
+        allRoles = _RoleManager.Roles.Select(x => x.Name).ToList();
         await GetUserRoles();
+    }
+
+    private async void GetUsers()
+    {
+        editUser = new();
+        users = new(_UserManager.Users.ToList());
+        await GetUserRoles();
+        StateHasChanged();
     }
 
     private async Task GetUserRoles()
@@ -80,20 +105,33 @@
         {
             var roles = await _UserManager.GetRolesAsync(user);
 
-            string strRoles = "";
+            userRoles.Add(user.Id, roles.ToList());
 
-            foreach (var role in roles)
-            {
-                strRoles = strRoles + role;
-            }
+            //string strRoles = "";
 
-            if (String.IsNullOrWhiteSpace(strRoles))
-            {
-                strRoles = "N/A";
-            }
+            //foreach (var role in roles)
+            //{
+            //    userRoles.Add(user.Id, role);
+            //}
 
-            userRoles.Add(user.Id, strRoles);
+            //if (String.IsNullOrWhiteSpace(strRoles))
+            //{
+            //    strRoles = "N/A";
+            //}
+
+            //userRoles.Add(user.Id, strRoles);
         }
+    }
+
+    private void SetEditUserToNew()
+    {
+        editUser = new();
+    }
+
+    private void SetEditUserToExisting(IdentityUser user)
+    {
+        editUser = user;
+        editUserRoles = new(userRoles[user.Id]);
     }
 
 }

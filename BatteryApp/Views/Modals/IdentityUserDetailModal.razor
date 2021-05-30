@@ -1,0 +1,293 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@inject UserManager<IdentityUser> _UserManager
+@inject RoleManager<IdentityRole> _RoleManager
+@inject IJSRuntime _jsRuntime
+
+<div class="modal fade" tabindex="-1" role="dialog" id="identityUserModal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-square">
+            <div class="modal-header">
+                <h5 class="modal-title">Identity Role Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="HandleClose">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="@User">
+                    <DataAnnotationsValidator />
+                    @if (showErrors)
+                    {
+                        <CustomFormErrors Errors="@errors" />
+                    }
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="title">UserName</label>
+                                <InputText @bind-Value="@User.Id" id="title" class="form-control border-square" readonly />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="title">Username</label>
+                                <InputText @bind-Value="@userUserName" id="title" class="form-control border-square" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="title">Email</label>
+                                <InputText @bind-Value="@userEmail" id="title" class="form-control border-square" type="email" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col px-4">
+                            <div class="form-check">
+                                <InputCheckbox @bind-Value="@userEmailConfirmed" class="form-check-input" type="checkbox" id="emailConfirmedCheckbox" />
+                                <label class="form-check-label" for="emailConfirmedCheckbox">
+                                    Email Confirmed?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <p>Roles</p>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="card border-square h-100">
+                                            <div class="card-header px-2 py-1">All Roles</div>
+                                            <div class="card-body small p-1">
+                                                <div class="list-group list-group-flush">
+                                                    @foreach (var role in AllRoles.Where(x => !UserRoles.Contains(x)))
+                                                    {
+                                                        <button type="button"
+                                                                class="list-group-item list-group-item-action border-square px-2 py-1 @(selectedAddRoles.Contains(role) ? "active" : "")"
+                                                                @onclick="@(() => ToggleRoleToSelectedAddRole(role))">
+                                                            @role
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-1 mx-1 px-1">
+                                        <button type="button"
+                                                class="btn btn-secondary btn-sm border-square mb-2"
+                                                style="width: 32px;"
+                                                title="Add Role"
+                                                @onclick="@AddRoles">
+                                            <span class="oi oi-chevron-right"></span>
+                                        </button>
+                                        <br />
+                                        <button type="button"
+                                                class="btn btn-secondary btn-sm border-square"
+                                                style="width: 32px;"
+                                                title="Remove Role"
+                                                @onclick="RemoveRoles">
+                                            <span class="oi oi-chevron-left"></span>
+                                        </button>
+                                    </div>
+                                    <div class="col">
+                                        <div class="card border-square h-100">
+                                            <div class="card-header  px-2 py-1">User's Roles</div>
+                                            <div class="card-body small p-1">
+                                                <div class="list-group list-group-flush">
+                                                    @foreach (var role in UserRoles)
+                                                    {
+                                                        <button type="button"
+                                                                class="list-group-item list-group-item-action border-square px-2 py-1 @(selectedRemoveRoles.Contains(role) ? "active" : "")"
+                                                                @onclick="@(() => ToggleRoleToSelectedRemoveRole(role))">
+                                                            @role
+                                                        </button>
+                                                    }
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary border-square" @onclick="@HandleSubmit">Submit</button>
+                            <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="HandleClose">Cancel</button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public List<string> UserRoles { get; set; }
+
+    [Parameter]
+    public List<string> AllRoles { get; set; }
+
+    [Parameter]
+    public IdentityUser User { get; set; }
+
+    [Parameter]
+    public Action ParentStateChanged { get; set; }
+
+    private Dictionary<string, List<string>> errors = new();
+
+    private List<string> selectedAddRoles = new();
+    private List<string> selectedRemoveRoles = new();
+
+    private bool showErrors = false;
+    private bool userEmailConfirmed;
+
+    private string userUserName;
+    private string userEmail;
+
+    protected override void OnParametersSet()
+    {
+        userUserName = User.UserName;
+        userEmail = User.Email;
+        userEmailConfirmed = User.EmailConfirmed;
+        base.OnParametersSet();
+    }
+
+    private async void HandleSubmit()
+    {
+        ClearErrors();
+
+        Validate_NullOrWhiteSpace("Username", userUserName);
+        Validate_NullOrWhiteSpace("Email", userEmail);
+
+        if (errors.Count() > 0)
+        {
+            showErrors = true;
+        }
+        else
+        {
+            User.UserName = userUserName;
+            User.Email = userEmail;
+            User.EmailConfirmed = userEmailConfirmed;
+            await _UserManager.UpdateAsync(User);
+
+            await HandleRemoveUserRoles();
+            await HandleAddUserRoles();
+
+            await CloseModal();
+            ParentStateChanged.Invoke();
+        }
+    }
+
+    private async Task HandleAddUserRoles()
+    {
+        foreach (var role in UserRoles)
+        {
+            bool isInRole = await _UserManager.IsInRoleAsync(User,role);
+
+            if (isInRole == false)
+            {
+                await _UserManager.AddToRoleAsync(User, role);
+            }
+        }
+    }
+
+    private async Task HandleRemoveUserRoles()
+    {
+        var removeRoles = AllRoles.Where(x => !UserRoles.Contains(x)).ToList();
+
+        foreach (var role in removeRoles)
+        {
+            bool isInRole = await _UserManager.IsInRoleAsync(User, role);
+
+            if (isInRole)
+            {
+                await _UserManager.RemoveFromRoleAsync(User, role);
+            }
+        }
+    }
+
+    private void ClearSelectRoles()
+    {
+        selectedAddRoles = new();
+        selectedRemoveRoles = new();
+    }
+
+    private void ToggleRoleToSelectedAddRole(string role)
+    {
+        if (selectedAddRoles.Contains(role))
+        {
+            selectedAddRoles.Remove(role);
+            return;
+        }
+
+        selectedAddRoles.Add(role);
+    }
+
+    private void ToggleRoleToSelectedRemoveRole(string role)
+    {
+        if (selectedRemoveRoles.Contains(role))
+        {
+            selectedRemoveRoles.Remove(role);
+            return;
+        }
+
+        selectedRemoveRoles.Add(role);
+    }
+
+    private void AddRoles()
+    {
+        UserRoles.AddRange(selectedAddRoles);
+        ClearSelectRoles();
+    }
+
+    private void RemoveRoles()
+    {
+        foreach (var role in selectedRemoveRoles)
+        {
+            UserRoles.Remove(role);
+        }
+        ClearSelectRoles();
+    }
+
+    private async Task CloseModal()
+    {
+
+        await _jsRuntime.InvokeAsync<object>("CloseModal", "identityUserModal");
+    }
+
+    private void ClearErrors()
+    {
+        showErrors = false;
+        errors = new();
+    }
+
+    private void HandleClose()
+    {
+        ClearErrors();
+        ParentStateChanged.Invoke();
+    }
+
+    private void Validate_NullOrWhiteSpace(string fieldName, string fieldValue)
+    {
+        List<string> messages = new();
+
+        if (String.IsNullOrWhiteSpace(fieldValue))
+        {
+            messages.Add($"Value is empty.  Please enter a {fieldName}.");
+            errors.Add(fieldName, messages);
+        }
+    }
+
+    private void Validate_EmailAddress(string fieldName, string fieldValue)
+        {
+
+        }
+}
