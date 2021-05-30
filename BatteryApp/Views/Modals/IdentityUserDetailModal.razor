@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity;
 @inject UserManager<IdentityUser> _UserManager
 @inject RoleManager<IdentityRole> _RoleManager
+@inject IIdentityUserValidator _userValidator
 @inject IJSRuntime _jsRuntime
 
 <div class="modal fade" tabindex="-1" role="dialog" id="identityUserModal">
@@ -164,8 +165,10 @@
     {
         ClearErrors();
 
-        Validate_NullOrWhiteSpace("Username", userUserName);
-        Validate_NullOrWhiteSpace("Email", userEmail);
+        _userValidator.Validate("Username", userUserName, false);
+        _userValidator.Validate("Email", userEmail, true);
+
+        errors = _userValidator.GetErrors();
 
         if (errors.Count() > 0)
         {
@@ -267,6 +270,7 @@
     {
         showErrors = false;
         errors = new();
+        _userValidator.ClearErrors();
     }
 
     private void HandleClose()
@@ -275,19 +279,4 @@
         ParentStateChanged.Invoke();
     }
 
-    private void Validate_NullOrWhiteSpace(string fieldName, string fieldValue)
-    {
-        List<string> messages = new();
-
-        if (String.IsNullOrWhiteSpace(fieldValue))
-        {
-            messages.Add($"Value is empty.  Please enter a {fieldName}.");
-            errors.Add(fieldName, messages);
-        }
-    }
-
-    private void Validate_EmailAddress(string fieldName, string fieldValue)
-        {
-
-        }
 }
