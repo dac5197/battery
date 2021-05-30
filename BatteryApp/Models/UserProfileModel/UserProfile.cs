@@ -18,10 +18,12 @@ namespace BatteryApp.Models.UserProfileModel
         [EmailAddress]
         public string Email { get; set; }
 
+        [Required]
         [MaxLength(100)]
         [DisplayName("First Name")]
         public string FirstName { get; set; }
 
+        [Required]
         [MaxLength(100)]
         [DisplayName("Last Name")]
         public string LastName { get; set; }
@@ -38,8 +40,18 @@ namespace BatteryApp.Models.UserProfileModel
         {
             get
             {
-                return $"{FirstName?.Substring(0, 1).ToUpper()}{LastName?.Substring(0, 1).ToUpper()}";
+                return $"{GetInitial(FirstName).ToUpper()}{GetInitial(LastName).ToUpper()}";
             }
+        }
+
+        private static string GetInitial(string Name)
+        {
+            if (String.IsNullOrWhiteSpace(Name))
+            {
+                return "";
+            }
+
+            return Name.Substring(0, 1);
         }
     }
 }

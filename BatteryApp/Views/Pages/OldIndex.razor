@@ -1,5 +1,7 @@
 ﻿@page "/oldindex"
 
+@attribute [Authorize]
+
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
@@ -37,7 +39,7 @@ Welcome to your new app.
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        
+
         if (user.Identity.IsAuthenticated)
         {
             _authMessage = $"{user.Identity.Name} is authenticated.";
