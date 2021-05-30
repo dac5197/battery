@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity;
 @inject RoleManager<IdentityRole> _RoleManager
+@inject IIdentityRoleValidator _roleValidator
 @inject IJSRuntime _jsRuntime
 
 <div class="modal fade" tabindex="-1" role="dialog" id="identityRoleModal">
@@ -55,7 +56,9 @@
     {
         ClearErrors();
 
-        ValidateRole();
+        _roleValidator.Validate("Name", RoleName);
+
+        errors = _roleValidator.GetErrors();
 
         if (errors.Count() > 0)
         {
@@ -99,23 +102,11 @@
         await _jsRuntime.InvokeAsync<object>("CloseModal", "identityRoleModal");
     }
 
-    private void ValidateRole()
-    {
-        string key = "Role";
-        List<string> messages = new();
-
-        if (String.IsNullOrWhiteSpace(RoleName))
-        {
-            messages.Add("Name is empty.  Please enter a Role name.");
-            errors.Add(key, messages);
-        }
-
-    }
-
     private void ClearErrors()
     {
         showErrors = false;
         errors = new();
+        _roleValidator.ClearErrors();
     }
 
     private void HandleClose()

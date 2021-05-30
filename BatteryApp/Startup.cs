@@ -89,6 +89,7 @@ namespace BatteryApp
             // Add Project Validators
             services.AddTransient<IBatteryAdvancedOptionsValidator, BatteryAdvancedOptionsValidator>();
             services.AddTransient<ICategoryValidator, CategoryValidator>();
+            services.AddTransient<IIdentityRoleValidator, IdentityRoleValidator>();
             services.AddTransient<IIdentityUserValidator, IdentityUserValidator>();
             services.AddTransient<IPriorityValidator, PriorityValidator>();
             services.AddTransient<IStatusValidator, StatusValidator>();

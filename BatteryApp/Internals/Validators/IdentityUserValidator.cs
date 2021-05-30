@@ -23,7 +23,7 @@ namespace BatteryApp.Internals.Validators
 
             if (isEmail && !String.IsNullOrWhiteSpace(fieldValue))
             {
-                messages.Add(Validate_EmailAddress(fieldName, fieldValue));
+                messages.Add(Validate_EmailAddress(fieldValue));
             }
 
             AddToErrors(fieldName, messages);
@@ -41,7 +41,7 @@ namespace BatteryApp.Internals.Validators
             return tempMessage;
         }
 
-        private static string Validate_EmailAddress(string fieldName, string fieldValue)
+        private static string Validate_EmailAddress(string fieldValue)
         {
             string tempMessage;
 
