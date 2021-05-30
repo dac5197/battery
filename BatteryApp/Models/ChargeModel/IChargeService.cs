@@ -10,6 +10,7 @@ namespace BatteryApp.Models.ChargeModel
         Task Delete(int id);
         Task<List<Charge>> Get();
         Task<Charge> Get(int id);
+        Task<List<Charge>> Get(string userId);
         Task<List<Charge>> Get(Battery battery);
         Task<List<Charge>> GetActive();
         Task<List<Charge>> GetActive(Battery battery);
@@ -19,6 +20,7 @@ namespace BatteryApp.Models.ChargeModel
         Task<List<Charge>> GetActiveParentsAndChildren(Battery battery);
         Task<List<Charge>> GetActiveParentsAndChildren(string userId);
         Task<List<Charge>> GetChildren(Charge charge);
+        Task<int> GetCount(string userId);
         Task<Charge> GetParent(Charge charge);
         Task<Charge> SetUpdated(int chargeId);
         Task<Charge> Update(Charge charge);

@@ -8,7 +8,8 @@
 @inject UserManager<IdentityUser> _UserManager
 @inject RoleManager<IdentityRole> _RoleManager
 
-
+@inject IBatteryService _batteryService
+@inject IChargeService _chargeService
 
 <div class="row">
     <div class="col">
@@ -41,12 +42,12 @@
                             {
                                 @foreach (var roleStr in userRoles[user.Id])
                                 {
-                                    @roleStr
+                                    @($"{roleStr} ")
                                 }
                             }
                         </td>
-                        <td></td>
-                        <td></td>
+                        <td>@userBatteryCounts.GetValueOrDefault(user.Id)</td>
+                        <td>@userChargeCounts.GetValueOrDefault(user.Id)</td>
                         <td>
                             <button type="button"
                                     class="btn btn-info btn-sm border-square"
@@ -55,15 +56,17 @@
                                     @onclick="@(() => SetEditUserToExisting(user))">
                                 Edit
                             </button>
-                            <button type="button" 
-                                    class="btn btn-danger btn-sm border-square" 
-                                    @onclick="@(() => SetEditUserToExisting(user))">X</button>
+                            <button type="button"
+                                    class="btn btn-danger btn-sm border-square"
+                                    @onclick="@(() => SetEditUserToExisting(user))">
+                                X
+                            </button>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-        
+
     </div>
 </div>
 
@@ -73,6 +76,8 @@
 
 @code {
     private Dictionary<string, List<string>> userRoles = new();
+    private Dictionary<string, int> userBatteryCounts = new();
+    private Dictionary<string, int> userChargeCounts = new();
 
     private List<IdentityUser> users = new();
 
@@ -87,6 +92,19 @@
         users = _UserManager.Users.ToList();
         allRoles = _RoleManager.Roles.Select(x => x.Name).ToList();
         await GetUserRoles();
+        await InitializeCounts();
+    }
+
+    private async Task InitializeCounts()
+    {
+        foreach (var user in users)
+        {
+            int batteryCount = await _batteryService.GetCount(user.Id);
+            userBatteryCounts.Add(user.Id, batteryCount);
+
+            int chargeCount = await _chargeService.GetCount(user.Id);
+            userChargeCounts.Add(user.Id, chargeCount);
+        }
     }
 
     private async void GetUsers()

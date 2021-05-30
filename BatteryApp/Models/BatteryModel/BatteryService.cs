@@ -51,6 +51,12 @@ namespace BatteryApp.Models.BatteryModel
             return battery;
         }
 
+        public async Task<int> GetCount(string userId)
+        {
+            var batteries = await Get(userId);
+            return batteries.Count;
+        }
+
         public async Task<Battery> Add(Battery battery)
         {
             using var context = _contextFactory.CreateDbContext();

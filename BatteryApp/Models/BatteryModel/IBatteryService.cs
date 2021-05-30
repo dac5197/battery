@@ -11,6 +11,7 @@ namespace BatteryApp.Models.BatteryModel
         Task<List<Battery>> Get(string userId);
         Task<List<Battery>> GetActive(string userId);
         Task<Battery> Get(int id);
+        Task<int> GetCount(string userId);
         Task<Battery> Update(Battery Battery);
     }
 }
