@@ -6,9 +6,9 @@ namespace BatteryApp.Internals
 {
     public interface IChargeChildController
     {
-        Task CompleteOpenChildren(Charge charge);
-        Task<List<Charge>> GetOpenChildren(Charge charge);
-        Task<bool> HasOpenChildren(Charge charge);
+        Task CompleteOpenChildrenAsync(Charge charge);
+        Task<List<Charge>> GetOpenChildrenAsync(Charge charge);
+        Task<bool> HasOpenChildrenAsync(Charge charge);
         Task ToggleCompletedStatusAsync(Charge charge, bool isComplete);
     }
 }

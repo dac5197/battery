@@ -32,15 +32,15 @@ namespace BatteryApp.Views.Utils
             }
         }
 
-        public async Task CompleteOpenChildren()
+        public async Task CompleteOpenChildrenAsync()
         {
-            await _chargeChildController.CompleteOpenChildren(Charge);
+            await _chargeChildController.CompleteOpenChildrenAsync(Charge);
         }
 
-        public async Task SetChargeAndOpenChildren(Charge charge)
+        public async Task SetChargeAndOpenChildrenAsync(Charge charge)
         {
             Charge = charge;
-            OpenChildren = await _chargeChildController.GetOpenChildren(charge);
+            OpenChildren = await _chargeChildController.GetOpenChildrenAsync(charge);
         }
 
     }

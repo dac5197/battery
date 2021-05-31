@@ -14,11 +14,11 @@ namespace BatteryApp.Views.Utils
         event Action OnChange;
 
         void AddBatteryLink(int id);
-        Task AddChargeLink(Charge charge);
+        Task AddChargeLinkAsync(Charge charge);
         void AddLink(string url, string label);
         void ClearLinks();
         void Hide();
-        Task Initialize(Charge charge);
+        Task InitializeAsync(Charge charge);
         void Show();
     }
 }

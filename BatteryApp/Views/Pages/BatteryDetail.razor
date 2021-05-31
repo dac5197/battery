@@ -443,7 +443,7 @@ else
 
     private async Task InitializeTagSearch()
     {
-        var relations = await _tagController.GetAllRelationsForBattery(battery);
+        var relations = await _tagController.GetAllRelationsForBatteryAsync(battery);
 
         _search.Initialize(relations);
     }

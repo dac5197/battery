@@ -10,7 +10,7 @@ namespace BatteryApp.Views.Utils
         bool HasChildren { get; }
         List<Charge> OpenChildren { get; set; }
 
-        Task CompleteOpenChildren();
-        Task SetChargeAndOpenChildren(Charge charge);
+        Task CompleteOpenChildrenAsync();
+        Task SetChargeAndOpenChildrenAsync(Charge charge);
     }
 }

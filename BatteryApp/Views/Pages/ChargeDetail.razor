@@ -418,7 +418,7 @@
 
         // Get page objects
         category = categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault();
-        hasOpenChildren = await _chargeChildController.HasOpenChildren(charge);
+        hasOpenChildren = await _chargeChildController.HasOpenChildrenAsync(charge);
         userProfile = await _userProfileService.Get(charge.OwnerId);
 
         // Set defaults
@@ -427,7 +427,7 @@
         _search.Clear();
 
         // Get breadcrumb nav links
-        await _breadcrumb.Initialize(charge);
+        await _breadcrumb.InitializeAsync(charge);
         _breadcrumb.Show();
     }
 
@@ -470,7 +470,7 @@
     private async void ChildrenStateChanged()
     {
         children = await _chargeService.GetChildrenAsync(charge);
-        hasOpenChildren = await _chargeChildController.HasOpenChildren(charge);
+        hasOpenChildren = await _chargeChildController.HasOpenChildrenAsync(charge);
         await RefreshNotes();
         StateHasChanged();
     }

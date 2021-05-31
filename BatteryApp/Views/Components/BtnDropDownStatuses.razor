@@ -44,7 +44,7 @@
 
     private async void ChangeChargeStatus(int statusId)
     {
-        await _chargeOpenChildrenModalHelper.SetChargeAndOpenChildren(Charge);
+        await _chargeOpenChildrenModalHelper.SetChargeAndOpenChildrenAsync(Charge);
 
         if (_chargeOpenChildrenModalHelper.HasChildren && statusId == completeStatus.Id)
         {

@@ -327,7 +327,7 @@ else
 
         foreach (var battery in batteries)
         {
-            var relations = await _tagController.GetAllRelationsForBattery(battery);
+            var relations = await _tagController.GetAllRelationsForBatteryAsync(battery);
             tagRelations.AddRange(relations);
         }
 

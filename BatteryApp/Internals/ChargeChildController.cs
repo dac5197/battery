@@ -18,9 +18,9 @@ namespace BatteryApp.Internals
             _statusService = statusService;
         }
 
-        public async Task CompleteOpenChildren(Charge charge)
+        public async Task CompleteOpenChildrenAsync(Charge charge)
         {
-            var openChildren = await GetOpenChildren(charge);
+            var openChildren = await GetOpenChildrenAsync(charge);
             var completedStatus = await _statusService.GetCompletedStatusAsync(charge.BatteryId);
 
             foreach (var child in openChildren)
@@ -30,7 +30,7 @@ namespace BatteryApp.Internals
             }
         }
 
-        public async Task<List<Charge>> GetOpenChildren(Charge charge)
+        public async Task<List<Charge>> GetOpenChildrenAsync(Charge charge)
         {
             var children = await _chargeService.GetChildrenAsync(charge);
             var completedStatus = await _statusService.GetCompletedStatusAsync(charge.BatteryId);
@@ -38,9 +38,9 @@ namespace BatteryApp.Internals
             return children.Where(x => x.StatusId != completedStatus.Id).ToList();
         }
 
-        public async Task<bool> HasOpenChildren(Charge charge)
+        public async Task<bool> HasOpenChildrenAsync(Charge charge)
         {
-            var openChildren = await GetOpenChildren(charge);
+            var openChildren = await GetOpenChildrenAsync(charge);
 
             if (openChildren.Count > 0)
             {

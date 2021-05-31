@@ -48,7 +48,7 @@ namespace BatteryApp.Internals
             return output;
         }
 
-        public async Task<List<ChargeTagRelation>> GetAllRelationsForBattery(Battery battery)
+        public async Task<List<ChargeTagRelation>> GetAllRelationsForBatteryAsync(Battery battery)
         {
             List<ChargeTagRelation> relations = new();
             var tags = await GetAllTagsAsync(battery);

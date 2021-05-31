@@ -51,7 +51,7 @@
 
     private async void CompleteChildren()
     {
-        await _chargeChildController.CompleteOpenChildren(Charge);
+        await _chargeChildController.CompleteOpenChildrenAsync(Charge);
         await CloseModal();
         CompletedOpenChildren.Invoke();
     }

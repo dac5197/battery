@@ -35,16 +35,16 @@ namespace BatteryApp.Views.Utils
             Links.Add(link);
         }
 
-        public async Task Initialize(Charge charge)
+        public async Task InitializeAsync(Charge charge)
         {
             ClearLinks();
-            await AddChargeLink(charge);
+            await AddChargeLinkAsync(charge);
             AddBatteryLink(charge.BatteryId);
 
             Links.Reverse();
         }
 
-        public async Task AddChargeLink(Charge charge)
+        public async Task AddChargeLinkAsync(Charge charge)
         {
             Category category = await _categoryService.GetAsync(charge.CategoryId);
 
@@ -56,7 +56,7 @@ namespace BatteryApp.Views.Utils
             if (charge.ParentId is not null)
             {
                 Charge parent = await _chargeService.GetAsync((int)charge.ParentId);
-                await AddChargeLink(parent);
+                await AddChargeLinkAsync(parent);
             }
         }
 
