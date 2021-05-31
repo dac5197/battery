@@ -40,10 +40,7 @@
                         <td>
                             @if (userRoles.ContainsKey(user.Id))
                             {
-                                @foreach (var roleStr in userRoles[user.Id])
-                                {
-                                    @($"{roleStr} ")
-                                }
+                                @String.Join(", ", userRoles[user.Id])
                             }
                         </td>
                         <td>@userBatteryCounts.GetValueOrDefault(user.Id)</td>
