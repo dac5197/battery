@@ -47,7 +47,7 @@ namespace BatteryApp.Internals.Validators
 
             try
             {
-                MailAddress m = new MailAddress(fieldValue);
+                MailAddress m = new(fieldValue);
                 tempMessage = "";
             }
             catch (FormatException)

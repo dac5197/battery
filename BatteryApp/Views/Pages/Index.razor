@@ -76,10 +76,10 @@ else
                             <div class="float-right">
                                 <BtnGroup_TwoButtons BtnOneClass="@btnClassActiveBatteries"
                                                         BtnOneText="Active"
-                                                        BtnOneAction="@GetActiveBatteries_Button"
+                                                        BtnOneAction="@GetActiveBatteriesAsync_Button"
                                                         BtnTwoClass="@btnClassAllBatteries"
                                                         BtnTwoText="All"
-                                                        BtnTwoAction="@GetAllBatteries_Button"
+                                                        BtnTwoAction="@GetAllBatteriesAsync_Button"
                                                         QuestionToolTipAlignment="Right"
                                                         QuestionToolTipText="Toggle between Active Batteries and All Batteries"></BtnGroup_TwoButtons>
                             </div>
@@ -130,7 +130,7 @@ else
                             <IndexTagList_Battery Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
                                                     TagCounts="@tagActiveCounts"
                                                     FilterChargesByTag="@SearchTags"
-                                                    SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
+                                                    SetManageTagsBattery="@SetManageTagsBatteryAsync"></IndexTagList_Battery>
                         }
 
                         @if (showBatteryCharges.ContainsKey(battery.Id) ? showBatteryCharges[battery.Id] : false)
@@ -161,12 +161,12 @@ else
         }
     </div>
     <!-- Modals -->
-    <BatteryDetailModal ParentStateChanged="@BatteriesChanged" UserId="@userId"></BatteryDetailModal>
+    <BatteryDetailModal ParentStateChanged="@BatteriesChangedAsync" UserId="@userId"></BatteryDetailModal>
     <ManageTagsModal Battery="@manageTagsBattery"
                         Tags="@tags.Where(x => x.BatteryId == manageTagsBattery.Id).ToList()"
                         TagAllCounts="@tagCounts"
                         TagActiveCounts="@tagActiveCounts"
-                        ParentStateChanged="@TagsChanged"></ManageTagsModal>
+                        ParentStateChanged="@TagsChangedAsync"></ManageTagsModal>
 }
 
 
@@ -219,43 +219,43 @@ else
 
         btnClassActiveBatteries = btnActive;
         btnClassAllBatteries = btnInactive;
-        await GetActiveBatteries();
+        await GetActiveBatteriesAsync();
 
         // Hide the breadcrump nav
         _breadcrumb.Hide();
     }
 
-    private async Task GetActiveBatteries()
+    private async Task GetActiveBatteriesAsync()
     {
         batteries = await _batteryService.GetActiveAsync(userId);
-        await Initialize();
+        await InitializeAsync();
     }
 
-    private async Task GetAllBatteries()
+    private async Task GetAllBatteriesAsync()
     {
         batteries = await _batteryService.GetAsync(userId);
-        await Initialize();
+        await InitializeAsync();
     }
 
-    private async void GetActiveBatteries_Button()
+    private async void GetActiveBatteriesAsync_Button()
     {
         btnClassActiveBatteries = btnActive;
         btnClassAllBatteries = btnInactive;
 
-        await GetActiveBatteries();
+        await GetActiveBatteriesAsync();
         StateHasChanged();
     }
 
-    private async void GetAllBatteries_Button()
+    private async void GetAllBatteriesAsync_Button()
     {
         btnClassActiveBatteries = btnInactive;
         btnClassAllBatteries = btnActive;
 
-        await GetAllBatteries();
+        await GetAllBatteriesAsync();
         StateHasChanged();
     }
 
-    private async void BatteriesChanged()
+    private async void BatteriesChangedAsync()
     {
         batteries = await _batteryService.GetActiveAsync(userId);
         _search.Initialize(batteries);
@@ -265,7 +265,7 @@ else
         StateHasChanged();
     }
 
-    private async Task Initialize()
+    private async Task InitializeAsync()
     {
         // Get entities
         charges = await _chargeService.GetActiveAsync(userId);
@@ -278,9 +278,9 @@ else
         SortChargesByStatus();
         InitializeShowBatteryChargesDict();
         InitializeShowBatteryTagsDict();
-        await InitializeChargeChildren();
-        await InitializeTagSearch();
-        await GetTagCounts();
+        await InitializeChargeChildrenAsync();
+        await InitializeTagSearchAsync();
+        await GetTagCountsAsync();
 
 
         // Initialize filtered lists
@@ -312,7 +312,7 @@ else
         }
     }
 
-    private async Task InitializeChargeChildren()
+    private async Task InitializeChargeChildrenAsync()
     {
         foreach (var charge in charges)
         {
@@ -321,7 +321,7 @@ else
         }
     }
 
-    private async Task InitializeTagSearch()
+    private async Task InitializeTagSearchAsync()
     {
         List<ChargeTagRelation> tagRelations = new();
 
@@ -417,20 +417,20 @@ else
         showBatteryCharges[charge.BatteryId] = true;
     }
 
-    private async Task SetManageTagsBattery(int batteryId)
+    private async Task SetManageTagsBatteryAsync(int batteryId)
     {
         var battery = batteries.Where(x => x.Id == batteryId).FirstOrDefault();
         manageTagsBattery = battery;
-        await GetTagCounts();
+        await GetTagCountsAsync();
     }
 
-    private async void TagsChanged()
+    private async void TagsChangedAsync()
     {
         tags = await _tagService.GetAsync(userId);
         StateHasChanged();
     }
 
-    private async Task GetTagCounts()
+    private async Task GetTagCountsAsync()
     {
         tagCounts = await _tagController.CountAllChargeTagRelationshipsAsync(userId);
         tagActiveCounts = await _tagController.CountActiveChargeTagRelationshipsAsync(userId);

@@ -24,7 +24,7 @@
 
 
 <div class="small mt-2">
-    <EditForm Model="charge" OnValidSubmit="@HandleValidSubmit">
+    <EditForm Model="charge" OnValidSubmit="@HandleValidSubmitAsync">
         <DataAnnotationsValidator />
         <!-- Title card -->
         <div class="row">
@@ -81,7 +81,7 @@
                                 {
                                     <TagListItem Charge="@charge"
                                                     Tag="@tag"
-                                                    ParentStateChanged="@TagStateChanged"
+                                                    ParentStateChanged="@TagStateChangedAsync"
                                                     SetTagToDelete="@SetTagToDelete"
                                                     SetTagToEdit="@SetTagToEdit"
                                                     ShowRemove="true"></TagListItem>
@@ -197,7 +197,7 @@
                     <div class="form-group m-0">
                         <h6>Notes</h6>
                         <InputTextArea @bind-Value="@noteText" rows="3" id="notes" class="form-control form-control-sm border-square"></InputTextArea>
-                        <button @onclick="@SaveNote" class="btn btn-primary border-square my-2 float-right" type="button">Save</button>
+                        <button @onclick="@SaveNoteAsync" class="btn btn-primary border-square my-2 float-right" type="button">Save</button>
                     </div>
 
                 </div>
@@ -281,7 +281,7 @@
                             <ul class="list-group list-group-flush">
                                 @foreach (var child in children)
                                 {
-                                    <ChargeDetail_RelatedListItem Charge="@child" IsParent="false" ParentStateChanged="@ChildrenStateChanged"></ChargeDetail_RelatedListItem>
+                                    <ChargeDetail_RelatedListItem Charge="@child" IsParent="false" ParentStateChanged="@ChildrenStateChangedAsync"></ChargeDetail_RelatedListItem>
                                 }
                             </ul>
                         </div>
@@ -305,7 +305,7 @@
                     Categories="@categories"
                     Priorities="@priorities"
                     Statuses="@statuses"
-                    ParentStateChanged="@ChildrenStateChanged"></ChargeDetailModal>
+                    ParentStateChanged="@ChildrenStateChangedAsync"></ChargeDetailModal>
 
 <ChargeChildrenWarningModal Charge="@charge"
                             CompletedOpenChildren="@CompletedOpenChildren"
@@ -313,11 +313,11 @@
 
 <DeleteChargeModal Charge="@charge" Children="@children"></DeleteChargeModal>
 
-<AddTagModal Battery="@battery" Charge="@charge" ParentStateChanged="@TagStateChanged" Tags="batteryTags"></AddTagModal>
+<AddTagModal Battery="@battery" Charge="@charge" ParentStateChanged="@TagStateChangedAsync" Tags="batteryTags"></AddTagModal>
 
-<EditTagModal Battery="@battery" Tag="@tagToEdit" ParentStateChanged="@TagStateChanged"></EditTagModal>
+<EditTagModal Battery="@battery" Tag="@tagToEdit" ParentStateChanged="@TagStateChangedAsync"></EditTagModal>
 
-<DeteteTagModal Tag="@tagToDelete" ParentStateChanged="@TagStateChanged"></DeteteTagModal>
+<DeteteTagModal Tag="@tagToDelete" ParentStateChanged="@TagStateChangedAsync"></DeteteTagModal>
 
 
 
@@ -439,7 +439,7 @@
         }
     }
 
-    private async void HandleValidSubmit()
+    private async void HandleValidSubmitAsync()
     {
         if (hasOpenChildren && charge.StatusId == completeStatus.Id)
         {
@@ -458,7 +458,7 @@
         charge = await _chargeService.GetAsync(Id);
         children = await _chargeService.GetChildrenAsync(charge);
         category = await _categoryService.GetAsync(charge.CategoryId);
-        await RefreshNotes();
+        await RefreshNotesAsync();
         StateHasChanged();
     }
 
@@ -467,25 +467,25 @@
         textareaRows = _calcTextareaRows.CalculateRows((string)e.Value, minTextareaRows, maxTextareaRows);
     }
 
-    private async void ChildrenStateChanged()
+    private async void ChildrenStateChangedAsync()
     {
         children = await _chargeService.GetChildrenAsync(charge);
         hasOpenChildren = await _chargeChildController.HasOpenChildrenAsync(charge);
-        await RefreshNotes();
+        await RefreshNotesAsync();
         StateHasChanged();
     }
 
-    private async void TagStateChanged()
+    private async void TagStateChangedAsync()
     {
 
         tags = await _tagController.GetAllTagsAsync(charge.Id);
         batteryTags = await _tagController.GetAllTagsAsync(battery);
-        await RefreshNotes();
-        await ChargeStateChanged();
+        await RefreshNotesAsync();
+        await ChargeStateChangedAsync();
 
     }
 
-    private async Task ChargeStateChanged()
+    private async Task ChargeStateChangedAsync()
     {
         charge = await _chargeService.GetAsync(Id);
         StateHasChanged();
@@ -501,15 +501,15 @@
         tagToDelete = tagFromChild;
     }
 
-    private async void SaveNote()
+    private async void SaveNoteAsync()
     {
         if (!string.IsNullOrWhiteSpace(noteText))
         {
             await _noteService.AddNoteFromChargeAsync(charge, noteText);
             await _chargeService.SetUpdatedAsync(charge.Id);
             noteText = "";
-            await RefreshNotes();
-            await ChargeStateChanged();
+            await RefreshNotesAsync();
+            await ChargeStateChangedAsync();
         }
     }
 
@@ -542,7 +542,7 @@
         StateHasChanged();
     }
 
-    private async Task RefreshNotes()
+    private async Task RefreshNotesAsync()
     {
         notes = await _noteService.GetAllNotesForChargeAsync(charge.Id);
 
@@ -568,7 +568,7 @@
     private void CompletedOpenChildren()
     {
         hasOpenChildren = false;
-        HandleValidSubmit();
+        HandleValidSubmitAsync();
     }
 }
 

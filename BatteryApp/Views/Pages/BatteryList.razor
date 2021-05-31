@@ -44,10 +44,10 @@ else
                             <div class="float-right">
                                 <BtnGroup_TwoButtons BtnOneClass="@btnClassActiveBatteries"
                                                      BtnOneText="Active"
-                                                     BtnOneAction="@SetActiveBatteriesFilter"
+                                                     BtnOneAction="@SetActiveBatteriesFilterAsync"
                                                      BtnTwoClass="@btnClassAllBatteries"
                                                      BtnTwoText="All"
-                                                     BtnTwoAction="@SetAllBatteriesFilter"
+                                                     BtnTwoAction="@SetAllBatteriesFilterAsync"
                                                      QuestionToolTipAlignment="Right"
                                                      QuestionToolTipText="Toggle between Active Batteries and All Batteries"></BtnGroup_TwoButtons>
                             </div>
@@ -82,7 +82,7 @@ else
             </div>
         </div>
 
-        <BatteryDetailModal ParentStateChanged="@StateChanged" UserId="@userId"></BatteryDetailModal>
+        <BatteryDetailModal ParentStateChanged="@StateChangedAsync" UserId="@userId"></BatteryDetailModal>
     </div>
 }
 
@@ -119,15 +119,15 @@ else
         _breadcrumb.Hide();
     }
 
-    private async void StateChanged()
+    private async void StateChangedAsync()
     {
         if (btnClassActiveBatteries == btnActive)
         {
-            await GetActiveBatteries();
+            await GetActiveBatteriesAsync();
         }
         else
         {
-            await GetAllBatteries();
+            await GetAllBatteriesAsync();
         }
         StateHasChanged();
     }
@@ -153,34 +153,34 @@ else
         filteredBatteries = batteries.Where(x => x.Name.ToLower().Contains(searchText.ToLower())).ToList();
     }
 
-    private async Task GetAllBatteries()
+    private async Task GetAllBatteriesAsync()
     {
         batteries = await _batteryService.GetAsync(userId);
         FilterBatteryList();
         StateHasChanged();
     }
 
-    private async void SetAllBatteriesFilter()
+    private async void SetAllBatteriesFilterAsync()
     {
         btnClassActiveBatteries = btnInactive;
         btnClassAllBatteries = btnActive;
 
-        await GetAllBatteries();
+        await GetAllBatteriesAsync();
     }
 
-    private async Task GetActiveBatteries()
+    private async Task GetActiveBatteriesAsync()
     {
         batteries = await _batteryService.GetActiveAsync(userId);
         FilterBatteryList();
         StateHasChanged();
     }
 
-    private async void SetActiveBatteriesFilter()
+    private async void SetActiveBatteriesFilterAsync()
     {
         btnClassActiveBatteries = btnActive;
         btnClassAllBatteries = btnInactive;
 
-        await GetActiveBatteries();
+        await GetActiveBatteriesAsync();
     }
 
 
