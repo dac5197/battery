@@ -117,7 +117,7 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col">
-                            <button type="submit" class="btn btn-primary border-square" @onclick="@HandleSubmit">Submit</button>
+                            <button type="submit" class="btn btn-primary border-square" @onclick="@HandleSubmitAsync">Submit</button>
                             <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="HandleClose">Cancel</button>
                         </div>
                     </div>
@@ -161,7 +161,7 @@
         base.OnParametersSet();
     }
 
-    private async void HandleSubmit()
+    private async void HandleSubmitAsync()
     {
         ClearErrors();
 
@@ -181,15 +181,15 @@
             User.EmailConfirmed = userEmailConfirmed;
             await _UserManager.UpdateAsync(User);
 
-            await HandleRemoveUserRoles();
-            await HandleAddUserRoles();
+            await HandleRemoveUserRolesAsync();
+            await HandleAddUserRolesAsync();
 
-            await CloseModal();
+            await CloseModalAsync();
             ParentStateChanged.Invoke();
         }
     }
 
-    private async Task HandleAddUserRoles()
+    private async Task HandleAddUserRolesAsync()
     {
         foreach (var role in UserRoles)
         {
@@ -202,7 +202,7 @@
         }
     }
 
-    private async Task HandleRemoveUserRoles()
+    private async Task HandleRemoveUserRolesAsync()
     {
         var removeRoles = AllRoles.Where(x => !UserRoles.Contains(x)).ToList();
 
@@ -260,7 +260,7 @@
         ClearSelectRoles();
     }
 
-    private async Task CloseModal()
+    private async Task CloseModalAsync()
     {
 
         await _jsRuntime.InvokeAsync<object>("CloseModal", "identityUserModal");

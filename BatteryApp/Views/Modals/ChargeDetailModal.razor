@@ -12,7 +12,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <EditForm Model="@Charge" OnValidSubmit="@HandleValidSubmit">
+                <EditForm Model="@Charge" OnValidSubmit="@HandleValidSubmitAsync">
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
@@ -129,7 +129,7 @@
         StateHasChanged();
     }
 
-    private async void HandleValidSubmit()
+    private async void HandleValidSubmitAsync()
     {
         if (Charge.Id == 0)
         {
@@ -140,7 +140,7 @@
             await _chargeService.UpdateAsync(Charge);
         }
 
-        await CloseModal();
+        await CloseModalAsync();
         ParentStateChanged?.Invoke();
     }
 
@@ -149,7 +149,7 @@
         textareaRows = _calcTextareaRows.CalculateRows((string)e.Value);
     }
 
-    private async Task CloseModal()
+    private async Task CloseModalAsync()
     {
         showAdvancedOptions = false;
         await _jsRuntime.InvokeAsync<object>("CloseModal", "chargeModal");

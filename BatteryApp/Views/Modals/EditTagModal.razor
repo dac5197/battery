@@ -13,7 +13,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <EditForm Model="@Tag" OnValidSubmit="@HandleValidSubmit" class="form-inline border-square">
+                <EditForm Model="@Tag" OnValidSubmit="@HandleValidSubmitAsync" class="form-inline border-square">
                     <DataAnnotationsValidator />
                     @if (showErrors)
                     {
@@ -50,7 +50,7 @@
         tagName = Tag.Name;
     }
 
-    private async void HandleValidSubmit()
+    private async void HandleValidSubmitAsync()
     {
         showErrors = false;
         errors.Clear();
@@ -59,7 +59,7 @@
         if (Tag.Name == tagName)
         {
             ClearErrors();
-            await CloseModal();
+            await CloseModalAsync();
         }
         else
         {
@@ -74,14 +74,14 @@
             {
                 await _tagService.UpdateAsync(Tag);
 
-                await CloseModal();
+                await CloseModalAsync();
 
                 ParentStateChanged?.Invoke();
             }
         }
     }
 
-    private async Task CloseModal()
+    private async Task CloseModalAsync()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "editTagModal");
     }

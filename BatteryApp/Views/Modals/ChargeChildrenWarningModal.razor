@@ -32,7 +32,7 @@
                 }
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" @onclick="@CompleteChildren">Confirm</button>
+                <button type="button" class="btn btn-danger" @onclick="@CompleteChildrenAsync">Confirm</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
             </div>
         </div>
@@ -49,14 +49,14 @@
     [Parameter]
     public Action CompletedOpenChildren { get; set; }
 
-    private async void CompleteChildren()
+    private async void CompleteChildrenAsync()
     {
         await _chargeChildController.CompleteOpenChildrenAsync(Charge);
-        await CloseModal();
+        await CloseModalAsync();
         CompletedOpenChildren.Invoke();
     }
 
-    private async Task CloseModal()
+    private async Task CloseModalAsync()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "chargeChildrenWarningModal");
     }

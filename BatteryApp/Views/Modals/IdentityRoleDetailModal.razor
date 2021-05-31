@@ -28,7 +28,7 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col">
-                            <button type="submit" class="btn btn-primary border-square" @onclick="@HandleValidSubmit">Submit</button>
+                            <button type="submit" class="btn btn-primary border-square" @onclick="@HandleValidSubmitAsync">Submit</button>
                             <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="HandleClose">Cancel</button>
                         </div>
                     </div>
@@ -51,8 +51,7 @@
 
     private bool showErrors = false;
 
-
-    private async void HandleValidSubmit()
+    private async void HandleValidSubmitAsync()
     {
         ClearErrors();
 
@@ -66,7 +65,7 @@
         }
         else
         {
-            var isRoleNew = await IsRoleNew();
+            var isRoleNew = await IsRoleNewAsync();
 
             Role.Name = RoleName;
 
@@ -78,13 +77,13 @@
             {
                 await _RoleManager.UpdateAsync(Role);
             }
-            await CloseModal();
+            await CloseModalAsync();
             ParentStateChanged.Invoke();
         }
 
     }
 
-    private async Task<bool> IsRoleNew()
+    private async Task<bool> IsRoleNewAsync()
     {
         var roleResult = await _RoleManager.FindByIdAsync(Role.Id);
 
@@ -96,7 +95,7 @@
         return false;
     }
 
-    private async Task CloseModal()
+    private async Task CloseModalAsync()
     {
 
         await _jsRuntime.InvokeAsync<object>("CloseModal", "identityRoleModal");

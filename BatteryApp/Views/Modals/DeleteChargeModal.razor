@@ -32,7 +32,7 @@
                 }
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger border-square" @onclick="Delete">Delete</button>
+                <button type="button" class="btn btn-danger border-square" @onclick="DeleteAsync">Delete</button>
                 <button type="button" class="btn btn-secondary border-square" data-dismiss="modal">Cancel</button>
             </div>
         </div>
@@ -46,7 +46,7 @@
     [Parameter]
     public List<Charge> Children { get; set; }
 
-    private async void Delete()
+    private async void DeleteAsync()
     {
         await _deleteChargeController.DeleteChargeAndAllRelatedItemsAsync(Charge);
         _navManager.NavigateTo($"/battery/{Charge.BatteryId}", true);

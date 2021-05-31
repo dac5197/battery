@@ -94,9 +94,9 @@
 </div>
 
 <!-- Tag Modals -->
-<AddTagModal Battery="@Battery" Tags="@Tags" ParentStateChanged="@TagsChanged"></AddTagModal>
-<EditTagModal Battery="@Battery" Tag="@editTag" ParentStateChanged="@TagsChanged"></EditTagModal>
-<DeteteTagModal Tag="@editTag" ParentStateChanged="@TagsChanged"></DeteteTagModal>
+<AddTagModal Battery="@Battery" Tags="@Tags" ParentStateChanged="@TagsChangedAsync"></AddTagModal>
+<EditTagModal Battery="@Battery" Tag="@editTag" ParentStateChanged="@TagsChangedAsync"></EditTagModal>
+<DeteteTagModal Tag="@editTag" ParentStateChanged="@TagsChangedAsync"></DeteteTagModal>
 
 @code {
     [Parameter]
@@ -116,12 +116,12 @@
 
     private Tag editTag = new();
 
-    public async Task CloseModal()
+    public async Task CloseModalAsync()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "ManageTagsModal");
     }
 
-    private async void TagsChanged()
+    private async void TagsChangedAsync()
     {
         Tags = await _tagController.GetAllTagsAsync(Battery);
         ParentStateChanged.Invoke();

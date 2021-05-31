@@ -18,7 +18,7 @@
                 <p>Do you want to continue?</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger border-square" @onclick="DeleteTag">Delete</button>
+                <button type="button" class="btn btn-danger border-square" @onclick="DeleteTagAsync">Delete</button>
                 <button type="button" class="btn btn-secondary border-square" data-dismiss="modal">Cancel</button>
             </div>
         </div>
@@ -32,14 +32,14 @@
     [Parameter]
     public Action ParentStateChanged { get; set; }
 
-    private async void DeleteTag()
+    private async void DeleteTagAsync()
     {
         await _tagController.DeleteTagAndAllRelationshipsAsync(Tag.Id);
         ParentStateChanged.Invoke();
-        await CloseModal();
+        await CloseModalAsync();
     }
 
-    private async Task CloseModal()
+    private async Task CloseModalAsync()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "deleteTagModal");
     }
