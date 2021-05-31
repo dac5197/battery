@@ -2,6 +2,8 @@
 
 @layout AdminLayout
 
+@attribute [Authorize(Roles = "Admin")]
+
 @using Microsoft.AspNetCore.Authorization;
 @using Microsoft.AspNetCore.Identity;
 @inject AuthenticationStateProvider _authStateProvider
@@ -32,18 +34,20 @@
                         <td>@role.Name</td>
                         <td>@roleAssignmentCount[role.Name]</td>
                         <td>
-                            <button type="button" 
-                                    class="btn btn-info btn-sm border-square" 
+                            <button type="button"
+                                    class="btn btn-info btn-sm border-square"
                                     data-toggle="modal"
                                     data-target="#identityRoleModal"
                                     @onclick="@(() => SetEditRoleToExisting(role))">
                                 Edit
                             </button>
-                            <button type="button" 
-                                    class="btn btn-danger btn-sm border-square" 
+                            <button type="button"
+                                    class="btn btn-danger btn-sm border-square"
                                     data-toggle="modal"
                                     data-target="#confirmDeleteModal"
-                                    @onclick="@(() => SetEditRoleToExisting(role))">X</button>
+                                    @onclick="@(() => SetEditRoleToExisting(role))">
+                                X
+                            </button>
                         </td>
                     </tr>
                 }
@@ -72,7 +76,7 @@
     </ModalBody>
 </ConfirmDeleteModal>
 
-@code {        
+@code {
     private Dictionary<string, int> roleAssignmentCount = new();
 
     private List<IdentityRole> roles = new();

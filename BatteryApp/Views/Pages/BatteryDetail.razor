@@ -1,6 +1,6 @@
 ﻿@page "/battery/{id:int}"
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin, User")]
 
 @inject AuthenticationStateProvider _authStateProvider
 @inject NavigationManager _navManager
@@ -100,9 +100,9 @@ else
         <div class="row mb-3">
             <div class="col-lg-12">
                 <IndexTagList_Battery Tags="@tags"
-                                        TagCounts="@(btnClassActiveCharges == btnActive ? tagActiveCounts : tagAllCounts)"
-                                        FilterChargesByTag="@SearchTags"
-                                        SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
+                                      TagCounts="@(btnClassActiveCharges == btnActive ? tagActiveCounts : tagAllCounts)"
+                                      FilterChargesByTag="@SearchTags"
+                                      SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
             </div>
         </div>
 
@@ -212,11 +212,11 @@ else
                                     </div>
                                 </div>
                                 <input type="text"
-                                        class="form-control py-2 border-square bg-transparent pl-5"
-                                        id="searchChargesInput"
-                                        placeholder="Search"
-                                        value="@searchText"
-                                        @oninput="@(e => Search(e))" />
+                                       class="form-control py-2 border-square bg-transparent pl-5"
+                                       id="searchChargesInput"
+                                       placeholder="Search"
+                                       value="@searchText"
+                                       @oninput="@(e => Search(e))" />
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-outline-info border-square" @onclick="@ClearSearch">Clear</button>
                                 </div>
@@ -239,21 +239,21 @@ else
                         <div class="col-sm-12">
                             <button data-toggle="modal" data-target="#chargeModal" class="btn btn-success btn-sm mx-2 px-3 border-square" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
                             <BtnGroup_TwoButtons BtnOneClass="@btnClassActiveCharges"
-                                                    BtnOneText="Active"
-                                                    BtnOneAction="@SetActiveChargesFilter"
-                                                    BtnTwoClass="@btnClassAllCharges"
-                                                    BtnTwoText="All"
-                                                    BtnTwoAction="@SetAllChargesFilter"
-                                                    QuestionToolTipAlignment="Center"
-                                                    QuestionToolTipText="Toggle between Active Items (Open items or items completed within the last 3 days) and All Items"></BtnGroup_TwoButtons>
+                                                 BtnOneText="Active"
+                                                 BtnOneAction="@SetActiveChargesFilter"
+                                                 BtnTwoClass="@btnClassAllCharges"
+                                                 BtnTwoText="All"
+                                                 BtnTwoAction="@SetAllChargesFilter"
+                                                 QuestionToolTipAlignment="Center"
+                                                 QuestionToolTipText="Toggle between Active Items (Open items or items completed within the last 3 days) and All Items"></BtnGroup_TwoButtons>
                             <BtnGroup_TwoButtons BtnOneClass="@btnClassChargeCardView"
-                                                    BtnOneText="Card View"
-                                                    BtnOneAction="@ShowChargeCardView"
-                                                    BtnTwoClass="@btnClassChargeTableView"
-                                                    BtnTwoText="Table View"
-                                                    BtnTwoAction="@ShowChargeTableView"
-                                                    QuestionToolTipAlignment="Right"
-                                                    QuestionToolTipText="Toggle between displaying Charges in lanes with cards or in a table."></BtnGroup_TwoButtons>
+                                                 BtnOneText="Card View"
+                                                 BtnOneAction="@ShowChargeCardView"
+                                                 BtnTwoClass="@btnClassChargeTableView"
+                                                 BtnTwoText="Table View"
+                                                 BtnTwoAction="@ShowChargeTableView"
+                                                 QuestionToolTipAlignment="Right"
+                                                 QuestionToolTipText="Toggle between displaying Charges in lanes with cards or in a table."></BtnGroup_TwoButtons>
                         </div>
                     </div>
                 </div>
@@ -287,10 +287,10 @@ else
                         <CascadingValue Name="SearchText" Value="@searchText">
                             <CascadingValue Name="ShowChildren" Value="@showChargeCardChildren">
                                 <ChargeTable @bind-Child="@chargeObject"
-                                                @ref="@chargeTable"
-                                                Charges="@_search.GetCharges()"
-                                                ChargeChildrenCounts="@chargeChildrenCounts"
-                                                ParentStateChanged="@StateChanged"></ChargeTable>
+                                             @ref="@chargeTable"
+                                             Charges="@_search.GetCharges()"
+                                             ChargeChildrenCounts="@chargeChildrenCounts"
+                                             ParentStateChanged="@StateChanged"></ChargeTable>
                             </CascadingValue>
                         </CascadingValue>
                     </CascadingValue>
@@ -301,11 +301,11 @@ else
     </div>
     <!-- Modals -->
     <ChargeDetailModal @ref="@chargeDetailModal"
-                        Charge="@chargeObject"
-                        Categories="@categories"
-                        Priorities="@priorities"
-                        Statuses="@statuses"
-                        ParentStateChanged="@StateChanged"></ChargeDetailModal>
+                       Charge="@chargeObject"
+                       Categories="@categories"
+                       Priorities="@priorities"
+                       Statuses="@statuses"
+                       ParentStateChanged="@StateChanged"></ChargeDetailModal>
 
     <ChargeChildrenWarningModal Charge="@_chargeOpenChildrenModalHelper.Charge"
                                 CompletedOpenChildren="@CompleteChargeWithChildren"
@@ -322,10 +322,10 @@ else
                         StatusesCount="@statuses.Count"></DeleteBatteryModal>
 
     <ManageTagsModal Battery="@battery"
-                        Tags="@tags"
-                        TagActiveCounts="@tagActiveCounts"
-                        TagAllCounts="@tagAllCounts"
-                        ParentStateChanged="@TagsChanged"></ManageTagsModal>
+                     Tags="@tags"
+                     TagActiveCounts="@tagActiveCounts"
+                     TagAllCounts="@tagAllCounts"
+                     ParentStateChanged="@TagsChanged"></ManageTagsModal>
 }
 
 

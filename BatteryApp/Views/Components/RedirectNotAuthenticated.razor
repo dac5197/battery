@@ -14,12 +14,14 @@
             var returnUrl = Navigation.ToBaseRelativePath(Navigation.Uri);
 
             Navigation.NavigateTo("Identity/Account/Login", true);
-
+            return;
             //if (string.IsNullOrWhiteSpace(returnUrl))
             //    Navigation.NavigateTo("Identity/Account/Login", true);
             //else
             //    Navigation.NavigateTo($"Identity/Account/Login?returnUrl={returnUrl}", true);
         }
+
+        Navigation.NavigateTo("/about", true);
     }
 
 }

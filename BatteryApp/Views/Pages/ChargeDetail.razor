@@ -1,6 +1,6 @@
 ﻿@page "/charge/{id:int}"
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin, User")]
 
 @inject AuthenticationStateProvider _authStateProvider
 @inject NavigationManager _navManager

@@ -2,6 +2,8 @@
 
 @layout AdminLayout
 
+@attribute [Authorize(Roles = "Admin")]
+
 @using Microsoft.AspNetCore.Authorization;
 @using Microsoft.AspNetCore.Identity;
 @inject AuthenticationStateProvider _authStateProvider

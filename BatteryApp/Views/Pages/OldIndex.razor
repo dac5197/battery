@@ -1,6 +1,6 @@
 ﻿@page "/oldindex"
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin, User")]
 
 <h1>Hello, world!</h1>
 

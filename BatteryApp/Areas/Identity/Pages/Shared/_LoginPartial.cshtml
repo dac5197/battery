@@ -28,8 +28,9 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Manage Identity</a>
-    <a class="dropdown-item" href="/profile">Manage Profile</a>
+    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Identity</a>
+    <a class="dropdown-item" href="/profile">Profile</a>
+    <a class="dropdown-item" href="/about">About</a>
     <div class="dropdown-divider"></div>
     <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
         <button id="logout" type="submit" class="dropdown-item btn btn-link link-black link-no-underline">Logout</button>
