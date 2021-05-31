@@ -13,7 +13,7 @@
         }
         else
         {
-            <a class="dropdown-item small" href="" @onclick="@(() => ChangeChargePriority(p.Id))" @onclick:preventDefault="true"> @p.DisplayName</a>
+            <a class="dropdown-item small" href="" @onclick="@(() => ChangeChargePriorityAsync(p.Id))" @onclick:preventDefault="true"> @p.DisplayName</a>
         }
     }
 </div>
@@ -36,7 +36,7 @@
         base.OnInitialized();
     }
 
-    private async void ChangeChargePriority(int priorityId)
+    private async void ChangeChargePriorityAsync(int priorityId)
     {
         Charge.PriorityId = priorityId;
         await _chargeService.UpdateAsync(Charge);

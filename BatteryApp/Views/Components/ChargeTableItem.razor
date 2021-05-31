@@ -84,7 +84,7 @@
                             <ChargeTableItem @key="@child"
                                              Charge="@child"
                                              IsChild="true"
-                                             ParentStateChanged="StateChanged"></ChargeTableItem>
+                                             ParentStateChanged="StateChangedAsync"></ChargeTableItem>
                         }
                     </tbody>
                 </table>
@@ -173,7 +173,7 @@
         StateHasChanged();
     }
 
-    private async void StateChanged()
+    private async void StateChangedAsync()
     {
         children = await _chargeService.GetChildrenAsync(Charge);
         await _chargeService.GetAsync(Charge.Id);

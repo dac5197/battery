@@ -145,11 +145,11 @@
 
         if (children.Any())
         {
-            await GetChildrenTags();
+            await GetChildrenTagsAsync();
         }
     }
 
-    private async Task GetChildrenTags()
+    private async Task GetChildrenTagsAsync()
     {
         foreach (var child in children)
         {

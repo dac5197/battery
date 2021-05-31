@@ -1,6 +1,6 @@
 ﻿@inject IInitializeChargeChildToParent _chargeRelationship
 
-<a class="new-item" data-toggle="modal" data-target="#chargeModal" @onclick="@InitializeSpark">
+<a class="new-item" data-toggle="modal" data-target="#chargeModal" @onclick="@InitializeSparkAsync">
     <span class="oi oi-plus"></span>
 </a>
 
@@ -27,7 +27,7 @@
     [Parameter]
     public EventCallback<Charge> ChildChanged { get; set; }
 
-    private async void InitializeSpark()
+    private async void InitializeSparkAsync()
     {
         Child = new Charge();
         Child = await _chargeRelationship.SetRelationshipAsync(Charge, Child);

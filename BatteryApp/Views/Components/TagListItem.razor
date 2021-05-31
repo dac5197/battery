@@ -13,7 +13,7 @@
             <a class="dropdown-item small" data-toggle="modal" data-target="#editTagModal" @onclick="@(() => SetTagToEdit.InvokeAsync(Tag))">Edit</a>
             @if (ShowRemove)
             {
-                <a class="dropdown-item small" href="" @onclick="@RemoveTag" @onclick:preventDefault="true">Remove</a>
+                <a class="dropdown-item small" href="" @onclick="@RemoveTagAsync" @onclick:preventDefault="true">Remove</a>
             }
             <a class="dropdown-item small" data-toggle="modal" data-target="#deleteTagModal" @onclick="@(() => SetTagToDelete.InvokeAsync(Tag))">Delete</a>
         </div>
@@ -52,7 +52,7 @@
     [Parameter]
     public bool IsReadonly { get; set; } = false;
 
-    private async void RemoveTag()
+    private async void RemoveTagAsync()
     {
         await _tagController.RemoveTagFromChargeAsync(Charge.Id, Tag);
         ParentStateChanged?.Invoke();

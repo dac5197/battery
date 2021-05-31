@@ -11,7 +11,7 @@
 <li class="list-group-item border-0 px-4">
     @if (IsParent is false)
     {
-        <input @onchange="@(() => SetStatus())" type="checkbox" checked="@isCompleted" class="form-check-input" />
+        <input @onchange="@(() => SetStatusAsync())" type="checkbox" checked="@isCompleted" class="form-check-input" />
     }
 <a href="@($"/charge/{Charge.Id}")" class="link-black" @onclick="HandleClick">
     <div class="d-inline">
@@ -68,11 +68,10 @@
         _navManager.NavigateTo($"/charge/{Charge.Id}", true);
     }
 
-    private async void SetStatus()
+    private async void SetStatusAsync()
     {
         isCompleted = !isCompleted;
         await _chargeChildController.ToggleCompletedStatusAsync(Charge, isCompleted);
         ParentStateChanged?.Invoke();
-        //StateHasChanged();
     }
 }

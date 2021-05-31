@@ -17,7 +17,7 @@
         }
         else
         {
-            <a class="dropdown-item small" href="" @onclick="@(() => ChangeChargeStatus(s.Id))" @onclick:preventDefault="true"> @s.Name</a>
+            <a class="dropdown-item small" href="" @onclick="@(() => ChangeChargeStatusAsync(s.Id))" @onclick:preventDefault="true"> @s.Name</a>
         }
     }
 </div>
@@ -42,7 +42,7 @@
         status = Statuses.Where(x => x.Id == Charge.StatusId).FirstOrDefault();
     }
 
-    private async void ChangeChargeStatus(int statusId)
+    private async void ChangeChargeStatusAsync(int statusId)
     {
         await _chargeOpenChildrenModalHelper.SetChargeAndOpenChildrenAsync(Charge);
 
