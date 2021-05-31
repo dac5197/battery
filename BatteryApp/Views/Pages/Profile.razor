@@ -18,7 +18,7 @@
                     <h3>My Profile</h3>
                 </div>
             </div>
-            <EditForm Model="@userProfile" OnValidSubmit="HandleValidSumbit">
+            <EditForm Model="@userProfile" OnValidSubmit="HandleValidSumbitAsync">
                 <DataAnnotationsValidator />
                 <div class="row mb-3">
                     <div class="col">
@@ -85,13 +85,13 @@
         var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
-        await GetUserProfile();
+        await GetUserProfileAsync();
 
         // Hide the breadcrump nav
         _breadcrumb.Hide();
     }
 
-    private async void HandleValidSumbit()
+    private async void HandleValidSumbitAsync()
     {
         if (isNewProfile)
         {
@@ -102,11 +102,11 @@
             await _userProfileService.Update(userProfile);
         }
 
-        await GetUserProfile();
+        await GetUserProfileAsync();
         StateHasChanged();
     }
 
-    private async Task GetUserProfile()
+    private async Task GetUserProfileAsync()
     {
         userProfile = await _userProfileService.Get(userId);
 

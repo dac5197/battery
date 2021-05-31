@@ -9,7 +9,7 @@
         <div class="modal-content border-square">
             <div class="modal-header">
                 <h5 class="modal-title">Battery Detail - Status Options</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ResetEditStatuses">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ResetEditStatusesAsync">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
@@ -62,7 +62,7 @@
                                         class="btn btn-info btn-sm border-square"
                                         style="width: 32px;"
                                         title="Reset"
-                                        @onclick="@ResetEditStatuses">
+                                        @onclick="@ResetEditStatusesAsync">
                                     <span class="oi oi-action-undo"></span>
                                 </button>
                                 <button type="button"
@@ -87,8 +87,8 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col">
-                        <button type="submit" class="btn btn-primary border-square" @onclick="@HandleSubmit">Submit</button>
-                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="@ResetEditStatuses">Cancel</button>
+                        <button type="submit" class="btn btn-primary border-square" @onclick="@HandleSubmitAsync">Submit</button>
+                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="@ResetEditStatusesAsync">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -117,7 +117,7 @@
     private bool isNewStatus = false;
     private bool showErrors = false;
 
-    private async void HandleSubmit()
+    private async void HandleSubmitAsync()
     {
         showErrors = false;
         errors.Clear();
@@ -152,21 +152,21 @@
 
             if (statusesToBeDeleted.Any())
             {
-                await DeleteStatuses(statusesToBeDeleted);
+                await DeleteStatusesAsync(statusesToBeDeleted);
             }
 
-            await CloseModal();
+            await CloseModalAsync();
 
             ParentStateChanged?.Invoke();
         }
     }
 
-    public async Task CloseModal()
+    public async Task CloseModalAsync()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "batteryDetailExiting_StatusOptionsModal");
     }
 
-    private async void ResetEditStatuses()
+    private async void ResetEditStatusesAsync()
     {
         Statuses = await _statusService.GetAsync(Battery);
         _validationService.ClearErrors();
@@ -202,7 +202,7 @@
         StateHasChanged();
     }
 
-    private async Task DeleteStatuses(List<Status> statuses)
+    private async Task DeleteStatusesAsync(List<Status> statuses)
     {
         var defaultStatus = Statuses.OrderBy(x => x.Order).FirstOrDefault();
 
@@ -212,13 +212,13 @@
         {
             var chargesToBeChanged = charges.Where(x => x.StatusId == status.Id).ToList();
 
-            await UpdateCharges(chargesToBeChanged, defaultStatus);
+            await UpdateChargesAsync(chargesToBeChanged, defaultStatus);
 
             await _statusService.DeleteAsync(status.Id);
         }
     }
 
-    private async Task UpdateCharges(List<Charge> charges, Status status)
+    private async Task UpdateChargesAsync(List<Charge> charges, Status status)
     {
         foreach (var charge in charges)
         {

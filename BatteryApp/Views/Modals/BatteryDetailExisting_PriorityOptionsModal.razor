@@ -9,7 +9,7 @@
         <div class="modal-content border-square">
             <div class="modal-header">
                 <h5 class="modal-title">Battery Detail - Priority Options</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ResetEditPriorities">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@ResetEditPrioritiesAsync">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
@@ -62,7 +62,7 @@
                                         class="btn btn-info btn-sm border-square"
                                         style="width: 32px;"
                                         title="Reset"
-                                        @onclick="@ResetEditPriorities">
+                                        @onclick="@ResetEditPrioritiesAsync">
                                     <span class="oi oi-action-undo"></span>
                                 </button>
                                 <button type="button"
@@ -80,8 +80,8 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col">
-                        <button type="submit" class="btn btn-primary border-square" @onclick="@HandleSubmit">Submit</button>
-                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="@ResetEditPriorities">Cancel</button>
+                        <button type="submit" class="btn btn-primary border-square" @onclick="@HandleSubmitAsync">Submit</button>
+                        <button type="button" class="btn btn-secondary border-square" data-dismiss="modal" @onclick="@ResetEditPrioritiesAsync">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -110,7 +110,7 @@
     private bool isNewPriority = false;
     private bool showErrors = false;
 
-    private async void HandleSubmit()
+    private async void HandleSubmitAsync()
     {
         showErrors = false;
         errors.Clear();
@@ -145,21 +145,21 @@
 
             if (prioritiesToBeDeleted.Any())
             {
-                await DeletePriorities(prioritiesToBeDeleted);
+                await DeletePrioritiesAsync(prioritiesToBeDeleted);
             }
 
-            await CloseModal();
+            await CloseModalAsync();
 
             ParentStateChanged?.Invoke();
         }
     }
 
-    public async Task CloseModal()
+    public async Task CloseModalAsync()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "batteryDetailExiting_PriorityOptionsModal");
     }
 
-    private async void ResetEditPriorities()
+    private async void ResetEditPrioritiesAsync()
     {
         Priorities = await _priorityService.GetAsync(Battery);
         _validationService.ClearErrors();
@@ -195,7 +195,7 @@
         StateHasChanged();
     }
 
-    private async Task DeletePriorities(List<Priority> priorities)
+    private async Task DeletePrioritiesAsync(List<Priority> priorities)
     {
         var defaultPriority = Priorities.Where(x => x.IsDefault == true).FirstOrDefault();
 
@@ -205,13 +205,13 @@
         {
             var chargesToBeChanged = charges.Where(x => x.PriorityId == priority.Id).ToList();
 
-            await UpdateCharges(chargesToBeChanged, defaultPriority);
+            await UpdateChargesAsync(chargesToBeChanged, defaultPriority);
 
             await _priorityService.DeleteAsync(priority.Id);
         }
     }
 
-    private async Task UpdateCharges(List<Charge> charges, Priority priority)
+    private async Task UpdateChargesAsync(List<Charge> charges, Priority priority)
     {
         foreach (var charge in charges)
         {

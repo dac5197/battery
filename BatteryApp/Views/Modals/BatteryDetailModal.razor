@@ -17,7 +17,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <EditForm Model="@battery" OnValidSubmit="@HandleValidSubmit">
+                <EditForm Model="@battery" OnValidSubmit="@HandleValidSubmitAsync">
                     <DataAnnotationsValidator />
                     @if (showErrors)
                     {
@@ -310,7 +310,7 @@
         battery.OwnerId = UserId;
     }
 
-    private async void HandleValidSubmit()
+    private async void HandleValidSubmitAsync()
     {
         showErrors = false;
         errors.Clear();
@@ -326,7 +326,7 @@
 
             await _batteryAdvOptions.SaveAsync(newBattery, categories, priorities, statuses);
 
-            await CloseModal();
+            await CloseModalAsync();
 
             ParentStateChanged?.Invoke();
         }
@@ -334,7 +334,7 @@
 
     }
 
-    public async Task CloseModal()
+    public async Task CloseModalAsync()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "batteryDetailModal");
     }

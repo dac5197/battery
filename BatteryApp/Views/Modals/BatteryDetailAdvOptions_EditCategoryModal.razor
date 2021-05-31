@@ -10,7 +10,7 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <EditForm Model="@Category" OnValidSubmit="@HandleValidSubmit">
+            <EditForm Model="@Category" OnValidSubmit="@HandleValidSubmitAsync">
                 <div class="modal-body">
                     <div class="row px-2 mb-2">
                         <div class="col">
@@ -90,13 +90,13 @@
         icons = new List<string>(defaultIcons);
     }
 
-    private async void HandleValidSubmit()
+    private async void HandleValidSubmitAsync()
     {
-        await CloseModal();
+        await CloseModalAsync();
         ParentStateChanged?.Invoke();
     }
 
-    public async Task CloseModal()
+    public async Task CloseModalAsync()
     {
         await _jsRuntime.InvokeAsync<object>("CloseModal", "BatteryDetailAdvOptions_EditCategoryModal");
     }

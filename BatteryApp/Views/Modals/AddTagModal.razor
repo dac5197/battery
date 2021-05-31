@@ -14,7 +14,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <EditForm Model="@tag" OnValidSubmit="@HandleValidSubmit">
+                <EditForm Model="@tag" OnValidSubmit="@HandleValidSubmitAsync">
                     <DataAnnotationsValidator />
                     @if (showErrors)
                     {
@@ -30,7 +30,7 @@
                 @foreach (var tag in filteredTags)
                 {
 
-                    <div class="badge tag-badge existing-tag border-square m-1" @onclick="@(() => AddExistingTag(tag))">
+                    <div class="badge tag-badge existing-tag border-square m-1" @onclick="@(() => AddExistingTagAsync(tag))">
                         @tag.Name
                     </div>
                 }
@@ -80,7 +80,7 @@
         }
     }
 
-    private async void HandleValidSubmit()
+    private async void HandleValidSubmitAsync()
     {
         showErrors = false;
         errors.Clear();
@@ -107,20 +107,20 @@
             }
 
             tag = new();
-            await CloseModal();
+            await CloseModalAsync();
         }
 
 
     }
 
-    private async void AddExistingTag(Tag existingTag)
+    private async void AddExistingTagAsync(Tag existingTag)
     {
         ClearErrors();
         await _tagController.AddRelationshipAsync(Charge.Id, existingTag);
-        await CloseModal();
+        await CloseModalAsync();
     }
 
-    private async Task CloseModal()
+    private async Task CloseModalAsync()
     {
         ClearErrors();
         await _jsRuntime.InvokeAsync<object>("CloseModal", "addTagModal");
