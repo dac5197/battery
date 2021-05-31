@@ -130,17 +130,17 @@
                 {
                     priority.BatteryId = Battery.Id;
                     priority.OwnerId = Battery.OwnerId;
-                    await _priorityService.Add(priority);
+                    await _priorityService.AddAsync(priority);
                 }
                 // Update exsting Priority
                 else
                 {
-                    await _priorityService.Update(priority);
+                    await _priorityService.UpdateAsync(priority);
                 }
             }
 
             // Delete any Categories in DB but not in Categories list
-            var originalValuePriorities = await _priorityService.Get(Battery);
+            var originalValuePriorities = await _priorityService.GetAsync(Battery);
             var prioritiesToBeDeleted = originalValuePriorities.Where(o => !Priorities.Any(c => c.Id == o.Id)).ToList();
 
             if (prioritiesToBeDeleted.Any())
@@ -161,7 +161,7 @@
 
     private async void ResetEditPriorities()
     {
-        Priorities = await _priorityService.Get(Battery);
+        Priorities = await _priorityService.GetAsync(Battery);
         _validationService.ClearErrors();
         StateHasChanged();
     }
@@ -207,7 +207,7 @@
 
             await UpdateCharges(chargesToBeChanged, defaultPriority);
 
-            await _priorityService.Delete(priority.Id);
+            await _priorityService.DeleteAsync(priority.Id);
         }
     }
 

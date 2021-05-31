@@ -21,7 +21,7 @@ namespace BatteryApp.Internals
         public async Task CompleteOpenChildren(Charge charge)
         {
             var openChildren = await GetOpenChildren(charge);
-            var completedStatus = await _statusService.GetCompletedStatus(charge.BatteryId);
+            var completedStatus = await _statusService.GetCompletedStatusAsync(charge.BatteryId);
 
             foreach (var child in openChildren)
             {
@@ -33,7 +33,7 @@ namespace BatteryApp.Internals
         public async Task<List<Charge>> GetOpenChildren(Charge charge)
         {
             var children = await _chargeService.GetChildrenAsync(charge);
-            var completedStatus = await _statusService.GetCompletedStatus(charge.BatteryId);
+            var completedStatus = await _statusService.GetCompletedStatusAsync(charge.BatteryId);
 
             return children.Where(x => x.StatusId != completedStatus.Id).ToList();
         }
@@ -54,7 +54,7 @@ namespace BatteryApp.Internals
         {
             if (isComplete)
             {
-                var completedStatus = await _statusService.GetCompletedStatus(charge.BatteryId);
+                var completedStatus = await _statusService.GetCompletedStatusAsync(charge.BatteryId);
                 charge.StatusId = completedStatus.Id;
             }
             else
@@ -66,7 +66,7 @@ namespace BatteryApp.Internals
                 }
                 else
                 {
-                    var initialStatus = await _statusService.GetInitialStatus(charge.BatteryId);
+                    var initialStatus = await _statusService.GetInitialStatusAsync(charge.BatteryId);
                     charge.StatusId = initialStatus.Id;
                 }
             }

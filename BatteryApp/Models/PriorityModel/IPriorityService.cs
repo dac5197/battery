@@ -6,14 +6,14 @@ namespace BatteryApp.Models.PriorityModel
 {
     public interface IPriorityService
     {
-        Task<Priority> Add(Priority priority);
-        Task Delete(int id);
-        Task<List<Priority>> Get();
-        Task<List<Priority>> Get(Battery battery);
-        Task<Priority> Get(int id);
-        Task<List<Priority>> Get(string userId);
-        Task<Priority> GetDefault(int batteryId);
+        Task<Priority> AddAsync(Priority priority);
+        Task DeleteAsync(int id);
+        Task<List<Priority>> GetAsync();
+        Task<List<Priority>> GetAsync(Battery battery);
+        Task<Priority> GetAsync(int id);
+        Task<List<Priority>> GetAsync(string userId);
+        Task<Priority> GetDefaultAsync(int batteryId);
         List<Priority> GetDefaultValues();
-        Task<Priority> Update(Priority priority);
+        Task<Priority> UpdateAsync(Priority priority);
     }
 }

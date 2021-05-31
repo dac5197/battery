@@ -49,7 +49,7 @@
     protected override async Task OnInitializedAsync()
     {
         charges = await _chargeService.GetActiveParentsOnlyAsync(Battery);
-        statuses = await _statusService.Get(Battery);
+        statuses = await _statusService.GetAsync(Battery);
 
     }
 }

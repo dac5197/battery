@@ -35,7 +35,7 @@ namespace BatteryApp.Models.ChargeModel
             Dictionary<int, int> counts = new();
 
             var charges = await _chargeService.GetAsync(battery);
-            var statuses = await _statusService.Get(battery);
+            var statuses = await _statusService.GetAsync(battery);
 
             foreach (var status in statuses)
             {
@@ -57,7 +57,7 @@ namespace BatteryApp.Models.ChargeModel
             Dictionary<int, int> counts = new();
 
             var charges = await _chargeService.GetAsync(battery);
-            var statuses = await _statusService.Get(battery);
+            var statuses = await _statusService.GetAsync(battery);
 
             foreach (var status in statuses)
             {

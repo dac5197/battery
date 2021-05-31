@@ -47,7 +47,7 @@ namespace BatteryApp.Internals
                 priority.BatteryId = battery.Id;
                 priority.OwnerId = battery.OwnerId;
 
-                await _priorityService.Add(priority);
+                await _priorityService.AddAsync(priority);
             }
         }
 
@@ -58,7 +58,7 @@ namespace BatteryApp.Internals
                 status.BatteryId = battery.Id;
                 status.OwnerId = battery.OwnerId;
 
-                await _statusService.Add(status);
+                await _statusService.AddAsync(status);
             }
         }
     }

@@ -137,17 +137,17 @@
                 {
                     status.BatteryId = Battery.Id;
                     status.OwnerId = Battery.OwnerId;
-                    await _statusService.Add(status);
+                    await _statusService.AddAsync(status);
                 }
                 // Update exsting Category
                 else
                 {
-                    await _statusService.Update(status);
+                    await _statusService.UpdateAsync(status);
                 }
             }
 
             // Delete any Categories in DB but not in Categories list
-            var originalValueStatus = await _statusService.Get(Battery);
+            var originalValueStatus = await _statusService.GetAsync(Battery);
             var statusesToBeDeleted = originalValueStatus.Where(o => !Statuses.Any(s => s.Id == o.Id)).ToList();
 
             if (statusesToBeDeleted.Any())
@@ -168,7 +168,7 @@
 
     private async void ResetEditStatuses()
     {
-        Statuses = await _statusService.Get(Battery);
+        Statuses = await _statusService.GetAsync(Battery);
         _validationService.ClearErrors();
         StateHasChanged();
     }
@@ -214,7 +214,7 @@
 
             await UpdateCharges(chargesToBeChanged, defaultStatus);
 
-            await _statusService.Delete(status.Id);
+            await _statusService.DeleteAsync(status.Id);
         }
     }
 

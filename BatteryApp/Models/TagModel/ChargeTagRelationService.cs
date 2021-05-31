@@ -16,39 +16,39 @@ namespace BatteryApp.Models.TagModel
             _contextFactory = contextFactory;
         }
 
-        public async Task<List<ChargeTagRelation>> Get()
+        public async Task<List<ChargeTagRelation>> GetAsync()
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.ChargeTagRelations.ToListAsync();
         }
 
-        public async Task<ChargeTagRelation> Get(int id)
+        public async Task<ChargeTagRelation> GetAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var relation = await context.ChargeTagRelations.FindAsync(id);
             return relation;
         }
 
-        public async Task<ChargeTagRelation> Get(int chargeId, int tagId)
+        public async Task<ChargeTagRelation> GetAsync(int chargeId, int tagId)
         {
             using var context = _contextFactory.CreateDbContext();
             var relation = await context.ChargeTagRelations.Where(x => x.ChargeId == chargeId && x.TagId == tagId).FirstOrDefaultAsync();
             return relation;
         }
 
-        public async Task<List<ChargeTagRelation>> GetAllRelationsForCharge(int chargeId)
+        public async Task<List<ChargeTagRelation>> GetAllRelationsForChargeAsync(int chargeId)
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.ChargeTagRelations.Where(x => x.ChargeId == chargeId).ToListAsync();
         }
 
-        public async Task<List<ChargeTagRelation>> GetAllRelationsForTag(int tagId)
+        public async Task<List<ChargeTagRelation>> GetAllRelationsForTagAsync(int tagId)
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.ChargeTagRelations.Where(x => x.TagId == tagId).ToListAsync();
         }
 
-        public async Task<ChargeTagRelation> Add(ChargeTagRelation relation)
+        public async Task<ChargeTagRelation> AddAsync(ChargeTagRelation relation)
         {
             using var context = _contextFactory.CreateDbContext();
             context.ChargeTagRelations.Add(relation);
@@ -56,7 +56,7 @@ namespace BatteryApp.Models.TagModel
             return relation;
         }
 
-        public async Task<ChargeTagRelation> Add(int chargeId, int tagId)
+        public async Task<ChargeTagRelation> AddAsync(int chargeId, int tagId)
         {
             using var context = _contextFactory.CreateDbContext();
 
@@ -68,7 +68,7 @@ namespace BatteryApp.Models.TagModel
             return relation;
         }
 
-        public async Task<ChargeTagRelation> Update(ChargeTagRelation relation)
+        public async Task<ChargeTagRelation> UpdateAsync(ChargeTagRelation relation)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Entry(relation).State = EntityState.Modified;
@@ -76,11 +76,11 @@ namespace BatteryApp.Models.TagModel
             return relation;
         }
 
-        public async Task<ChargeTagRelation> Update(int chargeId, int tagId)
+        public async Task<ChargeTagRelation> UpdateAsync(int chargeId, int tagId)
         {
             using var context = _contextFactory.CreateDbContext();
 
-            ChargeTagRelation relation = await Get(chargeId, tagId);
+            ChargeTagRelation relation = await GetAsync(chargeId, tagId);
 
             context.Entry(relation).State = EntityState.Modified;
             await context.SaveChangesAsync();
@@ -88,7 +88,7 @@ namespace BatteryApp.Models.TagModel
             return relation;
         }
 
-        public async Task Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var relation = await context.ChargeTagRelations.FindAsync(id);
@@ -96,10 +96,10 @@ namespace BatteryApp.Models.TagModel
             await context.SaveChangesAsync();
         }
 
-        public async Task Delete(int chargeId, int tagId)
+        public async Task DeleteAsync(int chargeId, int tagId)
         {
             using var context = _contextFactory.CreateDbContext();
-            ChargeTagRelation relation = await Get(chargeId, tagId);
+            ChargeTagRelation relation = await GetAsync(chargeId, tagId);
             context.ChargeTagRelations.Remove(relation);
             await context.SaveChangesAsync();
         }

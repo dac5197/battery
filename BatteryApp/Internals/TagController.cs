@@ -26,14 +26,14 @@ namespace BatteryApp.Internals
 
         public async Task<List<Tag>> GetAllTagsAsync(Battery battery)
         {
-            var tags = await _tagService.Get(battery);
+            var tags = await _tagService.GetAsync(battery);
             return tags;
         }
 
         public async Task<List<Tag>> GetAllTagsAsync(int chargeId)
         {
-            var relations = await _chargeTagRelationService.GetAllRelationsForCharge(chargeId);
-            var tags = await _tagService.Get();
+            var relations = await _chargeTagRelationService.GetAllRelationsForChargeAsync(chargeId);
+            var tags = await _tagService.GetAsync();
             var output = tags.Where(t => relations.Any(r => r.TagId == t.Id)).ToList();
 
             return output;
@@ -41,7 +41,7 @@ namespace BatteryApp.Internals
 
         public async Task<List<Charge>> GetAllChargesAsync(Tag tag, Battery battery)
         {
-            var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
+            var relations = await _chargeTagRelationService.GetAllRelationsForTagAsync(tag.Id);
             var charges = await _chargeService.GetActiveAsync(battery);
             var output = charges.Where(c => relations.Any(r => r.ChargeId == c.Id)).ToList();
 
@@ -55,7 +55,7 @@ namespace BatteryApp.Internals
 
             foreach (var tag in tags)
             {
-                var relation = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
+                var relation = await _chargeTagRelationService.GetAllRelationsForTagAsync(tag.Id);
                 relations.AddRange(relation);
             }
 
@@ -64,19 +64,19 @@ namespace BatteryApp.Internals
 
         public async Task AddTagFromChargeAsync(int chargeId, Tag tag)
         {
-            var newTag = await _tagService.Add(tag);
-            await _chargeTagRelationService.Add(chargeId, newTag.Id);
+            var newTag = await _tagService.AddAsync(tag);
+            await _chargeTagRelationService.AddAsync(chargeId, newTag.Id);
             await _noteService.AddTagHistoryNoteAsync(chargeId, tag);
             await _chargeService.SetUpdatedAsync(chargeId);
         }
 
         public async Task AddRelationshipAsync(int chargeId, Tag tag)
         {
-            var relation = await _chargeTagRelationService.Get(chargeId, tag.Id);
+            var relation = await _chargeTagRelationService.GetAsync(chargeId, tag.Id);
 
             if (relation is null)
             {
-                await _chargeTagRelationService.Add(chargeId, tag.Id);
+                await _chargeTagRelationService.AddAsync(chargeId, tag.Id);
                 await _noteService.AddTagHistoryNoteAsync(chargeId, tag);
                 await _chargeService.SetUpdatedAsync(chargeId);
             }
@@ -85,29 +85,29 @@ namespace BatteryApp.Internals
         public async Task RemoveTagFromChargeAsync(int chargeId, Tag tag)
         {
             await _noteService.RemoveTagHistoryNoteAsync(chargeId, tag);
-            await _chargeTagRelationService.Delete(chargeId, tag.Id);
+            await _chargeTagRelationService.DeleteAsync(chargeId, tag.Id);
             await _chargeService.SetUpdatedAsync(chargeId);
         }
 
         public async Task DeleteTagAndAllRelationshipsAsync(int tagId)
         {
-            var relations = await _chargeTagRelationService.GetAllRelationsForTag(tagId);
+            var relations = await _chargeTagRelationService.GetAllRelationsForTagAsync(tagId);
 
             foreach (var relation in relations)
             {
-                await _chargeTagRelationService.Delete(relation.Id);
+                await _chargeTagRelationService.DeleteAsync(relation.Id);
             }
 
-            await _tagService.Delete(tagId);
+            await _tagService.DeleteAsync(tagId);
         }
 
         public async Task DeleteAllRelationshipsForChargeAsync(int chargeId)
         {
-            var relations = await _chargeTagRelationService.GetAllRelationsForCharge(chargeId);
+            var relations = await _chargeTagRelationService.GetAllRelationsForChargeAsync(chargeId);
 
             foreach (var relation in relations)
             {
-                await _chargeTagRelationService.Delete(relation.Id);
+                await _chargeTagRelationService.DeleteAsync(relation.Id);
             }
         }
 
@@ -131,11 +131,11 @@ namespace BatteryApp.Internals
         {
             Dictionary<int, int> counts = new();
 
-            var tags = await _tagService.Get(battery);
+            var tags = await _tagService.GetAsync(battery);
 
             foreach (var tag in tags)
             {
-                var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
+                var relations = await _chargeTagRelationService.GetAllRelationsForTagAsync(tag.Id);
 
                 counts.Add(tag.Id, relations.Count);
             }
@@ -147,11 +147,11 @@ namespace BatteryApp.Internals
         {
             Dictionary<int, int> counts = new();
 
-            var tags = await _tagService.Get(userId);
+            var tags = await _tagService.GetAsync(userId);
 
             foreach (var tag in tags)
             {
-                var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
+                var relations = await _chargeTagRelationService.GetAllRelationsForTagAsync(tag.Id);
 
                 counts.Add(tag.Id, relations.Count);
             }
@@ -162,13 +162,13 @@ namespace BatteryApp.Internals
         public async Task<Dictionary<int, int>> CountActiveChargeTagRelationshipsAsync(Battery battery)
         {
             Dictionary<int, int> counts = new();
-            var tags = await _tagService.Get(battery);
+            var tags = await _tagService.GetAsync(battery);
 
             var combinedCharges = await _chargeService.GetActiveParentsAndChildrenAsync(battery);
 
             foreach (var tag in tags)
             {
-                var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
+                var relations = await _chargeTagRelationService.GetAllRelationsForTagAsync(tag.Id);
 
                 var relationsCount = (from c in combinedCharges
                                       join r in relations on c.Id equals r.ChargeId
@@ -184,13 +184,13 @@ namespace BatteryApp.Internals
         public async Task<Dictionary<int, int>> CountActiveChargeTagRelationshipsAsync(string userId)
         {
             Dictionary<int, int> counts = new();
-            var tags = await _tagService.Get(userId);
+            var tags = await _tagService.GetAsync(userId);
 
             var combinedCharges = await _chargeService.GetActiveParentsAndChildrenAsync(userId);
 
             foreach (var tag in tags)
             {
-                var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
+                var relations = await _chargeTagRelationService.GetAllRelationsForTagAsync(tag.Id);
 
                 var relationsCount = (from c in combinedCharges
                                       join r in relations on c.Id equals r.ChargeId

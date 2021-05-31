@@ -387,9 +387,9 @@ else
         // Get entities
         categories = await _categoryService.GetAsync(battery);
         charges = await _chargeService.GetActiveAsync(battery);
-        priorities = await _priorityService.Get(battery);
-        statuses = await _statusService.Get(battery);
-        tags = await _tagService.Get(battery);
+        priorities = await _priorityService.GetAsync(battery);
+        statuses = await _statusService.GetAsync(battery);
+        tags = await _tagService.GetAsync(battery);
 
         // Calculate counts
         await GetChargeCounts();
@@ -550,8 +550,8 @@ else
     private async void GetOptions()
     {
         categories = await _categoryService.GetAsync(battery);
-        priorities = await _priorityService.Get(battery);
-        statuses = await _statusService.Get(battery);
+        priorities = await _priorityService.GetAsync(battery);
+        statuses = await _statusService.GetAsync(battery);
     }
 
     private async void SetActiveChargesFilter()
@@ -601,7 +601,7 @@ else
     private async void CompleteChargeWithChildren()
     {
         var charge = _chargeOpenChildrenModalHelper.Charge;
-        var completeStatus = await _statusService.GetCompletedStatus(battery.Id);
+        var completeStatus = await _statusService.GetCompletedStatusAsync(battery.Id);
         charge.StatusId = completeStatus.Id;
         await _chargeService.UpdateAsync(charge);
 
@@ -623,7 +623,7 @@ else
 
     private async void TagsChanged()
     {
-        tags = await _tagService.Get(userId);
+        tags = await _tagService.GetAsync(userId);
         StateHasChanged();
     }
 

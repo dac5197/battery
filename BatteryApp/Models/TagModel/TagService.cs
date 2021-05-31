@@ -17,32 +17,32 @@ namespace BatteryApp.Models.TagModel
             _contextFactory = contextFactory;
         }
 
-        public async Task<List<Tag>> Get()
+        public async Task<List<Tag>> GetAsync()
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Tags.ToListAsync();
         }
 
-        public async Task<List<Tag>> Get(Battery battery)
+        public async Task<List<Tag>> GetAsync(Battery battery)
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Tags.Where(x => x.BatteryId == battery.Id).ToListAsync();
         }
 
-        public async Task<List<Tag>> Get(string userId)
+        public async Task<List<Tag>> GetAsync(string userId)
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Tags.Where(x => x.OwnerId == userId).ToListAsync();
         }
 
-        public async Task<Tag> Get(int id)
+        public async Task<Tag> GetAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var tag = await context.Tags.FindAsync(id);
             return tag;
         }
 
-        public async Task<Tag> Add(Tag tag)
+        public async Task<Tag> AddAsync(Tag tag)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Tags.Add(tag);
@@ -50,7 +50,7 @@ namespace BatteryApp.Models.TagModel
             return tag;
         }
 
-        public async Task<Tag> Update(Tag tag)
+        public async Task<Tag> UpdateAsync(Tag tag)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Entry(tag).State = EntityState.Modified;
@@ -58,7 +58,7 @@ namespace BatteryApp.Models.TagModel
             return tag;
         }
 
-        public async Task Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var tag = await context.Tags.FindAsync(id);

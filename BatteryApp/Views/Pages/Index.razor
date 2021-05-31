@@ -213,9 +213,9 @@ else
         batteries = await _batteryService.GetActiveAsync(userId);
         charges = await _chargeService.GetActiveAsync(userId);
         categories = await _categoryService.GetAsync(userId);
-        priorities = await _priorityService.Get(userId);
-        statuses = await _statusService.Get(userId);
-        tags = await _tagService.Get(userId);
+        priorities = await _priorityService.GetAsync(userId);
+        statuses = await _statusService.GetAsync(userId);
+        tags = await _tagService.GetAsync(userId);
 
         btnClassActiveBatteries = btnActive;
         btnClassAllBatteries = btnInactive;
@@ -270,9 +270,9 @@ else
         // Get entities
         charges = await _chargeService.GetActiveAsync(userId);
         categories = await _categoryService.GetAsync(userId);
-        priorities = await _priorityService.Get(userId);
-        statuses = await _statusService.Get(userId);
-        tags = await _tagService.Get(userId);
+        priorities = await _priorityService.GetAsync(userId);
+        statuses = await _statusService.GetAsync(userId);
+        tags = await _tagService.GetAsync(userId);
 
         // Initialize other values
         SortChargesByStatus();
@@ -426,7 +426,7 @@ else
 
     private async void TagsChanged()
     {
-        tags = await _tagService.Get(userId);
+        tags = await _tagService.GetAsync(userId);
         StateHasChanged();
     }
 

@@ -5,16 +5,16 @@ namespace BatteryApp.Models.TagModel
 {
     public interface IChargeTagRelationService
     {
-        Task<ChargeTagRelation> Add(ChargeTagRelation relation);
-        Task<ChargeTagRelation> Add(int chargeId, int tagId);
-        Task Delete(int id);
-        Task Delete(int chargeId, int tagId);
-        Task<List<ChargeTagRelation>> Get();
-        Task<ChargeTagRelation> Get(int id);
-        Task<ChargeTagRelation> Get(int chargeId, int tagId);
-        Task<List<ChargeTagRelation>> GetAllRelationsForTag(int tagId);
-        Task<List<ChargeTagRelation>> GetAllRelationsForCharge(int chargeId);
-        Task<ChargeTagRelation> Update(ChargeTagRelation relation);
-        Task<ChargeTagRelation> Update(int chargeId, int tagId);
+        Task<ChargeTagRelation> AddAsync(ChargeTagRelation relation);
+        Task<ChargeTagRelation> AddAsync(int chargeId, int tagId);
+        Task DeleteAsync(int id);
+        Task DeleteAsync(int chargeId, int tagId);
+        Task<List<ChargeTagRelation>> GetAsync();
+        Task<ChargeTagRelation> GetAsync(int id);
+        Task<ChargeTagRelation> GetAsync(int chargeId, int tagId);
+        Task<List<ChargeTagRelation>> GetAllRelationsForTagAsync(int tagId);
+        Task<List<ChargeTagRelation>> GetAllRelationsForChargeAsync(int chargeId);
+        Task<ChargeTagRelation> UpdateAsync(ChargeTagRelation relation);
+        Task<ChargeTagRelation> UpdateAsync(int chargeId, int tagId);
     }
 }

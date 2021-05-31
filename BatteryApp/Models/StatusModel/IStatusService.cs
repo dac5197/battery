@@ -6,15 +6,15 @@ namespace BatteryApp.Models.StatusModel
 {
     public interface IStatusService
     {
-        Task<Status> Add(Status status);
-        Task Delete(int id);
-        Task<List<Status>> Get();
-        Task<List<Status>> Get(Battery battery);
-        Task<List<Status>> Get(string userId);
-        Task<Status> Get(int id);
-        Task<Status> GetCompletedStatus(int batteryId);
+        Task<Status> AddAsync(Status status);
+        Task DeleteAsync(int id);
+        Task<List<Status>> GetAsync();
+        Task<List<Status>> GetAsync(Battery battery);
+        Task<List<Status>> GetAsync(string userId);
+        Task<Status> GetAsync(int id);
+        Task<Status> GetCompletedStatusAsync(int batteryId);
         List<Status> GetDefaultValues();
-        Task<Status> GetInitialStatus(int batteryId);
-        Task<Status> Update(Status status);
+        Task<Status> GetInitialStatusAsync(int batteryId);
+        Task<Status> UpdateAsync(Status status);
     }
 }

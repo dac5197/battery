@@ -19,34 +19,34 @@ namespace BatteryApp.Models.PriorityModel
             _contextFactory = contextFactory;
         }
 
-        public async Task<List<Priority>> Get()
+        public async Task<List<Priority>> GetAsync()
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Priorities.ToListAsync();
         }
 
-        public async Task<List<Priority>> Get(Battery battery)
+        public async Task<List<Priority>> GetAsync(Battery battery)
         {
             using var context = _contextFactory.CreateDbContext();
             var priorities = await context.Priorities.ToListAsync();
             return priorities.Where(x => x.BatteryId == battery.Id).ToList();
         }
 
-        public async Task<List<Priority>> Get(string userId)
+        public async Task<List<Priority>> GetAsync(string userId)
         {
             using var context = _contextFactory.CreateDbContext();
             var priorities = await context.Priorities.ToListAsync();
             return priorities.Where(x => x.OwnerId == userId).ToList();
         }
 
-        public async Task<Priority> Get(int id)
+        public async Task<Priority> GetAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var priority = await context.Priorities.FindAsync(id);
             return priority;
         }
 
-        public async Task<Priority> GetDefault(int batteryId)
+        public async Task<Priority> GetDefaultAsync(int batteryId)
         {
             using var context = _contextFactory.CreateDbContext();
             var priorities = await context.Priorities.ToListAsync();
@@ -79,7 +79,7 @@ namespace BatteryApp.Models.PriorityModel
             return priorities;
         }
 
-        public async Task<Priority> Add(Priority priority)
+        public async Task<Priority> AddAsync(Priority priority)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Priorities.Add(priority);
@@ -87,7 +87,7 @@ namespace BatteryApp.Models.PriorityModel
             return priority;
         }
 
-        public async Task<Priority> Update(Priority priority)
+        public async Task<Priority> UpdateAsync(Priority priority)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Entry(priority).State = EntityState.Modified;
@@ -95,7 +95,7 @@ namespace BatteryApp.Models.PriorityModel
             return priority;
         }
 
-        public async Task Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var priority = await context.Priorities.FindAsync(id);

@@ -103,7 +103,7 @@
             else
             {
                 tag = _tagController.SetDefaults(Battery, tag);
-                await _tagService.Add(tag);
+                await _tagService.AddAsync(tag);
             }
 
             tag = new();

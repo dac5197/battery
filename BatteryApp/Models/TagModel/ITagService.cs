@@ -6,12 +6,12 @@ namespace BatteryApp.Models.TagModel
 {
     public interface ITagService
     {
-        Task<Tag> Add(Tag tag);
-        Task Delete(int id);
-        Task<List<Tag>> Get();
-        Task<List<Tag>> Get(Battery battery);
-        Task<List<Tag>> Get(string userId);
-        Task<Tag> Get(int id);
-        Task<Tag> Update(Tag tag);
+        Task<Tag> AddAsync(Tag tag);
+        Task DeleteAsync(int id);
+        Task<List<Tag>> GetAsync();
+        Task<List<Tag>> GetAsync(Battery battery);
+        Task<List<Tag>> GetAsync(string userId);
+        Task<Tag> GetAsync(int id);
+        Task<Tag> UpdateAsync(Tag tag);
     }
 }

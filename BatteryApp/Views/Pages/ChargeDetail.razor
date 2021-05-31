@@ -400,12 +400,12 @@
         battery = await _batteryService.GetAsync(charge.BatteryId);
         children = await _chargeService.GetChildrenAsync(charge);
         parent = await _chargeService.GetParentAsync(charge);
-        completeStatus = await _statusService.GetCompletedStatus(charge.BatteryId);
+        completeStatus = await _statusService.GetCompletedStatusAsync(charge.BatteryId);
 
         // Get Lists
         categories = await _categoryService.GetAsync(battery);
-        priorities = await _priorityService.Get(battery);
-        statuses = await _statusService.Get(battery);
+        priorities = await _priorityService.GetAsync(battery);
+        statuses = await _statusService.GetAsync(battery);
 
         // Get tags
         tags = await _tagController.GetAllTagsAsync(charge.Id);

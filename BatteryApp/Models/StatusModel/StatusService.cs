@@ -19,34 +19,34 @@ namespace BatteryApp.Models.StatusModel
             _contextFactory = contextFactory;
         }
 
-        public async Task<List<Status>> Get()
+        public async Task<List<Status>> GetAsync()
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Statuses.ToListAsync();
         }
 
-        public async Task<List<Status>> Get(Battery battery)
+        public async Task<List<Status>> GetAsync(Battery battery)
         {
             using var context = _contextFactory.CreateDbContext();
             var statuses = await context.Statuses.ToListAsync();
             return statuses.Where(x => x.BatteryId == battery.Id).ToList();
         }
 
-        public async Task<List<Status>> Get(string userId)
+        public async Task<List<Status>> GetAsync(string userId)
         {
             using var context = _contextFactory.CreateDbContext();
             var statuses = await context.Statuses.ToListAsync();
             return statuses.Where(x => x.OwnerId == userId).ToList();
         }
 
-        public async Task<Status> Get(int id)
+        public async Task<Status> GetAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var status = await context.Statuses.FindAsync(id);
             return status;
         }
 
-        public async Task<Status> GetCompletedStatus(int batteryId)
+        public async Task<Status> GetCompletedStatusAsync(int batteryId)
         {
             using var context = _contextFactory.CreateDbContext();
             var statuses = await context.Statuses.ToListAsync();
@@ -80,7 +80,7 @@ namespace BatteryApp.Models.StatusModel
             return statuses;
         }
 
-        public async Task<Status> GetInitialStatus(int batteryId)
+        public async Task<Status> GetInitialStatusAsync(int batteryId)
         {
             using var context = _contextFactory.CreateDbContext();
             var statuses = await context.Statuses.ToListAsync();
@@ -90,7 +90,7 @@ namespace BatteryApp.Models.StatusModel
             return initialStatus;
         }
 
-        public async Task<Status> Add(Status status)
+        public async Task<Status> AddAsync(Status status)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Statuses.Add(status);
@@ -98,7 +98,7 @@ namespace BatteryApp.Models.StatusModel
             return status;
         }
 
-        public async Task<Status> Update(Status status)
+        public async Task<Status> UpdateAsync(Status status)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Entry(status).State = EntityState.Modified;
@@ -106,19 +106,19 @@ namespace BatteryApp.Models.StatusModel
             return status;
         }
 
-        public async Task Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
                        
             var status = await context.Statuses.FindAsync(id);
 
-            await ReOrderStatuses(status);
+            await ReOrderStatusesAsync(status);
 
             context.Statuses.Remove(status);
             await context.SaveChangesAsync();
         }
 
-        private async Task ReOrderStatuses(Status status)
+        private async Task ReOrderStatusesAsync(Status status)
         {
             using var context = _contextFactory.CreateDbContext();
             var statuses = await context.Statuses.Where(x => x.BatteryId == status.BatteryId).ToListAsync();
@@ -127,7 +127,7 @@ namespace BatteryApp.Models.StatusModel
             foreach (var statusToBeReOrdered in statuseToBeReOrdered)
             {
                 statusToBeReOrdered.Order--;
-                await Update(statusToBeReOrdered);
+                await UpdateAsync(statusToBeReOrdered);
             }
         }
     }

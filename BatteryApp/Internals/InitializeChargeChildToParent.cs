@@ -33,10 +33,10 @@ namespace BatteryApp.Internals
             var childCategory = await _categoryService.GetDefaultChildCategoryAsync(parent.BatteryId);
             child.CategoryId = childCategory.Id;
             // Set child priority to default priority
-            var defaultPriority = await _priorityService.GetDefault(parent.BatteryId);
+            var defaultPriority = await _priorityService.GetDefaultAsync(parent.BatteryId);
             child.PriorityId = defaultPriority.Id;
             // Set child to initial status
-            var initialStatus = await _statusService.GetInitialStatus(parent.BatteryId);
+            var initialStatus = await _statusService.GetInitialStatusAsync(parent.BatteryId);
             child.StatusId = initialStatus.Id;
 
             return child;

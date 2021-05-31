@@ -25,7 +25,7 @@ namespace BatteryApp.Internals
 
         public async Task<DateTime?> GetCompletedAsync(Charge charge)
         {
-            var completedStatus = await _statusService.GetCompletedStatus(charge.BatteryId);
+            var completedStatus = await _statusService.GetCompletedStatusAsync(charge.BatteryId);
 
             if (charge.StatusId == completedStatus.Id)
             {
@@ -51,13 +51,13 @@ namespace BatteryApp.Internals
             charge.OwnerId = battery.OwnerId;
 
 
-            var initialStatus = await _statusService.GetInitialStatus(charge.BatteryId);
+            var initialStatus = await _statusService.GetInitialStatusAsync(charge.BatteryId);
             charge.StatusId = initialStatus.Id;
 
             var category = await _categoryService.GetDefaultChargeCategoryAsync(battery.Id);
             charge.CategoryId = category.Id;
 
-            var defaultPriority = await _priorityService.GetDefault(battery.Id);
+            var defaultPriority = await _priorityService.GetDefaultAsync(battery.Id);
             charge.PriorityId = defaultPriority.Id;
 
             return charge;
