@@ -73,8 +73,8 @@
 </div>
 
 <!-- Modals -->
-<IdentityUserDetailModal User="editUser" UserRoles="@editUserRoles" AllRoles="@allRoles" ParentStateChanged="@GetUsers"></IdentityUserDetailModal>
-<ConfirmDeleteModal ModalTitle="Confirm Delete" ParentDeleteAction="@DeleteUser">
+<IdentityUserDetailModal User="editUser" UserRoles="@editUserRoles" AllRoles="@allRoles" ParentStateChanged="@GetUsersAsync"></IdentityUserDetailModal>
+<ConfirmDeleteModal ModalTitle="Confirm Delete" ParentDeleteAction="@DeleteUserAsync">
     <ModalBody>
         <p>User: @editUser.UserName</p>
         <br />
@@ -99,11 +99,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await InitiliazeUsers();
+        await InitiliazeUsersAsync();
         allRoles = _RoleManager.Roles.Select(x => x.Name).ToList();
     }
 
-    private async Task InitializeCounts()
+    private async Task InitializeCountsAsync()
     {
         userBatteryCounts = new();
         userChargeCounts = new();
@@ -118,21 +118,21 @@
         }
     }
 
-    private async Task InitiliazeUsers()
+    private async Task InitiliazeUsersAsync()
     {
         editUser = new();
         users = new(_UserManager.Users.ToList());
-        await GetUserRoles();
-        await InitializeCounts();
+        await GetUserRolesAsync();
+        await InitializeCountsAsync();
     }
 
-    private async void GetUsers()
+    private async void GetUsersAsync()
     {
-        await InitiliazeUsers();
+        await InitiliazeUsersAsync();
         StateHasChanged();
     }
 
-    private async Task GetUserRoles()
+    private async Task GetUserRolesAsync()
     {
         userRoles = new();
 
@@ -155,7 +155,7 @@
         editUserRoles = new(userRoles[user.Id]);
     }
 
-    private async void DeleteUser()
+    private async void DeleteUserAsync()
     {
 
         var batteries = await _batteryService.GetAsync(editUser.Id);
@@ -168,7 +168,7 @@
         await _profileService.Delete(editUser.Id);
         await _UserManager.DeleteAsync(editUser);
 
-        await InitiliazeUsers();
+        await InitiliazeUsersAsync();
         StateHasChanged();
     }
 }

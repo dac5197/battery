@@ -30,7 +30,7 @@
 else
 {
     <div class="small mt-2">
-        <EditForm Context="formContext" Model="battery" OnValidSubmit="@HandleValidSubmit">
+        <EditForm Context="formContext" Model="battery" OnValidSubmit="@HandleValidSubmitAsync">
             <DataAnnotationsValidator />
             <!-- Battery Details -->
             <div class="row mb-3">
@@ -102,7 +102,7 @@ else
                 <IndexTagList_Battery Tags="@tags"
                                       TagCounts="@(btnClassActiveCharges == btnActive ? tagActiveCounts : tagAllCounts)"
                                       FilterChargesByTag="@SearchTags"
-                                      SetManageTagsBattery="@SetManageTagsBattery"></IndexTagList_Battery>
+                                      SetManageTagsBattery="@SetManageTagsBatteryAsync"></IndexTagList_Battery>
             </div>
         </div>
 
@@ -237,13 +237,13 @@ else
                 <div class="card border-square shadow-sm p-2">
                     <div class="row justify-content-center">
                         <div class="col-sm-12">
-                            <button data-toggle="modal" data-target="#chargeModal" class="btn btn-success btn-sm mx-2 px-3 border-square" value="Add Charge" @onclick="(() => InitializeChargeObject())">Add Charge</button>
+                            <button data-toggle="modal" data-target="#chargeModal" class="btn btn-success btn-sm mx-2 px-3 border-square" value="Add Charge" @onclick="(() => InitializeChargeObjectAsync())">Add Charge</button>
                             <BtnGroup_TwoButtons BtnOneClass="@btnClassActiveCharges"
                                                  BtnOneText="Active"
-                                                 BtnOneAction="@SetActiveChargesFilter"
+                                                 BtnOneAction="@SetActiveChargesFilterAsync"
                                                  BtnTwoClass="@btnClassAllCharges"
                                                  BtnTwoText="All"
-                                                 BtnTwoAction="@SetAllChargesFilter"
+                                                 BtnTwoAction="@SetAllChargesFilterAsync"
                                                  QuestionToolTipAlignment="Center"
                                                  QuestionToolTipText="Toggle between Active Items (Open items or items completed within the last 3 days) and All Items"></BtnGroup_TwoButtons>
                             <BtnGroup_TwoButtons BtnOneClass="@btnClassChargeCardView"
@@ -271,7 +271,7 @@ else
                                                 Charges="@_search.GetCharges()"
                                                 chargesActiveCounts="@activeChargesCounts"
                                                 chargesInactiveCounts="@inactiveChargesCounts"
-                                                ParentStateChanged="@StateChanged"></ChargeCardList>
+                                                ParentStateChanged="@StateChangedAsync"></ChargeCardList>
                             </CascadingValue>
                         </CascadingValue>
                     </CascadingValue>
@@ -290,7 +290,7 @@ else
                                              @ref="@chargeTable"
                                              Charges="@_search.GetCharges()"
                                              ChargeChildrenCounts="@chargeChildrenCounts"
-                                             ParentStateChanged="@StateChanged"></ChargeTable>
+                                             ParentStateChanged="@StateChangedAsync"></ChargeTable>
                             </CascadingValue>
                         </CascadingValue>
                     </CascadingValue>
@@ -305,15 +305,15 @@ else
                        Categories="@categories"
                        Priorities="@priorities"
                        Statuses="@statuses"
-                       ParentStateChanged="@StateChanged"></ChargeDetailModal>
+                       ParentStateChanged="@StateChangedAsync"></ChargeDetailModal>
 
     <ChargeChildrenWarningModal Charge="@_chargeOpenChildrenModalHelper.Charge"
-                                CompletedOpenChildren="@CompleteChargeWithChildren"
+                                CompletedOpenChildren="@CompleteChargeWithChildrenAsync"
                                 OpenChildren="@_chargeOpenChildrenModalHelper.OpenChildren"></ChargeChildrenWarningModal>
 
-    <BatteryDetailExisting_CategoryOptionsModal Battery="@battery" Categories="@categories" ParentStateChanged="@StateChanged"></BatteryDetailExisting_CategoryOptionsModal>
-    <BatteryDetailExisting_PriorityOptionsModal Battery="@battery" Priorities="@priorities" ParentStateChanged="@StateChanged"></BatteryDetailExisting_PriorityOptionsModal>
-    <BatteryDetailExisting_StatusOptionsModal Battery="@battery" Statuses="@statuses" ParentStateChanged="@StateChanged"></BatteryDetailExisting_StatusOptionsModal>
+    <BatteryDetailExisting_CategoryOptionsModal Battery="@battery" Categories="@categories" ParentStateChanged="@StateChangedAsync"></BatteryDetailExisting_CategoryOptionsModal>
+    <BatteryDetailExisting_PriorityOptionsModal Battery="@battery" Priorities="@priorities" ParentStateChanged="@StateChangedAsync"></BatteryDetailExisting_PriorityOptionsModal>
+    <BatteryDetailExisting_StatusOptionsModal Battery="@battery" Statuses="@statuses" ParentStateChanged="@StateChangedAsync"></BatteryDetailExisting_StatusOptionsModal>
 
     <DeleteBatteryModal Battery="@battery"
                         ChargesCount="@allChargesCount"
@@ -325,7 +325,7 @@ else
                      Tags="@tags"
                      TagActiveCounts="@tagActiveCounts"
                      TagAllCounts="@tagAllCounts"
-                     ParentStateChanged="@TagsChanged"></ManageTagsModal>
+                     ParentStateChanged="@TagsChangedAsync"></ManageTagsModal>
 }
 
 
@@ -392,14 +392,14 @@ else
         tags = await _tagService.GetAsync(battery);
 
         // Calculate counts
-        await GetChargeCounts();
-        await GetTagCounts();
+        await GetChargeCountsAsync();
+        await GetTagCountsAsync();
 
         // Initialize search entities
         _search.Initialize(battery);
         _search.Initialize(charges);
-        await InitializeChargeChildren();
-        await InitializeTagSearch();
+        await InitializeChargeChildrenAsync();
+        await InitializeTagSearchAsync();
 
         // Set filter button bootstrap classes
         btnClassActiveCharges = btnActive;
@@ -425,7 +425,7 @@ else
         }
     }
 
-    private async Task InitializeChargeChildren()
+    private async Task InitializeChargeChildrenAsync()
     {
         foreach (var charge in charges)
         {
@@ -434,31 +434,31 @@ else
         }
     }
 
-    private async void InitializeChargeObject()
+    private async void InitializeChargeObjectAsync()
     {
         chargeObject = new Charge();
         chargeObject = await _chargeLifecycle.SetDefaultValuesAsync(battery, chargeObject);
         chargeDetailModal.StateChanged();
     }
 
-    private async Task InitializeTagSearch()
+    private async Task InitializeTagSearchAsync()
     {
         var relations = await _tagController.GetAllRelationsForBatteryAsync(battery);
 
         _search.Initialize(relations);
     }
 
-    private async void StateChanged()
+    private async void StateChangedAsync()
     {
-        GetOptions();
+        GetOptionsAsync();
 
         if (btnClassActiveCharges == btnActive)
         {
-            await GetActiveCharges();
+            await GetActiveChargesAsync();
         }
         else
         {
-            await GetAllCharges();
+            await GetAllChargesAsync();
         }
 
         StateHasChanged();
@@ -474,7 +474,7 @@ else
         textareaRows = _calcTextareaRows.CalculateRows((string)e.Value, minTextareaRows, maxTextareaRows);
     }
 
-    private async void HandleValidSubmit()
+    private async void HandleValidSubmitAsync()
     {
         await _batteryService.UpdateAsync(battery);
         StateHasChanged();
@@ -523,23 +523,23 @@ else
         StateHasChanged();
     }
 
-    private async Task GetAllCharges()
+    private async Task GetAllChargesAsync()
     {
         charges = await _chargeService.GetAsync(battery);
-        await GetCharges();
+        await GetChargesAsync();
     }
 
-    private async Task GetActiveCharges()
+    private async Task GetActiveChargesAsync()
     {
         charges = await _chargeService.GetActiveAsync(battery);
-        await GetCharges();
+        await GetChargesAsync();
     }
 
-    private async Task GetCharges()
+    private async Task GetChargesAsync()
     {
-        await GetChargeCounts();
+        await GetChargeCountsAsync();
         _search.Initialize(charges);
-        await InitializeChargeChildren();
+        await InitializeChargeChildrenAsync();
         _search.SearchCharges(searchText);
         _search.SearchChildren(searchText);
         chargeTable?.ResetSort();
@@ -547,27 +547,27 @@ else
         StateHasChanged();
     }
 
-    private async void GetOptions()
+    private async void GetOptionsAsync()
     {
         categories = await _categoryService.GetAsync(battery);
         priorities = await _priorityService.GetAsync(battery);
         statuses = await _statusService.GetAsync(battery);
     }
 
-    private async void SetActiveChargesFilter()
+    private async void SetActiveChargesFilterAsync()
     {
         btnClassActiveCharges = btnActive;
         btnClassAllCharges = btnInactive;
 
-        await GetActiveCharges();
+        await GetActiveChargesAsync();
     }
 
-    private async void SetAllChargesFilter()
+    private async void SetAllChargesFilterAsync()
     {
         btnClassActiveCharges = btnInactive;
         btnClassAllCharges = btnActive;
 
-        await GetAllCharges();
+        await GetAllChargesAsync();
     }
 
     private void ShowChargeCardView()
@@ -598,17 +598,17 @@ else
         showChargeCardChildren = !string.IsNullOrWhiteSpace(searchText);
     }
 
-    private async void CompleteChargeWithChildren()
+    private async void CompleteChargeWithChildrenAsync()
     {
         var charge = _chargeOpenChildrenModalHelper.Charge;
         var completeStatus = await _statusService.GetCompletedStatusAsync(battery.Id);
         charge.StatusId = completeStatus.Id;
         await _chargeService.UpdateAsync(charge);
 
-        StateChanged();
+        StateChangedAsync();
     }
 
-    private async Task GetChargeCounts()
+    private async Task GetChargeCountsAsync()
     {
         chargeChildrenCounts = await _chargeCountService.GetChildrenCountAsync(charges);
         allChargesCount = await _chargeCountService.GetAllCountAsync(battery);
@@ -616,18 +616,18 @@ else
         inactiveChargesCounts = await _chargeCountService.GetInactiveCountsByStatusAsync(battery);
     }
 
-    private async Task SetManageTagsBattery(int batteryId)
+    private async Task SetManageTagsBatteryAsync(int batteryId)
     {
-        await GetTagCounts();
+        await GetTagCountsAsync();
     }
 
-    private async void TagsChanged()
+    private async void TagsChangedAsync()
     {
         tags = await _tagService.GetAsync(userId);
         StateHasChanged();
     }
 
-    private async Task GetTagCounts()
+    private async Task GetTagCountsAsync()
     {
         tagActiveCounts = await _tagController.CountActiveChargeTagRelationshipsAsync(battery);
         tagAllCounts = await _tagController.CountAllChargeTagRelationshipsAsync(battery);

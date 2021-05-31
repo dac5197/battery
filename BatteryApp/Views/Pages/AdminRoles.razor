@@ -67,7 +67,7 @@
 
 <!-- Modals -->
 <IdentityRoleDetailModal Role="@editRole" RoleName="@editRole.Name" ParentStateChanged="@GetRoles"></IdentityRoleDetailModal>
-<ConfirmDeleteModal ModalTitle="Confirm Delete" ParentDeleteAction="@DeleteRole">
+<ConfirmDeleteModal ModalTitle="Confirm Delete" ParentDeleteAction="@DeleteRoleAsync">
     <ModalBody>
         <p>Role: @editRole.Name</p>
         <br />
@@ -87,10 +87,10 @@
     protected override async Task OnInitializedAsync()
     {
         GetRoles();
-        await CountUsersAssignedToRole();
+        await CountUsersAssignedToRoleAsync();
     }
 
-    private async Task CountUsersAssignedToRole()
+    private async Task CountUsersAssignedToRoleAsync()
     {
         var users = _UserManager.Users.ToList();
 
@@ -122,7 +122,7 @@
         editRole = new();
     }
 
-    private async void DeleteRole()
+    private async void DeleteRoleAsync()
     {
         await _RoleManager.DeleteAsync(editRole);
         GetRoles();
