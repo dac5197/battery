@@ -36,7 +36,7 @@ namespace BatteryApp.Internals
                 category.BatteryId = battery.Id;
                 category.OwnerId = battery.OwnerId;
 
-                await _categoryService.Add(category);
+                await _categoryService.AddAsync(category);
             }
         }
 

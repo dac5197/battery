@@ -110,10 +110,10 @@
 
         foreach (var user in users)
         {
-            int batteryCount = await _batteryService.GetCount(user.Id);
+            int batteryCount = await _batteryService.GetCountAsync(user.Id);
             userBatteryCounts.Add(user.Id, batteryCount);
 
-            int chargeCount = await _chargeService.GetCount(user.Id);
+            int chargeCount = await _chargeService.GetCountAsync(user.Id);
             userChargeCounts.Add(user.Id, chargeCount);
         }
     }
@@ -158,11 +158,11 @@
     private async void DeleteUser()
     {
 
-        var batteries = await _batteryService.Get(editUser.Id);
+        var batteries = await _batteryService.GetAsync(editUser.Id);
 
         foreach (var battery in batteries)
         {
-            await _batteryService.Delete(battery.Id);
+            await _batteryService.DeleteAsync(battery.Id);
         }
 
         await _profileService.Delete(editUser.Id);

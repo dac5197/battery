@@ -131,17 +131,17 @@
                 {
                     category.BatteryId = Battery.Id;
                     category.OwnerId = Battery.OwnerId;
-                    await _categoryService.Add(category);
+                    await _categoryService.AddAsync(category);
                 }
                 // Update exsting Category
                 else
                 {
-                    await _categoryService.Update(category);
+                    await _categoryService.UpdateAsync(category);
                 }
             }
 
             // Delete any Categories in DB but not in Categories list
-            var originalValueCategories = await _categoryService.Get(Battery);
+            var originalValueCategories = await _categoryService.GetAsync(Battery);
             var categoriesToBeDeleted = originalValueCategories.Where(o => !Categories.Any(c => c.Id == o.Id)).ToList();
 
             if (categoriesToBeDeleted.Any())
@@ -162,7 +162,7 @@
 
     private async void ResetEditCategories()
     {
-        Categories = await _categoryService.Get(Battery);
+        Categories = await _categoryService.GetAsync(Battery);
         _validationService.ClearErrors();
         StateHasChanged();
     }
@@ -200,7 +200,7 @@
     {
         var defaultCategory = Categories.Where(x => x.IsDefaultChargeCategory == true).FirstOrDefault();
 
-        var charges = await _chargeService.Get(Battery);
+        var charges = await _chargeService.GetAsync(Battery);
 
         foreach (var category in categories)
         {
@@ -208,7 +208,7 @@
 
             await UpdateCharges(chargesToBeChanged, defaultCategory);
 
-            await _categoryService.Delete(category.Id);
+            await _categoryService.DeleteAsync(category.Id);
         }
     }
 
@@ -217,7 +217,7 @@
         foreach (var charge in charges)
         {
             charge.CategoryId = category.Id;
-            await _chargeService.Update(charge);
+            await _chargeService.UpdateAsync(charge);
         }
     }
 }

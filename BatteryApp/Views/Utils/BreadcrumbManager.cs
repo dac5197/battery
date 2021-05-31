@@ -46,7 +46,7 @@ namespace BatteryApp.Views.Utils
 
         public async Task AddChargeLink(Charge charge)
         {
-            Category category = await _categoryService.Get(charge.CategoryId);
+            Category category = await _categoryService.GetAsync(charge.CategoryId);
 
             string url = $"/charge/{charge.Id}";
             string label = $"{category.Name}{charge.Id}";
@@ -55,7 +55,7 @@ namespace BatteryApp.Views.Utils
 
             if (charge.ParentId is not null)
             {
-                Charge parent = await _chargeService.Get((int)charge.ParentId);
+                Charge parent = await _chargeService.GetAsync((int)charge.ParentId);
                 await AddChargeLink(parent);
             }
         }

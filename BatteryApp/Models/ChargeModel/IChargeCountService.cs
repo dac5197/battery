@@ -6,10 +6,10 @@ namespace BatteryApp.Models.ChargeModel
 {
     public interface IChargeCountService
     {
-        Task<int> GetActiveCount(Battery battery);
-        Task<int> GetAllCount(Battery battery);
-        Task<Dictionary<int, int>> GetActiveCountsByStatus(Battery battery);
-        Task<List<ChargeChildrenCount>> GetChildrenCount(List<Charge> charges);
-        Task<Dictionary<int, int>> GetInactiveCountsByStatus(Battery battery);
+        Task<int> GetActiveCountAsync(Battery battery);
+        Task<int> GetAllCountAsync(Battery battery);
+        Task<Dictionary<int, int>> GetActiveCountsByStatusAsync(Battery battery);
+        Task<List<ChargeChildrenCount>> GetChildrenCountAsync(List<Charge> charges);
+        Task<Dictionary<int, int>> GetInactiveCountsByStatusAsync(Battery battery);
     }
 }

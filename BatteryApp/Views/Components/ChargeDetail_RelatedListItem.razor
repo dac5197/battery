@@ -59,7 +59,7 @@
     protected override async Task OnInitializedAsync()
     {
         isCompleted = _chargeLifecycle.IsCompleted(Charge);
-        category = await _categoryService.Get(Charge.CategoryId);
+        category = await _categoryService.GetAsync(Charge.CategoryId);
         tags = await _tagController.GetAllTagsAsync(Charge.Id);
     }
 

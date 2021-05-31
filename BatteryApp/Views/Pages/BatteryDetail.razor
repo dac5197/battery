@@ -380,13 +380,13 @@ else
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
         // Get Battery
-        battery = await _batteryService.Get(Id);
+        battery = await _batteryService.GetAsync(Id);
 
         RedirectUnAuthUser();
 
         // Get entities
-        categories = await _categoryService.Get(battery);
-        charges = await _chargeService.GetActive(battery);
+        categories = await _categoryService.GetAsync(battery);
+        charges = await _chargeService.GetActiveAsync(battery);
         priorities = await _priorityService.Get(battery);
         statuses = await _statusService.Get(battery);
         tags = await _tagService.Get(battery);
@@ -429,7 +429,7 @@ else
     {
         foreach (var charge in charges)
         {
-            var children = await _chargeService.GetChildren(charge);
+            var children = await _chargeService.GetChildrenAsync(charge);
             _search.AddChargeChildren(charge, children);
         }
     }
@@ -476,7 +476,7 @@ else
 
     private async void HandleValidSubmit()
     {
-        await _batteryService.Update(battery);
+        await _batteryService.UpdateAsync(battery);
         StateHasChanged();
     }
 
@@ -525,13 +525,13 @@ else
 
     private async Task GetAllCharges()
     {
-        charges = await _chargeService.Get(battery);
+        charges = await _chargeService.GetAsync(battery);
         await GetCharges();
     }
 
     private async Task GetActiveCharges()
     {
-        charges = await _chargeService.GetActive(battery);
+        charges = await _chargeService.GetActiveAsync(battery);
         await GetCharges();
     }
 
@@ -549,7 +549,7 @@ else
 
     private async void GetOptions()
     {
-        categories = await _categoryService.Get(battery);
+        categories = await _categoryService.GetAsync(battery);
         priorities = await _priorityService.Get(battery);
         statuses = await _statusService.Get(battery);
     }
@@ -603,17 +603,17 @@ else
         var charge = _chargeOpenChildrenModalHelper.Charge;
         var completeStatus = await _statusService.GetCompletedStatus(battery.Id);
         charge.StatusId = completeStatus.Id;
-        await _chargeService.Update(charge);
+        await _chargeService.UpdateAsync(charge);
 
         StateChanged();
     }
 
     private async Task GetChargeCounts()
     {
-        chargeChildrenCounts = await _chargeCountService.GetChildrenCount(charges);
-        allChargesCount = await _chargeCountService.GetAllCount(battery);
-        activeChargesCounts = await _chargeCountService.GetActiveCountsByStatus(battery);
-        inactiveChargesCounts = await _chargeCountService.GetInactiveCountsByStatus(battery);
+        chargeChildrenCounts = await _chargeCountService.GetChildrenCountAsync(charges);
+        allChargesCount = await _chargeCountService.GetAllCountAsync(battery);
+        activeChargesCounts = await _chargeCountService.GetActiveCountsByStatusAsync(battery);
+        inactiveChargesCounts = await _chargeCountService.GetInactiveCountsByStatusAsync(battery);
     }
 
     private async Task SetManageTagsBattery(int batteryId)

@@ -210,9 +210,9 @@ else
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
 
-        batteries = await _batteryService.GetActive(userId);
-        charges = await _chargeService.GetActive(userId);
-        categories = await _categoryService.Get(userId);
+        batteries = await _batteryService.GetActiveAsync(userId);
+        charges = await _chargeService.GetActiveAsync(userId);
+        categories = await _categoryService.GetAsync(userId);
         priorities = await _priorityService.Get(userId);
         statuses = await _statusService.Get(userId);
         tags = await _tagService.Get(userId);
@@ -227,13 +227,13 @@ else
 
     private async Task GetActiveBatteries()
     {
-        batteries = await _batteryService.GetActive(userId);
+        batteries = await _batteryService.GetActiveAsync(userId);
         await Initialize();
     }
 
     private async Task GetAllBatteries()
     {
-        batteries = await _batteryService.Get(userId);
+        batteries = await _batteryService.GetAsync(userId);
         await Initialize();
     }
 
@@ -257,7 +257,7 @@ else
 
     private async void BatteriesChanged()
     {
-        batteries = await _batteryService.GetActive(userId);
+        batteries = await _batteryService.GetActiveAsync(userId);
         _search.Initialize(batteries);
         InitializeShowBatteryChargesDict();
         InitializeShowBatteryTagsDict();
@@ -268,8 +268,8 @@ else
     private async Task Initialize()
     {
         // Get entities
-        charges = await _chargeService.GetActive(userId);
-        categories = await _categoryService.Get(userId);
+        charges = await _chargeService.GetActiveAsync(userId);
+        categories = await _categoryService.GetAsync(userId);
         priorities = await _priorityService.Get(userId);
         statuses = await _statusService.Get(userId);
         tags = await _tagService.Get(userId);
@@ -316,7 +316,7 @@ else
     {
         foreach (var charge in charges)
         {
-            var children = await _chargeService.GetChildren(charge);
+            var children = await _chargeService.GetChildrenAsync(charge);
             _search.AddChargeChildren(charge, children);
         }
     }

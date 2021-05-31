@@ -22,20 +22,20 @@ namespace BatteryApp.Models.BatteryModel
             _deleteChargeController = deleteChargeController;
         }
 
-        public async Task<List<Battery>> Get()
+        public async Task<List<Battery>> GetAsync()
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Batteries.ToListAsync();
         }
 
-        public async Task<List<Battery>> Get(string userId)
+        public async Task<List<Battery>> GetAsync(string userId)
         {
             using var context = _contextFactory.CreateDbContext();
             var batteries = await context.Batteries.ToListAsync();
             return batteries.Where(x => x.OwnerId == userId).ToList();
         }
 
-        public async Task<List<Battery>> GetActive(string userId)
+        public async Task<List<Battery>> GetActiveAsync(string userId)
         {
             using var context = _contextFactory.CreateDbContext();
             var batteries = await context.Batteries.ToListAsync();
@@ -44,20 +44,20 @@ namespace BatteryApp.Models.BatteryModel
                             .ToList();
         }
 
-        public async Task<Battery> Get(int id)
+        public async Task<Battery> GetAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var battery = await context.Batteries.FindAsync(id);
             return battery;
         }
 
-        public async Task<int> GetCount(string userId)
+        public async Task<int> GetCountAsync(string userId)
         {
-            var batteries = await Get(userId);
+            var batteries = await GetAsync(userId);
             return batteries.Count;
         }
 
-        public async Task<Battery> Add(Battery battery)
+        public async Task<Battery> AddAsync(Battery battery)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Batteries.Add(battery);
@@ -65,7 +65,7 @@ namespace BatteryApp.Models.BatteryModel
             return battery;
         }
 
-        public async Task<Battery> Update(Battery battery)
+        public async Task<Battery> UpdateAsync(Battery battery)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Entry(battery).State = EntityState.Modified;
@@ -73,20 +73,20 @@ namespace BatteryApp.Models.BatteryModel
             return battery;
         }
 
-        public async Task Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var battery = await context.Batteries.FindAsync(id);
 
-            await DeleteAllChargesAndRelatedItems(battery);
+            await DeleteAllChargesAndRelatedItemsAsync(battery);
 
             context.Batteries.Remove(battery);
             await context.SaveChangesAsync();
         }
 
-        private async Task DeleteAllChargesAndRelatedItems(Battery battery)
+        private async Task DeleteAllChargesAndRelatedItemsAsync(Battery battery)
         {
-            var charges = await _chargeService.Get(battery);
+            var charges = await _chargeService.GetAsync(battery);
 
             foreach (var charge in charges)
             {

@@ -143,7 +143,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        children = await _chargeService.GetChildren(Charge);
+        children = await _chargeService.GetChildrenAsync(Charge);
         dateTimeFormat = _configuration["Configurations:DateTimeFormat"];
 
         ShowChildrenIfChargeIsParent();
@@ -175,8 +175,8 @@
 
     private async void StateChanged()
     {
-        children = await _chargeService.GetChildren(Charge);
-        await _chargeService.Get(Charge.Id);
+        children = await _chargeService.GetChildrenAsync(Charge);
+        await _chargeService.GetAsync(Charge.Id);
         StateHasChanged();
     }
 

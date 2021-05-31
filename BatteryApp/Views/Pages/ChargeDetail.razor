@@ -394,16 +394,16 @@
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
         // Get entities
-        charge = await _chargeService.Get(Id);
+        charge = await _chargeService.GetAsync(Id);
 
         RedirectUnAuthUser();
-        battery = await _batteryService.Get(charge.BatteryId);
-        children = await _chargeService.GetChildren(charge);
+        battery = await _batteryService.GetAsync(charge.BatteryId);
+        children = await _chargeService.GetChildrenAsync(charge);
         parent = await _chargeService.GetParent(charge);
         completeStatus = await _statusService.GetCompletedStatus(charge.BatteryId);
 
         // Get Lists
-        categories = await _categoryService.Get(battery);
+        categories = await _categoryService.GetAsync(battery);
         priorities = await _priorityService.Get(battery);
         statuses = await _statusService.Get(battery);
 
@@ -447,7 +447,7 @@
             return;
         }
 
-        await _chargeService.Update(charge);
+        await _chargeService.UpdateAsync(charge);
 
         if (!string.IsNullOrWhiteSpace(noteText))
         {
@@ -455,9 +455,9 @@
             noteText = "";
         }
 
-        charge = await _chargeService.Get(Id);
-        children = await _chargeService.GetChildren(charge);
-        category = await _categoryService.Get(charge.CategoryId);
+        charge = await _chargeService.GetAsync(Id);
+        children = await _chargeService.GetChildrenAsync(charge);
+        category = await _categoryService.GetAsync(charge.CategoryId);
         await RefreshNotes();
         StateHasChanged();
     }
@@ -469,7 +469,7 @@
 
     private async void ChildrenStateChanged()
     {
-        children = await _chargeService.GetChildren(charge);
+        children = await _chargeService.GetChildrenAsync(charge);
         hasOpenChildren = await _chargeChildController.HasOpenChildren(charge);
         await RefreshNotes();
         StateHasChanged();
@@ -487,7 +487,7 @@
 
     private async Task ChargeStateChanged()
     {
-        charge = await _chargeService.Get(Id);
+        charge = await _chargeService.GetAsync(Id);
         StateHasChanged();
     }
 
@@ -506,7 +506,7 @@
         if (!string.IsNullOrWhiteSpace(noteText))
         {
             await _noteService.AddNoteFromCharge(charge, noteText);
-            await _chargeService.SetUpdated(charge.Id);
+            await _chargeService.SetUpdatedAsync(charge.Id);
             noteText = "";
             await RefreshNotes();
             await ChargeStateChanged();

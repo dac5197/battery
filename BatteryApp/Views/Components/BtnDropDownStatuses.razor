@@ -54,7 +54,7 @@
         }
 
         Charge.StatusId = statusId;
-        await _chargeService.Update(Charge);
+        await _chargeService.UpdateAsync(Charge);
         ParentStateChanged?.Invoke();
     }
 }

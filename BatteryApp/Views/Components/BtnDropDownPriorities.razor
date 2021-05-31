@@ -39,7 +39,7 @@
     private async void ChangeChargePriority(int priorityId)
     {
         Charge.PriorityId = priorityId;
-        await _chargeService.Update(Charge);
+        await _chargeService.UpdateAsync(Charge);
         priority = Priorities.Where(x => x.Id == priorityId).FirstOrDefault();
         ParentStateChanged?.Invoke();
     }

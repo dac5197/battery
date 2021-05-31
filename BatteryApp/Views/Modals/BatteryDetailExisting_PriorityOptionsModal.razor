@@ -199,7 +199,7 @@
     {
         var defaultPriority = Priorities.Where(x => x.IsDefault == true).FirstOrDefault();
 
-        var charges = await _chargeService.Get(Battery);
+        var charges = await _chargeService.GetAsync(Battery);
 
         foreach (var priority in priorities)
         {
@@ -216,7 +216,7 @@
         foreach (var charge in charges)
         {
             charge.PriorityId = priority.Id;
-            await _chargeService.Update(charge);
+            await _chargeService.UpdateAsync(charge);
         }
     }
 }

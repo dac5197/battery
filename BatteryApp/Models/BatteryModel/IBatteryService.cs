@@ -5,13 +5,13 @@ namespace BatteryApp.Models.BatteryModel
 {
     public interface IBatteryService
     {
-        Task<Battery> Add(Battery Battery);
-        Task Delete(int id);
-        Task<List<Battery>> Get();
-        Task<List<Battery>> Get(string userId);
-        Task<List<Battery>> GetActive(string userId);
-        Task<Battery> Get(int id);
-        Task<int> GetCount(string userId);
-        Task<Battery> Update(Battery Battery);
+        Task<Battery> AddAsync(Battery Battery);
+        Task DeleteAsync(int id);
+        Task<List<Battery>> GetAsync();
+        Task<List<Battery>> GetAsync(string userId);
+        Task<List<Battery>> GetActiveAsync(string userId);
+        Task<Battery> GetAsync(int id);
+        Task<int> GetCountAsync(string userId);
+        Task<Battery> UpdateAsync(Battery Battery);
     }
 }

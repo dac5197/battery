@@ -42,7 +42,7 @@ namespace BatteryApp.Internals
         public async Task<List<Charge>> GetAllChargesAsync(Tag tag, Battery battery)
         {
             var relations = await _chargeTagRelationService.GetAllRelationsForTag(tag.Id);
-            var charges = await _chargeService.GetActive(battery);
+            var charges = await _chargeService.GetActiveAsync(battery);
             var output = charges.Where(c => relations.Any(r => r.ChargeId == c.Id)).ToList();
 
             return output;
@@ -67,7 +67,7 @@ namespace BatteryApp.Internals
             var newTag = await _tagService.Add(tag);
             await _chargeTagRelationService.Add(chargeId, newTag.Id);
             await _noteService.AddTagHistoryNote(chargeId, tag);
-            await _chargeService.SetUpdated(chargeId);
+            await _chargeService.SetUpdatedAsync(chargeId);
         }
 
         public async Task AddRelationshipAsync(int chargeId, Tag tag)
@@ -78,7 +78,7 @@ namespace BatteryApp.Internals
             {
                 await _chargeTagRelationService.Add(chargeId, tag.Id);
                 await _noteService.AddTagHistoryNote(chargeId, tag);
-                await _chargeService.SetUpdated(chargeId);
+                await _chargeService.SetUpdatedAsync(chargeId);
             }
         }
 
@@ -86,7 +86,7 @@ namespace BatteryApp.Internals
         {
             await _noteService.RemoveTagHistoryNote(chargeId, tag);
             await _chargeTagRelationService.Delete(chargeId, tag.Id);
-            await _chargeService.SetUpdated(chargeId);
+            await _chargeService.SetUpdatedAsync(chargeId);
         }
 
         public async Task DeleteTagAndAllRelationshipsAsync(int tagId)
@@ -164,7 +164,7 @@ namespace BatteryApp.Internals
             Dictionary<int, int> counts = new();
             var tags = await _tagService.Get(battery);
 
-            var combinedCharges = await _chargeService.GetActiveParentsAndChildren(battery);
+            var combinedCharges = await _chargeService.GetActiveParentsAndChildrenAsync(battery);
 
             foreach (var tag in tags)
             {
@@ -186,7 +186,7 @@ namespace BatteryApp.Internals
             Dictionary<int, int> counts = new();
             var tags = await _tagService.Get(userId);
 
-            var combinedCharges = await _chargeService.GetActiveParentsAndChildren(userId);
+            var combinedCharges = await _chargeService.GetActiveParentsAndChildrenAsync(userId);
 
             foreach (var tag in tags)
             {

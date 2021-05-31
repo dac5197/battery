@@ -55,7 +55,7 @@
 
     private async void Delete()
     {
-        await _batteryService.Delete(Battery.Id);
+        await _batteryService.DeleteAsync(Battery.Id);
         _navManager.NavigateTo("/", true);
     }
 

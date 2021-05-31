@@ -106,7 +106,7 @@ else
         var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
-        batteries = await _batteryService.GetActive(userId);
+        batteries = await _batteryService.GetActiveAsync(userId);
         filteredBatteries = batteries;
 
         defaultCategories = _categoryService.GetDefaultValues();
@@ -155,7 +155,7 @@ else
 
     private async Task GetAllBatteries()
     {
-        batteries = await _batteryService.Get(userId);
+        batteries = await _batteryService.GetAsync(userId);
         FilterBatteryList();
         StateHasChanged();
     }
@@ -170,7 +170,7 @@ else
 
     private async Task GetActiveBatteries()
     {
-        batteries = await _batteryService.GetActive(userId);
+        batteries = await _batteryService.GetActiveAsync(userId);
         FilterBatteryList();
         StateHasChanged();
     }

@@ -20,34 +20,34 @@ namespace BatteryApp.Models.CategoryModel
             _contextFactory = contextFactory;
         }
 
-        public async Task<List<Category>> Get()
+        public async Task<List<Category>> GetAsync()
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Categories.ToListAsync();
         }
 
-        public async Task<List<Category>> Get(Battery battery)
+        public async Task<List<Category>> GetAsync(Battery battery)
         {
             using var context = _contextFactory.CreateDbContext();
             var categories = await context.Categories.ToListAsync();
             return categories.Where(x => x.BatteryId == battery.Id).ToList();
         }
 
-        public async Task<List<Category>> Get(string userId)
+        public async Task<List<Category>> GetAsync(string userId)
         {
             using var context = _contextFactory.CreateDbContext();
             var categories = await context.Categories.ToListAsync();
             return categories.Where(x => x.OwnerId == userId).ToList();
         }
 
-        public async Task<Category> Get(int id)
+        public async Task<Category> GetAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var category = await context.Categories.FindAsync(id);
             return category;
         }
 
-        public async Task<Category> GetByName(string name)
+        public async Task<Category> GetByNameAsync(string name)
         {
             using var context = _contextFactory.CreateDbContext();
             var categories = await context.Categories.ToListAsync();
@@ -55,7 +55,7 @@ namespace BatteryApp.Models.CategoryModel
             return category;
         }
 
-        public async Task<Category> GetDefaultChargeCategory(int batteryId)
+        public async Task<Category> GetDefaultChargeCategoryAsync(int batteryId)
         {
             using var context = _contextFactory.CreateDbContext();
             var categories = await context.Categories.ToListAsync();
@@ -65,7 +65,7 @@ namespace BatteryApp.Models.CategoryModel
             return category;
         }
 
-        public async Task<Category> GetDefaultChildCategory(int batteryId)
+        public async Task<Category> GetDefaultChildCategoryAsync(int batteryId)
         {
             using var context = _contextFactory.CreateDbContext();
             var categories = await context.Categories.ToListAsync();
@@ -112,7 +112,7 @@ namespace BatteryApp.Models.CategoryModel
 
         }
 
-        public async Task<Category> Add(Category category)
+        public async Task<Category> AddAsync(Category category)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Categories.Add(category);
@@ -120,7 +120,7 @@ namespace BatteryApp.Models.CategoryModel
             return category;
         }
 
-        public async Task<Category> Update(Category category)
+        public async Task<Category> UpdateAsync(Category category)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Entry(category).State = EntityState.Modified;
@@ -128,7 +128,7 @@ namespace BatteryApp.Models.CategoryModel
             return category;
         }
 
-        public async Task Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var category = await context.Categories.FindAsync(id);

@@ -140,7 +140,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        children = await _chargeService.GetChildren(Charge);
+        children = await _chargeService.GetChildrenAsync(Charge);
         tags = await _tagController.GetAllTagsAsync(Charge.Id);
 
         if (children.Any())

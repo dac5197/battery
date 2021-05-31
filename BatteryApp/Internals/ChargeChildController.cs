@@ -26,13 +26,13 @@ namespace BatteryApp.Internals
             foreach (var child in openChildren)
             {
                 child.StatusId = completedStatus.Id;
-                await _chargeService.Update(child);
+                await _chargeService.UpdateAsync(child);
             }
         }
 
         public async Task<List<Charge>> GetOpenChildren(Charge charge)
         {
-            var children = await _chargeService.GetChildren(charge);
+            var children = await _chargeService.GetChildrenAsync(charge);
             var completedStatus = await _statusService.GetCompletedStatus(charge.BatteryId);
 
             return children.Where(x => x.StatusId != completedStatus.Id).ToList();
@@ -71,7 +71,7 @@ namespace BatteryApp.Internals
                 }
             }
 
-            await _chargeService.Update(charge);
+            await _chargeService.UpdateAsync(charge);
         }
 
        

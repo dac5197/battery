@@ -206,7 +206,7 @@
     {
         var defaultStatus = Statuses.OrderBy(x => x.Order).FirstOrDefault();
 
-        var charges = await _chargeService.Get(Battery);
+        var charges = await _chargeService.GetAsync(Battery);
 
         foreach (var status in statuses)
         {
@@ -223,7 +223,7 @@
         foreach (var charge in charges)
         {
             charge.StatusId = status.Id;
-            await _chargeService.Update(charge);
+            await _chargeService.UpdateAsync(charge);
         }
     }
 

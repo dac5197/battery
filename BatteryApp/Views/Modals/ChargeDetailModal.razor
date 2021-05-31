@@ -133,11 +133,11 @@
     {
         if (Charge.Id == 0)
         {
-            await _chargeService.Add(Charge);
+            await _chargeService.AddAsync(Charge);
         }
         else
         {
-            await _chargeService.Update(Charge);
+            await _chargeService.UpdateAsync(Charge);
         }
 
         await CloseModal();

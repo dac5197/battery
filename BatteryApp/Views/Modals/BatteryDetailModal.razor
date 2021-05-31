@@ -322,7 +322,7 @@
         }
         else
         {
-            Battery newBattery = await _batteryService.Add(battery);
+            Battery newBattery = await _batteryService.AddAsync(battery);
 
             await _batteryAdvOptions.SaveAsync(newBattery, categories, priorities, statuses);
 

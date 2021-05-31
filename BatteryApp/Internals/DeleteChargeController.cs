@@ -28,7 +28,7 @@ namespace BatteryApp.Internals
 
         public async Task DeleteChildrenAsync(Charge charge)
         {
-            var children = await _chargeService.GetChildren(charge);
+            var children = await _chargeService.GetChildrenAsync(charge);
 
             foreach (var child in children)
             {
@@ -45,7 +45,7 @@ namespace BatteryApp.Internals
                 await _noteService.RemoveChildParentHistoryNote(charge);
             }
             
-            await _chargeService.Delete(charge.Id);
+            await _chargeService.DeleteAsync(charge.Id);
         }
 
         public async Task DeleteTagRelationshipsAsync(int chargeId)

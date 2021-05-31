@@ -6,23 +6,23 @@ namespace BatteryApp.Models.ChargeModel
 {
     public interface IChargeService
     {
-        Task<Charge> Add(Charge charge);
-        Task Delete(int id);
-        Task<List<Charge>> Get();
-        Task<Charge> Get(int id);
-        Task<List<Charge>> Get(string userId);
-        Task<List<Charge>> Get(Battery battery);
-        Task<List<Charge>> GetActive();
-        Task<List<Charge>> GetActive(Battery battery);
-        Task<List<Charge>> GetActive(string userId);
-        Task<List<Charge>> GetActiveParentsOnly(Battery battery);
-        Task<List<Charge>> GetActiveParentsOnly(string userId);
-        Task<List<Charge>> GetActiveParentsAndChildren(Battery battery);
-        Task<List<Charge>> GetActiveParentsAndChildren(string userId);
-        Task<List<Charge>> GetChildren(Charge charge);
-        Task<int> GetCount(string userId);
+        Task<Charge> AddAsync(Charge charge);
+        Task DeleteAsync(int id);
+        Task<List<Charge>> GetAsync();
+        Task<Charge> GetAsync(int id);
+        Task<List<Charge>> GetAsync(string userId);
+        Task<List<Charge>> GetAsync(Battery battery);
+        Task<List<Charge>> GetActiveAsync();
+        Task<List<Charge>> GetActiveAsync(Battery battery);
+        Task<List<Charge>> GetActiveAsync(string userId);
+        Task<List<Charge>> GetActiveParentsOnlyAsync(Battery battery);
+        Task<List<Charge>> GetActiveParentsOnlyAsync(string userId);
+        Task<List<Charge>> GetActiveParentsAndChildrenAsync(Battery battery);
+        Task<List<Charge>> GetActiveParentsAndChildrenAsync(string userId);
+        Task<List<Charge>> GetChildrenAsync(Charge charge);
+        Task<int> GetCountAsync(string userId);
         Task<Charge> GetParent(Charge charge);
-        Task<Charge> SetUpdated(int chargeId);
-        Task<Charge> Update(Charge charge);
+        Task<Charge> SetUpdatedAsync(int chargeId);
+        Task<Charge> UpdateAsync(Charge charge);
     }
 }

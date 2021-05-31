@@ -6,17 +6,17 @@ namespace BatteryApp.Models.CategoryModel
 {
     public interface ICategoryService
     {
-        Task<Category> Add(Category category);
-        Task Delete(int id);
-        Task<List<Category>> Get();
-        Task<Category> Get(int id);
-        Task<List<Category>> Get(Battery battery);
-        Task<List<Category>> Get(string userId);
-        Task<Category> GetByName(string name);
-        Task<Category> GetDefaultChargeCategory(int batteryId);
-        Task<Category> GetDefaultChildCategory(int batteryId);
+        Task<Category> AddAsync(Category category);
+        Task DeleteAsync(int id);
+        Task<List<Category>> GetAsync();
+        Task<Category> GetAsync(int id);
+        Task<List<Category>> GetAsync(Battery battery);
+        Task<List<Category>> GetAsync(string userId);
+        Task<Category> GetByNameAsync(string name);
+        Task<Category> GetDefaultChargeCategoryAsync(int batteryId);
+        Task<Category> GetDefaultChildCategoryAsync(int batteryId);
         List<Category> GetDefaultValues();
         List<string> GetIconList();
-        Task<Category> Update(Category category);
+        Task<Category> UpdateAsync(Category category);
     }
 }
