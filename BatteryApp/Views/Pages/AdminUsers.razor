@@ -10,6 +10,7 @@
 
 @inject IBatteryService _batteryService
 @inject IChargeService _chargeService
+@inject IUserProfileService _profileService
 
 <div class="row">
     <div class="col">
@@ -55,6 +56,8 @@
                             </button>
                             <button type="button"
                                     class="btn btn-danger btn-sm border-square"
+                                    data-toggle="modal"
+                                    data-target="#confirmDeleteModal"
                                     @onclick="@(() => SetEditUserToExisting(user))">
                                 X
                             </button>
@@ -69,6 +72,14 @@
 
 <!-- Modals -->
 <IdentityUserDetailModal User="editUser" UserRoles="@editUserRoles" AllRoles="@allRoles" ParentStateChanged="@GetUsers"></IdentityUserDetailModal>
+<ConfirmDeleteModal ModalTitle="Confirm Delete" ParentDeleteAction="@DeleteUser">
+    <ModalBody>
+        <p>User: @editUser.UserName</p>
+        <br />
+        <p>Deleting this User will delete it and all associations with it.</p>
+        <p>Do you want to continue?</p>
+    </ModalBody>
+</ConfirmDeleteModal>
 
 
 @code {
@@ -86,14 +97,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        users = _UserManager.Users.ToList();
+        await InitiliazeUsers();
         allRoles = _RoleManager.Roles.Select(x => x.Name).ToList();
-        await GetUserRoles();
-        await InitializeCounts();
     }
 
     private async Task InitializeCounts()
     {
+        userBatteryCounts = new();
+        userChargeCounts = new();
+
         foreach (var user in users)
         {
             int batteryCount = await _batteryService.GetCount(user.Id);
@@ -104,11 +116,17 @@
         }
     }
 
-    private async void GetUsers()
+    private async Task InitiliazeUsers()
     {
         editUser = new();
         users = new(_UserManager.Users.ToList());
         await GetUserRoles();
+        await InitializeCounts();
+    }
+
+    private async void GetUsers()
+    {
+        await InitiliazeUsers();
         StateHasChanged();
     }
 
@@ -121,20 +139,6 @@
             var roles = await _UserManager.GetRolesAsync(user);
 
             userRoles.Add(user.Id, roles.ToList());
-
-            //string strRoles = "";
-
-            //foreach (var role in roles)
-            //{
-            //    userRoles.Add(user.Id, role);
-            //}
-
-            //if (String.IsNullOrWhiteSpace(strRoles))
-            //{
-            //    strRoles = "N/A";
-            //}
-
-            //userRoles.Add(user.Id, strRoles);
         }
     }
 
@@ -149,4 +153,20 @@
         editUserRoles = new(userRoles[user.Id]);
     }
 
+    private async void DeleteUser()
+    {
+
+        var batteries = await _batteryService.Get(editUser.Id);
+
+        foreach (var battery in batteries)
+        {
+            await _batteryService.Delete(battery.Id);
+        }
+
+        await _profileService.Delete(editUser.Id);
+        await _UserManager.DeleteAsync(editUser);
+
+        await InitiliazeUsers();
+        StateHasChanged();
+    }
 }
