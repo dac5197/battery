@@ -61,7 +61,7 @@ namespace BatteryApp.Internals
             {
                 if (charge.ParentId is not null)
                 {
-                    var parent = await _chargeService.GetParent(charge);
+                    var parent = await _chargeService.GetParentAsync(charge);
                     charge.StatusId = parent.StatusId;
                 }
                 else

@@ -399,7 +399,7 @@
         RedirectUnAuthUser();
         battery = await _batteryService.GetAsync(charge.BatteryId);
         children = await _chargeService.GetChildrenAsync(charge);
-        parent = await _chargeService.GetParent(charge);
+        parent = await _chargeService.GetParentAsync(charge);
         completeStatus = await _statusService.GetCompletedStatus(charge.BatteryId);
 
         // Get Lists
@@ -412,8 +412,8 @@
         batteryTags = await _tagController.GetAllTagsAsync(battery);
 
         // Get notes
-        notes = await _noteService.GetAllNotesForCharge(charge.Id);
-        noteTypes = await _noteTypeService.Get();
+        notes = await _noteService.GetAllNotesForChargeAsync(charge.Id);
+        noteTypes = await _noteTypeService.GetAsync();
         ShowNoteNotes();
 
         // Get page objects
@@ -451,7 +451,7 @@
 
         if (!string.IsNullOrWhiteSpace(noteText))
         {
-            await _noteService.AddNoteFromCharge(charge, noteText);
+            await _noteService.AddNoteFromChargeAsync(charge, noteText);
             noteText = "";
         }
 
@@ -505,7 +505,7 @@
     {
         if (!string.IsNullOrWhiteSpace(noteText))
         {
-            await _noteService.AddNoteFromCharge(charge, noteText);
+            await _noteService.AddNoteFromChargeAsync(charge, noteText);
             await _chargeService.SetUpdatedAsync(charge.Id);
             noteText = "";
             await RefreshNotes();
@@ -544,7 +544,7 @@
 
     private async Task RefreshNotes()
     {
-        notes = await _noteService.GetAllNotesForCharge(charge.Id);
+        notes = await _noteService.GetAllNotesForChargeAsync(charge.Id);
 
         if (btnClassNoteNotes == btnActive)
         {

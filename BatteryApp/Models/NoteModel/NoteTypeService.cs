@@ -16,20 +16,20 @@ namespace BatteryApp.Models.NoteModel
             _contextFactory = contextFactory;
         }
 
-        public async Task<List<NoteType>> Get()
+        public async Task<List<NoteType>> GetAsync()
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.NoteTypes.ToListAsync();
         }
 
-        public async Task<NoteType> Get(int id)
+        public async Task<NoteType> GetAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var type = await context.NoteTypes.FindAsync(id);
             return type;
         }
 
-        public async Task<NoteType> Get(string name)
+        public async Task<NoteType> GetAsync(string name)
         {
             using var context = _contextFactory.CreateDbContext();
             var types = await context.NoteTypes.ToListAsync();
@@ -37,7 +37,7 @@ namespace BatteryApp.Models.NoteModel
             return type;
         }
 
-        public async Task<NoteType> Add(NoteType type)
+        public async Task<NoteType> AddAsync(NoteType type)
         {
             using var context = _contextFactory.CreateDbContext();
             context.NoteTypes.Add(type);
@@ -45,7 +45,7 @@ namespace BatteryApp.Models.NoteModel
             return type;
         }
 
-        public async Task<NoteType> Update(NoteType type)
+        public async Task<NoteType> UpdateAsync(NoteType type)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Entry(type).State = EntityState.Modified;
@@ -53,7 +53,7 @@ namespace BatteryApp.Models.NoteModel
             return type;
         }
 
-        public async Task Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var type = await context.NoteTypes.FindAsync(id);

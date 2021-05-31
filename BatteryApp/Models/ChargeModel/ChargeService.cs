@@ -147,7 +147,7 @@ namespace BatteryApp.Models.ChargeModel
             return charges.Count;
         }
 
-        public async Task<Charge> GetParent(Charge charge)
+        public async Task<Charge> GetParentAsync(Charge charge)
         {
             using var context = _contextFactory.CreateDbContext();
             var parent = await context.Charges.FindAsync(charge.ParentId);
@@ -166,12 +166,12 @@ namespace BatteryApp.Models.ChargeModel
             context.Charges.Add(charge);
             await context.SaveChangesAsync();
             
-            await _noteService.AddEntityHistoryNote(oldValues, newValues);
+            await _noteService.AddEntityHistoryNoteAsync(oldValues, newValues);
 
             if (charge.ParentId is not null)
             {
                 var parent = await GetAsync((int)charge.ParentId);
-                await _noteService.AddChildParentHistoryNote(charge, parent);
+                await _noteService.AddChildParentHistoryNoteAsync(charge, parent);
             }
 
             return charge;
@@ -187,7 +187,7 @@ namespace BatteryApp.Models.ChargeModel
             var oldValues = context.Entry(charge).GetDatabaseValues();
             var newValues = context.Entry(charge).CurrentValues;
 
-            await _noteService.AddEntityHistoryNote(oldValues, newValues);
+            await _noteService.AddEntityHistoryNoteAsync(oldValues, newValues);
 
             await context.SaveChangesAsync();
 

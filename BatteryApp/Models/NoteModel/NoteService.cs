@@ -21,27 +21,27 @@ namespace BatteryApp.Models.NoteModel
             _noteTypeService = noteTypeService;
         }
 
-        public async Task<List<Note>> Get()
+        public async Task<List<Note>> GetAsync()
         {
             using var context = _contextFactory.CreateDbContext();
             return await context.Notes.ToListAsync();
         }
 
-        public async Task<List<Note>> GetAllNotesForCharge(int chargeId)
+        public async Task<List<Note>> GetAllNotesForChargeAsync(int chargeId)
         {
             using var context = _contextFactory.CreateDbContext();
             var notes = await context.Notes.ToListAsync();
             return notes.Where(x => x.ChargeId == chargeId).ToList();
         }
 
-        public async Task<Note> Get(int id)
+        public async Task<Note> GetAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var note = await context.Notes.FindAsync(id);
             return note;
         }
 
-        public async Task<Note> Add(Note note)
+        public async Task<Note> AddAsync(Note note)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Notes.Add(note);
@@ -49,9 +49,9 @@ namespace BatteryApp.Models.NoteModel
             return note;
         }
 
-        public async Task<Note> AddNoteFromCharge(Charge charge, string noteText)
+        public async Task<Note> AddNoteFromChargeAsync(Charge charge, string noteText)
         {
-            NoteType noteType = await _noteTypeService.Get("Note");
+            NoteType noteType = await _noteTypeService.GetAsync("Note");
 
             Note note = new()
             {
@@ -68,11 +68,11 @@ namespace BatteryApp.Models.NoteModel
             return note;
         }
 
-        public async Task<Note> AddEntityHistoryNote(PropertyValues oldValues, PropertyValues newValues)
+        public async Task<Note> AddEntityHistoryNoteAsync(PropertyValues oldValues, PropertyValues newValues)
         {
             List<HistoryJson> historyJsonList = new();
             List<string> IgnoreFieldList = new() { "Created", "Updated" };
-            NoteType noteType = await _noteTypeService.Get("History");
+            NoteType noteType = await _noteTypeService.GetAsync("History");
 
             foreach (var property in newValues.Properties)
             {
@@ -111,15 +111,15 @@ namespace BatteryApp.Models.NoteModel
 
             if (historyJsonList.Count > 0)
             {
-                note = await Add(note);
+                note = await AddAsync(note);
             }
 
             return note;
         }
 
-        public async Task<Note> AddTagHistoryNote(int chargeId, Tag tag)
+        public async Task<Note> AddTagHistoryNoteAsync(int chargeId, Tag tag)
         {
-            NoteType noteType = await _noteTypeService.Get("Tag");
+            NoteType noteType = await _noteTypeService.GetAsync("Tag");
             List<HistoryJson> historyJsonList = new();
 
             HistoryJson record = new("Tag", null, tag.Name);
@@ -134,14 +134,14 @@ namespace BatteryApp.Models.NoteModel
                 Timestamp = DateTime.UtcNow
             };
 
-            note = await Add(note);
+            note = await AddAsync(note);
 
             return note;
         }
 
-        public async Task<Note> AddRelatedLinkHistoryNote(int chargeid, string desc, string linkType, string ownerId)
+        public async Task<Note> AddRelatedLinkHistoryNoteAsync(int chargeid, string desc, string linkType, string ownerId)
         {
-            NoteType noteType = await _noteTypeService.Get("Related");
+            NoteType noteType = await _noteTypeService.GetAsync("Related");
             List<HistoryJson> historyJsonList = new();
 
             HistoryJson record = new(linkType, null, desc);
@@ -156,22 +156,22 @@ namespace BatteryApp.Models.NoteModel
                 Timestamp = DateTime.UtcNow
             };
 
-            note = await Add(note);
+            note = await AddAsync(note);
 
             return note;
         }
 
-        public async Task AddChildParentHistoryNote(Charge child, Charge parent)
+        public async Task AddChildParentHistoryNoteAsync(Charge child, Charge parent)
         {
             // Add Child related link to Parent
-            await AddRelatedLinkHistoryNote(parent.Id, $"{child.Id}: {child.Title}", "Child", child.OwnerId);
+            await AddRelatedLinkHistoryNoteAsync(parent.Id, $"{child.Id}: {child.Title}", "Child", child.OwnerId);
             // Add Parent related link to Child
-            await AddRelatedLinkHistoryNote(child.Id, $"{parent.Id}: {parent.Title}", "Parent", child.OwnerId);
+            await AddRelatedLinkHistoryNoteAsync(child.Id, $"{parent.Id}: {parent.Title}", "Parent", child.OwnerId);
         }
 
-        public async Task<Note> RemoveTagHistoryNote(int chargeId, Tag tag)
+        public async Task<Note> RemoveTagHistoryNoteAsync(int chargeId, Tag tag)
         {
-            NoteType noteType = await _noteTypeService.Get("Tag");
+            NoteType noteType = await _noteTypeService.GetAsync("Tag");
             List<HistoryJson> historyJsonList = new();
             HistoryJson record = new("Tag", tag.Name, null);
             historyJsonList.Add(record);
@@ -185,14 +185,14 @@ namespace BatteryApp.Models.NoteModel
                 Timestamp = DateTime.UtcNow
             };
 
-            note = await Add(note);
+            note = await AddAsync(note);
 
             return note;
         }
 
-        public async Task<Note> RemoveChildParentHistoryNote(Charge child)
+        public async Task<Note> RemoveChildParentHistoryNoteAsync(Charge child)
         {
-            NoteType noteType = await _noteTypeService.Get("Related");
+            NoteType noteType = await _noteTypeService.GetAsync("Related");
             List<HistoryJson> historyJsonList = new();
 
             HistoryJson record = new("Child", $"{child.Id}: {child.Title}", null);
@@ -207,12 +207,12 @@ namespace BatteryApp.Models.NoteModel
                 Timestamp = DateTime.UtcNow
             };
 
-            note = await Add(note);
+            note = await AddAsync(note);
 
             return note;
         }
 
-        public async Task<Note> Update(Note note)
+        public async Task<Note> UpdateAsync(Note note)
         {
             using var context = _contextFactory.CreateDbContext();
             context.Entry(note).State = EntityState.Modified;
@@ -220,7 +220,7 @@ namespace BatteryApp.Models.NoteModel
             return note;
         }
 
-        public async Task Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             using var context = _contextFactory.CreateDbContext();
             var note = await context.Notes.FindAsync(id);

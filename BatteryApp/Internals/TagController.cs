@@ -66,7 +66,7 @@ namespace BatteryApp.Internals
         {
             var newTag = await _tagService.Add(tag);
             await _chargeTagRelationService.Add(chargeId, newTag.Id);
-            await _noteService.AddTagHistoryNote(chargeId, tag);
+            await _noteService.AddTagHistoryNoteAsync(chargeId, tag);
             await _chargeService.SetUpdatedAsync(chargeId);
         }
 
@@ -77,14 +77,14 @@ namespace BatteryApp.Internals
             if (relation is null)
             {
                 await _chargeTagRelationService.Add(chargeId, tag.Id);
-                await _noteService.AddTagHistoryNote(chargeId, tag);
+                await _noteService.AddTagHistoryNoteAsync(chargeId, tag);
                 await _chargeService.SetUpdatedAsync(chargeId);
             }
         }
 
         public async Task RemoveTagFromChargeAsync(int chargeId, Tag tag)
         {
-            await _noteService.RemoveTagHistoryNote(chargeId, tag);
+            await _noteService.RemoveTagHistoryNoteAsync(chargeId, tag);
             await _chargeTagRelationService.Delete(chargeId, tag.Id);
             await _chargeService.SetUpdatedAsync(chargeId);
         }

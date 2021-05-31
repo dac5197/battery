@@ -21,7 +21,7 @@ namespace BatteryApp.Models.ChargeModel
         Task<List<Charge>> GetActiveParentsAndChildrenAsync(string userId);
         Task<List<Charge>> GetChildrenAsync(Charge charge);
         Task<int> GetCountAsync(string userId);
-        Task<Charge> GetParent(Charge charge);
+        Task<Charge> GetParentAsync(Charge charge);
         Task<Charge> SetUpdatedAsync(int chargeId);
         Task<Charge> UpdateAsync(Charge charge);
     }

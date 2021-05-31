@@ -42,7 +42,7 @@ namespace BatteryApp.Internals
 
             if (charge.ParentId is not null)
             {
-                await _noteService.RemoveChildParentHistoryNote(charge);
+                await _noteService.RemoveChildParentHistoryNoteAsync(charge);
             }
             
             await _chargeService.DeleteAsync(charge.Id);
