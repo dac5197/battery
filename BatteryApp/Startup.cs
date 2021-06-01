@@ -33,9 +33,12 @@ namespace BatteryApp
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -58,6 +61,12 @@ namespace BatteryApp
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
+
+            // Add SignalR Service if not in development environment
+            if (_env.IsDevelopment() == false)
+            {
+                services.AddSignalR().AddAzureSignalR();
+            }
 
             // Add Email Sender and get vaules from appsettings.json and secrets
             services.AddTransient<IEmailSender, EmailSender>();
