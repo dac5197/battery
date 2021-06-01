@@ -1,6 +1,6 @@
 ﻿@page "/"
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin, User")]
 
 @inject AuthenticationStateProvider _authStateProvider
 @inject NavigationManager _navManager
@@ -62,11 +62,11 @@ else
                                     </div>
                                 </div>
                                 <input type="text"
-                                        class="form-control py-2 border-square bg-transparent pl-5"
-                                        id="searchChargesInput"
-                                        placeholder="Search"
-                                        value="@searchText"
-                                        @oninput="@(e => Search(e))" />
+                                       class="form-control py-2 border-square bg-transparent pl-5"
+                                       id="searchChargesInput"
+                                       placeholder="Search"
+                                       value="@searchText"
+                                       @oninput="@(e => Search(e))" />
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-outline-info border-square" @onclick="@ClearSearch">Clear</button>
                                 </div>
@@ -75,13 +75,13 @@ else
                         <div class="col-lg-3">
                             <div class="float-right">
                                 <BtnGroup_TwoButtons BtnOneClass="@btnClassActiveBatteries"
-                                                        BtnOneText="Active"
-                                                        BtnOneAction="@GetActiveBatteriesAsync_Button"
-                                                        BtnTwoClass="@btnClassAllBatteries"
-                                                        BtnTwoText="All"
-                                                        BtnTwoAction="@GetAllBatteriesAsync_Button"
-                                                        QuestionToolTipAlignment="Right"
-                                                        QuestionToolTipText="Toggle between Active Batteries and All Batteries"></BtnGroup_TwoButtons>
+                                                     BtnOneText="Active"
+                                                     BtnOneAction="@GetActiveBatteriesAsync_Button"
+                                                     BtnTwoClass="@btnClassAllBatteries"
+                                                     BtnTwoText="All"
+                                                     BtnTwoAction="@GetAllBatteriesAsync_Button"
+                                                     QuestionToolTipAlignment="Right"
+                                                     QuestionToolTipText="Toggle between Active Batteries and All Batteries"></BtnGroup_TwoButtons>
                             </div>
                         </div>
                     </div>
@@ -128,9 +128,9 @@ else
                         @if (showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)
                         {
                             <IndexTagList_Battery Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
-                                                    TagCounts="@tagActiveCounts"
-                                                    FilterChargesByTag="@SearchTags"
-                                                    SetManageTagsBattery="@SetManageTagsBatteryAsync"></IndexTagList_Battery>
+                                                  TagCounts="@tagActiveCounts"
+                                                  FilterChargesByTag="@SearchTags"
+                                                  SetManageTagsBattery="@SetManageTagsBatteryAsync"></IndexTagList_Battery>
                         }
 
                         @if (showBatteryCharges.ContainsKey(battery.Id) ? showBatteryCharges[battery.Id] : false)
@@ -139,19 +139,19 @@ else
                                 @foreach (var charge in _search.GetCharges().Where(x => x.BatteryId == battery.Id).Where(x => x.ParentId is null))
                                 {
                                     <IndexChargeCardListItem @key="@charge"
-                                                                Charge="@charge"
-                                                                Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
-                                                                Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
-                                                                Priority="@priorities.Where(x => x.Id == charge.PriorityId).FirstOrDefault()"
-                                                                Priorities="@priorities"
-                                                                PriorityDispalyWidth="@priorities.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.DisplayName.Length).First().DisplayName.Length"
-                                                                Status="@statuses.Where(x => x.Id == charge.StatusId).FirstOrDefault()"
-                                                                Statuses="@statuses"
-                                                                CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
-                                                                StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
-                                                                ShowChildren="@showChargeChildren"
-                                                                ShowTags="@(showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)"
-                                                                SearchText="@searchText"></IndexChargeCardListItem>
+                                                             Charge="@charge"
+                                                             Category="@categories.Where(x => x.Id == charge.CategoryId).FirstOrDefault()"
+                                                             Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
+                                                             Priority="@priorities.Where(x => x.Id == charge.PriorityId).FirstOrDefault()"
+                                                             Priorities="@priorities"
+                                                             PriorityDispalyWidth="@priorities.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.DisplayName.Length).First().DisplayName.Length"
+                                                             Status="@statuses.Where(x => x.Id == charge.StatusId).FirstOrDefault()"
+                                                             Statuses="@statuses"
+                                                             CompleteStatus="@statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Order).First()"
+                                                             StatusDispalyWidth="statuses.Where(x => x.BatteryId == battery.Id).OrderByDescending(x => x.Name.Length).First().Name.Length"
+                                                             ShowChildren="@showChargeChildren"
+                                                             ShowTags="@(showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)"
+                                                             SearchText="@searchText"></IndexChargeCardListItem>
                                 }
                             </div>
                         }
@@ -163,10 +163,10 @@ else
     <!-- Modals -->
     <BatteryDetailModal ParentStateChanged="@BatteriesChangedAsync" UserId="@userId"></BatteryDetailModal>
     <ManageTagsModal Battery="@manageTagsBattery"
-                        Tags="@tags.Where(x => x.BatteryId == manageTagsBattery.Id).ToList()"
-                        TagAllCounts="@tagCounts"
-                        TagActiveCounts="@tagActiveCounts"
-                        ParentStateChanged="@TagsChangedAsync"></ManageTagsModal>
+                     Tags="@tags.Where(x => x.BatteryId == manageTagsBattery.Id).ToList()"
+                     TagAllCounts="@tagCounts"
+                     TagActiveCounts="@tagActiveCounts"
+                     ParentStateChanged="@TagsChangedAsync"></ManageTagsModal>
 }
 
 

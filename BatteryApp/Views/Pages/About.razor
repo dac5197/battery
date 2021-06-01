@@ -6,50 +6,39 @@
     <div class="col">
 
     </div>
-    <div class="col-lg-6">
-        <div class="row">
-            <div class="col">
+    <div class="col-lg-8">
+        <div class="card border-square shadow-sm px-4 py-2 my-2">
+            <h2 class="text-center">About</h2>
+            <p class="text-center text-muted m-0">&#64;2021 - DACME Battery - Donald Chaney</p>
+            <br />
+            <p>
+                Battery is a to do web app developed in .NET Blazor Server.  It is my first .NET project that I began after completing a few tutorials and code-along videos.
+            </p>
+            <p>
+                In the Battery app, the user creates to do items called Charges that are organized in a Battery object.  The Charges are assigned a Category, Priority, and Status.  The options for these fields are per Battery and can be changed when creating the Battery or any time after.  I added customer validators to enforce business logic around the values these fields can have (such as at least one Category per Battery must be set as the default).
+            </p>
+            <p>
+                Charges are displayed in the Battery detail page in a lane layout as cards similar to a Kanban board or in a table layout.  Clicking on a Charge title will navigate to the Charge detail page where the Charge information is display and can be changed.  Also notes and history track all changes to a Charge field or user-entered work note.  From the related items section, child Charges can be created for sub-tasks to the main to do item.
+            </p>
+            <p>
+                Each Battery can also have Tags created for it and assigned to Charges.  They help organize the Charges and aid in searching.  The Tags unique to the Battery and cannot have any duplicate names (Tags for different Batteries can have the same name).
+            </p>
+            <p>
+                Authentication is handled by the ASP.NET Core Identity pages and Blazor authorization components.  Unauthorized users are redirected to either the login page or request access page depending if that user is logged in or not.
+            </p>
+            <p>
+                The back-end operations are handled by Entity Framework Core and SQL Server.  The Entity Framework ORM was similar to the Django ORM.  Some things were easier (such as tracking field changes) while others were not (such as handling many-to-many relationships).
+            </p>
+            <p>
 
-            </div>
+            </p>
+            <p>
+
+            </p>
+            <a href="https://www.donald-chaney.com/">Donald Chaney</a>
+            <br />
+            <a href="https://www.linkedin.com/in/donald-chaney/">LinkedIn</a>
         </div>
-        <div class="row">
-            <div class="col">
-                <div class="card border-square shadow-sm px-4 py-2 my-2">
-                    <h2 class="text-center">About</h2>
-                    <p class="text-center text-muted m-0">&#64;2021 - DACME Battery - Donald Chaney</p>
-                    <br />
-                    <p>
-                        Battery is a to do web app developed in .NET Blazor Server.  It is my first .NET project that I began after completing a few tutorials and code-along videos.
-                    </p>
-                    <p>
-                        In the Battery app, the user creates to do items called Charges that are organized in a Battery object.  The Charges are assigned a Category, Priority, and Status.  The options for these fields are per Battery and can be changed when creating the Battery or any time after.  I added customer validators to enforce business logic around the values these fields can have (such as at least one Category per Battery must be set as the default).
-                    </p>
-                    <p>
-                        Charges are displayed in the Battery detail page in a lane layout as cards similar to a Kanban board or in a table layout.  Clicking on a Charge title will navigate to the Charge detail page where the Charge information is display and can be changed.  Also notes and history track all changes to a Charge field or user-entered work note.  From the related items section, child Charges can be created for sub-tasks to the main to do item.
-                    </p>
-                    <p>
-                        Each Battery can also have Tags created for it and assigned to Charges.  They help organize the Charges and aid in searching.  The Tags unique to the Battery and cannot have any duplicate names (Tags for different Batteries can have the same name).
-                    </p>
-                    <p>
-                        Authentication is handled by the ASP.NET Core Identity pages and Blazor authorization components.  Unauthorized users are redirected to either the login page or request access page depending if that user is logged in or not.
-                    </p>
-                    <p>
-                        The back-end operations are handled by Entity Framework Core and SQL Server.  The Entity Framework ORM was similar to the Django ORM.  Some things were easier (such as tracking field changes) while others were not (such as handling many-to-many relationships).
-                    </p>
-                    <p>
-
-                    </p>
-                    <p>
-
-                    </p>
-                    <a href="https://www.donald-chaney.com/">Donald Chaney</a>
-                    <br />
-                    <a href="https://www.linkedin.com/in/donald-chaney/">LinkedIn</a>
-                </div>
-            </div>
-        </div>
-
-        
     </div>
     <div class="col">
 

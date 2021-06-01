@@ -1,0 +1,124 @@
+﻿@page "/welcome"
+
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Identity.UI.Services;
+@inject AuthenticationStateProvider _authStateProvider
+@inject UserManager<IdentityUser> _UserManager
+
+@inject IConfiguration _configuration
+@inject IEmailSender _emailSender
+
+<div class="row">
+    <div class="col">
+
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-square shadow-sm px-4 py-2 my-2">
+            <div class="card-body">
+                <h2 class="text-center">Welcome</h2>
+                <p class="text-center text-muted m-0">&#64;2021 - DACME Battery - Donald Chaney</p>
+                <br />
+                <p>
+                    Thanks for signing up for DACME Battery.  Please go <NavLink href="About">here</NavLink> to read more about this project.
+                </p>
+                <p>
+                    You do not have access.
+                </p>
+                <button type="button" class="btn btn-info border-square" @onclick="@SendRequestAccessEmailAsync">@(emailSent ? "Email Sent" : "Request Access")</button>
+                @if (clickCount > 10)
+                {
+                    <br />
+                    <p>@clickCount</p>
+                    <pre>@clickOutput</pre>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col">
+
+    </div>
+</div>
+
+@code {
+    private IdentityUser user;
+
+    private bool emailSent;
+
+    private int clickCount = 0;
+
+    private string userId;
+    private string emailToAddress;
+    private string clickOutput = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userClaims = (await _authStateProvider.GetAuthenticationStateAsync()).User;
+        userId = userClaims.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+
+        user = await _UserManager.FindByIdAsync(userId);
+
+        emailSent = false;
+        emailToAddress = _configuration["Configurations:RequestAccessEmail"];
+    }
+
+    private async void SendRequestAccessEmailAsync()
+    {
+        clickCount++;
+        HandleClick();
+
+        if (emailSent == false)
+        {
+            string subject = $"DACME Battery - Request Access";
+            string body = $"User {user.UserName} requests access to DACME Battery.  Please add role \"Users\".";
+
+            await _emailSender.SendEmailAsync(emailToAddress, subject, body);
+        }
+
+        emailSent = true;
+        StateHasChanged();
+    }
+
+    private void HandleClick()
+    {
+        switch (clickCount)
+        {
+            case 10:
+                clickOutput = "Tomorrow, and tomorrow, and tomorrow,\n";
+                break;
+            case 20:
+                clickOutput = clickOutput + "Creeps in this petty pace from day to day,\n";
+                break;
+            case 30:
+                clickOutput = clickOutput + "To the last syllable of recorded time;\n";
+                break;
+            case 40:
+                clickOutput = clickOutput + "And all our yesterdays have lighted fools\n";
+                break;
+            case 50:
+                clickOutput = clickOutput + "The way to dusty death. Out, out, brief candle!\n";
+                break;
+            case 60:
+                clickOutput = clickOutput + "Life's but a walking shadow, a poor player,\n";
+                break;
+            case 70:
+                clickOutput = clickOutput + "That struts and frets his hour upon the stage,\n";
+                break;
+            case 80:
+                clickOutput = clickOutput + "And then is heard no more. It is a tale\n";
+                break;
+            case 90:
+                clickOutput = clickOutput + "Told by an idiot, full of sound and fury,\n";
+                break;
+            case 100:
+                clickOutput = clickOutput + "Signifying nothing.\n";
+                break;
+            case 110:
+                clickOutput = clickOutput + "\n\n...from Macbeth, spoken by Macbeth\n";
+                break;
+            default:
+                break;
+        }
+    }
+}
