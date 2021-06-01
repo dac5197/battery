@@ -5,7 +5,8 @@
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.AspNetCore.Identity.UI.Services;
 @inject AuthenticationStateProvider _authStateProvider
-@inject UserManager<IdentityUser> _UserManager
+@inject RoleManager<IdentityRole> _RoleManager
+@inject UserManager<IdentityUser> _userManager
 
 @inject IConfiguration _configuration
 @inject IEmailSender _emailSender
@@ -57,10 +58,13 @@
         var userClaims = (await _authStateProvider.GetAuthenticationStateAsync()).User;
         userId = userClaims.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
-        user = await _UserManager.FindByIdAsync(userId);
+        user = await _userManager.FindByIdAsync(userId);
 
         emailSent = false;
         emailToAddress = _configuration["Configurations:RequestAccessEmail"];
+
+        await CreateAdminRoleAsync();
+        await CreateAdminUserAsync();
     }
 
     private async void SendRequestAccessEmailAsync()
@@ -78,6 +82,46 @@
 
         emailSent = true;
         StateHasChanged();
+    }
+
+    private async Task CreateAdminRoleAsync()
+    {
+        var adminRole = await _RoleManager.FindByNameAsync("Admin");
+
+        if (adminRole is null)
+        {
+            IdentityRole newAdminRole = new();
+            newAdminRole.Name = "Admin";
+            await _RoleManager.CreateAsync(newAdminRole);
+        }
+    }
+
+    private async Task CreateAdminUserAsync()
+    {
+        var adminUser = await _userManager.FindByNameAsync(_configuration["Admin:UserName"]);
+
+        if (adminUser is null)
+        {
+            IdentityUser newAdmin = new();
+
+            newAdmin.UserName = _configuration["Admin:UserName"];
+            newAdmin.Email = _configuration["Admin:UserName"];
+            newAdmin.EmailConfirmed = true;
+            var result = await _userManager.CreateAsync(newAdmin, _configuration["Admin:Password"]);
+        }
+
+        await AddAdminToRoleAsync();
+    }
+
+    private async Task AddAdminToRoleAsync()
+    {
+        var adminUser = await _userManager.FindByNameAsync(_configuration["Admin:UserName"]);
+        var isAdmin = await _userManager.IsInRoleAsync(adminUser, "Admin");
+
+        if (isAdmin == false)
+        {
+            await _userManager.AddToRoleAsync(adminUser, "Admin");
+        }
     }
 
     private void HandleClick()
