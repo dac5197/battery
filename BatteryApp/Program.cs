@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Identity;
 
 namespace BatteryApp
 {
@@ -25,6 +26,10 @@ namespace BatteryApp
                     {
                         config.ConfigureKeyVault();
                     }
+                    var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+                    config.AddAzureKeyVault(
+                    keyVaultEndpoint,
+                    new DefaultAzureCredential());
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
