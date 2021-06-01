@@ -63,7 +63,7 @@ namespace BatteryApp
             services.AddSingleton<WeatherForecastService>();
 
             // Add SignalR Service if not in development environment
-            if (_env.IsDevelopment() == false)
+            if (_env.IsProduction())
             {
                 services.AddSignalR().AddAzureSignalR();
             }
