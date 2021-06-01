@@ -11,6 +11,7 @@ namespace BatteryApp.Internals
 {
     public class EmailSender : IEmailSender
     {
+        private readonly IConfiguration _configuration;
         private string _host;
         private int _port;
         private bool _enableSSL;
@@ -18,13 +19,12 @@ namespace BatteryApp.Internals
         private string _password;
 
         // Get our parameterized configuration
-        public EmailSender(string host, int port, bool enableSSL, string userName, string password)
+        public EmailSender(IConfiguration configuration)
         {
-            _host = host;
-            _port = port;
-            _enableSSL = enableSSL;
-            _userName = userName;
-            _password = password;
+            _configuration = configuration;
+            GetSmtpSettings();
+            GetUserName();
+            GetPassword();
         }
 
         // Use our configuration to send the email by using SmtpClient
@@ -38,6 +38,23 @@ namespace BatteryApp.Internals
             return client.SendMailAsync(
                 new MailMessage(_userName, emailTo, subject, htmlMessage) { IsBodyHtml = true }
             );
+        }
+
+        private void GetSmtpSettings()
+        {
+            _host = _configuration["EmailSender:Host"];
+            _port = _configuration.GetValue<int>("EmailSender:Port");
+            _enableSSL = _configuration.GetValue<bool>("EmailSender:EnableSSL");
+        }
+
+        private void GetUserName()
+        {
+            _userName = _configuration["EmailProviders:GMail:UserName"];
+        }
+
+        private void GetPassword()
+        {
+            _password = _configuration["EmailProviders:GMail:Password"];
         }
     }
 }

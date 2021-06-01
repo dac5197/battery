@@ -60,15 +60,7 @@ namespace BatteryApp
             services.AddSingleton<WeatherForecastService>();
 
             // Add Email Sender and get vaules from appsettings.json and secrets
-            services.AddTransient<IEmailSender, EmailSender>(i =>
-                new EmailSender(
-                    Configuration["EmailSender:Host"],
-                    Configuration.GetValue<int>("EmailSender:Port"),
-                    Configuration.GetValue<bool>("EmailSender:EnableSSL"),
-                    Configuration["EmailProviders:GMail:UserName"],
-                    Configuration["EmailProviders:GMail:Password"]
-                )
-            );
+            services.AddTransient<IEmailSender, EmailSender>();
 
             // Add Project Models CRUD Services
             services.AddTransient<IBatteryService, BatteryService>();
