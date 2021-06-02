@@ -59,6 +59,11 @@ Tutorials and other videos I watched to learn .Net.  All of these videos were he
 
 ## License
 
+GNU General Public License v3.0
+
+Copyright (c) [2021] [Don Chaney]
+
+[LICENSE](https://github.com/dac5197/battery/blob/master/LISCENSE.md)
 
 [Back To The Top](#read-me-template)
 
