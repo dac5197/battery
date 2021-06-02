@@ -65,7 +65,7 @@ namespace BatteryApp
             // Add SignalR Service if in production environment
             if (_env.IsProduction())
             {
-                services.AddSignalR().AddAzureSignalR();
+                services.AddSignalR().AddAzureSignalR(Configuration["Azure:SignalR:ConnectionString"]);
             }
 
             // Add Email Sender and get vaules from appsettings.json and secrets
