@@ -32,7 +32,7 @@
                 {
                     <tr>
                         <td>@role.Name</td>
-                        <td>@roleAssignmentCount[role.Name]</td>
+                        <td>@(roleAssignmentCount.ContainsKey(role.Name) ? roleAssignmentCount[role.Name] : 0)</td>
                         <td>
                             <button type="button"
                                     class="btn btn-info btn-sm border-square"
@@ -66,7 +66,7 @@
 </div>
 
 <!-- Modals -->
-<IdentityRoleDetailModal Role="@editRole" RoleName="@editRole.Name" ParentStateChanged="@GetRoles"></IdentityRoleDetailModal>
+<IdentityRoleDetailModal Role="@editRole" RoleName="@editRole.Name" ParentStateChanged="@HandleRolesChangesAsync"></IdentityRoleDetailModal>
 <ConfirmDeleteModal ModalTitle="Confirm Delete" ParentDeleteAction="@DeleteRoleAsync">
     <ModalBody>
         <p>Role: @editRole.Name</p>
@@ -109,7 +109,14 @@
         editRole = new();
 
         roles = new(_RoleManager.Roles.ToList());
+
         StateHasChanged();
+    }
+
+    private async void HandleRolesChangesAsync()
+    {
+        GetRoles();
+        await CountUsersAssignedToRoleAsync();
     }
 
     private void SetEditRoleToExisting(IdentityRole role)
@@ -126,10 +133,13 @@
     {
         await _RoleManager.DeleteAsync(editRole);
         GetRoles();
+        await CountUsersAssignedToRoleAsync();
     }
 
     private void InitializeRoleAssignmentCountDictionary()
     {
+        roleAssignmentCount = new();
+
         foreach (var role in roles)
         {
             roleAssignmentCount.Add(role.Name, 0);
