@@ -58,7 +58,7 @@ namespace BatteryApp
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages(options => options.RootDirectory = "/Views/Pages");
             services.AddServerSideBlazor();
-            services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
+            //services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
