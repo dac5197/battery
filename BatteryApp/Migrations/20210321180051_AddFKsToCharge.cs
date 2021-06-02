@@ -22,7 +22,7 @@ namespace BatteryApp.Migrations
                 column: "CategoryId",
                 principalTable: "Categories",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Charges_Priorities_PriorityId",
@@ -30,7 +30,7 @@ namespace BatteryApp.Migrations
                 column: "PriorityId",
                 principalTable: "Priorities",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
