@@ -20,8 +20,8 @@
                     {
                         <CustomFormErrors Errors="@errors" />
                     }
-                    <label for="tag-name mx-1">Tag Name</label>
-                    <InputText @bind-Value="@tag.Name" @oninput="@(e => FilterTags(e))" id="tag-name" class="form-control border-square mx-1" />
+                    <label for="tag-name-add" class="mx-1">Tag Name</label>
+                    <InputText @bind-Value="@tag.Name" @oninput="@(e => FilterTags(e))" id="tag-name-add" class="form-control border-square mx-1" />
                     <button type="submit" class="btn btn-primary mx-1 my-2 border-square">Submit</button>
                 </EditForm>
                 <br />

@@ -19,8 +19,8 @@
                     {
                         <CustomFormErrors Errors="@errors" />
                     }
-                    <label for="tag-name mx-1">Tag Name</label>
-                    <InputText @bind-Value="@Tag.Name" id="tag-name" class="form-control border-square mx-1" />
+                    <label for="tag-name-edit" class="mx-1">Tag Name</label>
+                    <InputText @bind-Value="@Tag.Name" id="tag-name-edit" class="form-control border-square mx-1" />
                     <ValidationMessage For="@(() => Tag.Name)" />
                     <button type="submit" class="btn btn-primary border-square mx-1">Submit</button>
                 </EditForm>
