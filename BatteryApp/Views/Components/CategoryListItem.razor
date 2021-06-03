@@ -1,6 +1,7 @@
-﻿@inject ISearchUtil _search
+﻿@inject IColorChanger _color
+@inject ISearchUtil _search
 
-<div class="badge category-badge-index border-square m-1 @(Category.Id == _search.GetCategory().Id ? "searched-category" : "")"
+<div class="badge category-badge-index border-square m-1 @(Category.Id == _search.GetCategory().Id ? $"searched-category-{Category.Id}" : "")"
      style="color: white; background-color: @Category.IconColor">
     <span class="oi @Category?.Icon small" style="color: white;"></span>
     @Category.Name
@@ -13,8 +14,8 @@
         font-size: small;
     }
 
-    .searched-category {
-        outline: #d9d9d9;
+    .searched-category-@Category.Id {
+        outline: @_color.DarkenBy(Category.IconColor, 15);
         outline-style: solid;
     }
 </style>

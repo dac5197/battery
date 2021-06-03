@@ -95,6 +95,7 @@ namespace BatteryApp
 
             // Add Project View Utils
             services.AddTransient<ICalculateTextareaRows, CalculateTextareaRows>();
+            services.AddTransient<IColorChanger, ColorChanger>();
             services.AddTransient<ITableSort_Charges, TableSort_Charges>();
             services.AddScoped<IBreadcrumbManager, BreadcrumbManager>();
             services.AddScoped<IChargeOpenChildrenModalHelper, ChargeOpenChildrenModalHelper>();
