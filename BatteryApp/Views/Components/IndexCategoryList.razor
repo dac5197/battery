@@ -1,0 +1,26 @@
+﻿<div class="card bg-light border-square px-2">
+    <div class="row">
+        <div class="col">
+            <IconCategories />
+            @foreach (var category in Categories.OrderBy(x => x.Name))
+            {
+                <span style="cursor: pointer"
+                      @onclick="@(() => FilterChargesByCategory.InvokeAsync(category))">
+                    <CategoryListItem Category="@category" Count="@(CategoryCounts.ContainsKey(category.Id) ? CategoryCounts[category.Id] : 0)"></CategoryListItem>
+                </span>
+
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<Category> Categories { get; set; }
+
+    [Parameter]
+    public Dictionary<int, int> CategoryCounts { get; set; }
+
+    [Parameter]
+    public EventCallback<Category> FilterChargesByCategory { get; set; }
+}

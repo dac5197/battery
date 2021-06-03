@@ -105,6 +105,12 @@ else
                                 }
 
                             </button>
+                            <button class="btn btn-sm btn-light mx-1"
+                                    title="Toggle Categories"
+                                    type="button"
+                                    @onclick="@(() => ToggleShowBatteryCategories(battery))">
+                                <IconCategories />
+                            </button>
                             @if (showBatteryTags.ContainsKey(battery.Id))
                             {
                                 <button class="btn btn-sm btn-light mx-1"
@@ -125,6 +131,12 @@ else
                             </NavLink>
                             <span class="h3 float-right">(@charges.Where(x => x.BatteryId == battery.Id).Count())</span>
                         </div>
+                        @if (showBatteryCategories.ContainsKey(battery.Id) ? showBatteryCategories[battery.Id] : false)
+                        {
+                            <IndexCategoryList Categories="@categories.Where(x => x.BatteryId == battery.Id).Where(x => x.IsDefaultChildCategory is false).ToList()"
+                                               CategoryCounts="@categoryCounts"
+                                               FilterChargesByCategory="@SearchCategories"></IndexCategoryList>
+                        }
                         @if (showBatteryTags.ContainsKey(battery.Id) ? showBatteryTags[battery.Id] : false)
                         {
                             <IndexTagList_Battery Tags="@tags.Where(x => x.BatteryId == battery.Id).ToList()"
@@ -187,8 +199,10 @@ else
     private List<Status> statuses = new();
     private List<Tag> tags = new();
 
+    private Dictionary<int, bool> showBatteryCategories = new();
     private Dictionary<int, bool> showBatteryCharges = new();
     private Dictionary<int, bool> showBatteryTags = new();
+    private Dictionary<int, int> categoryCounts = new();
     private Dictionary<int, int> tagCounts = new();
     private Dictionary<int, int> tagActiveCounts = new();
 
@@ -209,16 +223,9 @@ else
         var user = (await _authStateProvider.GetAuthenticationStateAsync()).User;
         userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
-
-        batteries = await _batteryService.GetActiveAsync(userId);
-        charges = await _chargeService.GetActiveAsync(userId);
-        categories = await _categoryService.GetAsync(userId);
-        priorities = await _priorityService.GetAsync(userId);
-        statuses = await _statusService.GetAsync(userId);
-        tags = await _tagService.GetAsync(userId);
-
         btnClassActiveBatteries = btnActive;
         btnClassAllBatteries = btnInactive;
+
         await GetActiveBatteriesAsync();
 
         // Hide the breadcrump nav
@@ -259,6 +266,8 @@ else
     {
         batteries = await _batteryService.GetActiveAsync(userId);
         _search.Initialize(batteries);
+        InitializeCategoryCountDict();
+        InitializeShowBatteryCategoriesDict();
         InitializeShowBatteryChargesDict();
         InitializeShowBatteryTagsDict();
 
@@ -276,6 +285,8 @@ else
 
         // Initialize other values
         SortChargesByStatus();
+        InitializeCategoryCountDict();
+        InitializeShowBatteryCategoriesDict();
         InitializeShowBatteryChargesDict();
         InitializeShowBatteryTagsDict();
         await InitializeChargeChildrenAsync();
@@ -285,6 +296,30 @@ else
 
         // Initialize filtered lists
         _search.Initialize(batteries, charges);
+    }
+
+    private void InitializeCategoryCountDict()
+    {
+        categoryCounts = new();
+
+        foreach (var category in categories)
+        {
+            var chargeCatCount = charges.Where(x => x.CategoryId == category.Id)
+                                        .Where(x => x.ParentId is null)
+                                        .Count();
+
+            categoryCounts.Add(category.Id, chargeCatCount);
+        }
+    }
+
+    private void InitializeShowBatteryCategoriesDict()
+    {
+        showBatteryCategories.Clear();
+
+        foreach (var battery in batteries)
+        {
+            showBatteryCategories.Add(battery.Id, false);
+        }
     }
 
     private void InitializeShowBatteryChargesDict()
@@ -339,6 +374,11 @@ else
         showBatteryCharges = showBatteryCharges.Keys.ToDictionary(x => x, _ => false);
     }
 
+    private void ToggleShowBatteryCategories(Battery battery)
+    {
+        showBatteryCategories[battery.Id] = !showBatteryCategories[battery.Id];
+    }
+
     private void ToggleShowBatteryCharges(Battery battery)
     {
         showBatteryCharges[battery.Id] = !showBatteryCharges[battery.Id];
@@ -386,6 +426,21 @@ else
         }
 
         showChargeChildren = true;
+    }
+
+    private void SearchCategories(Category category)
+    {
+        if (category == _search.GetCategory())
+        {
+            ClearSearch();
+            return;
+        }
+
+        _search.Search(category);
+
+        ShowBatteryByBattery(batteries.Where(x => x.Id == category.BatteryId).FirstOrDefault());
+
+        StateHasChanged();
     }
 
     private void SearchTags(Tag tag)

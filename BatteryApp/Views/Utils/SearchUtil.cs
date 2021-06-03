@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.TagModel;
 using Microsoft.AspNetCore.Components;
@@ -20,6 +21,7 @@ namespace BatteryApp.Views.Utils
         private Dictionary<int, List<Charge>> _searchedChargeChildren = new();
         private List<ChargeTagRelation> _chargeTagRelations = new();
         private List<ChargeTagRelation> _searchedChargeTagRelations = new();
+        private Category _searchCategory = new();
         private Tag _searchTag = new();
 
         public void Clear()
@@ -28,6 +30,7 @@ namespace BatteryApp.Views.Utils
             _searchedCharges = new(_charges);
             _searchedChargeChildren = new(_chargeChildren);
             _searchedChargeTagRelations = new(_chargeTagRelations);
+            _searchCategory = new();
             _searchTag = new();
         }
 
@@ -114,6 +117,11 @@ namespace BatteryApp.Views.Utils
             return emptyList;
         }
 
+        public Category GetCategory()
+        {
+            return _searchCategory;
+        }
+
         public Tag GetTag()
         {
             return _searchTag;
@@ -143,10 +151,20 @@ namespace BatteryApp.Views.Utils
             return (MarkupString)highlightText;
         }
 
+        public void Search(Category category)
+        {
+            _searchedCharges = new();
+            _searchCategory = category;
+            _searchTag = new();
+
+            SearchCharges(category);
+        }
+
         public void Search(Tag tag)
         {
             _searchedCharges = new();
             _searchedChargeTagRelations = _chargeTagRelations.Where(x => x.TagId == tag.Id).ToList();
+            _searchCategory = new();
             _searchTag = tag;
 
             SearchCharges(tag);
@@ -166,6 +184,13 @@ namespace BatteryApp.Views.Utils
             {
                 AddBatteryToResults(charge.BatteryId);
             }
+        }
+
+        public void SearchCharges(Category category)
+        {
+            _searchedCharges = _charges.Where(x => x.CategoryId == category.Id).ToList();
+
+            AddBatteryToResults(category.BatteryId);
         }
 
         public void SearchCharges(Tag tag)

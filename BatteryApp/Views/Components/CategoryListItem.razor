@@ -1,0 +1,28 @@
+﻿@inject ISearchUtil _search
+
+<div class="badge category-badge-index border-square m-1 @(Category.Id == _search.GetCategory().Id ? "searched-category" : "")"
+     style="color: white; background-color: @Category.IconColor">
+    <span class="oi @Category?.Icon small" style="color: white;"></span>
+    @Category.Name
+    <span class="badge badge-light border-square ml-1">@Count</span>
+</div>
+
+<style>
+    .category-badge-index {
+        font-weight: normal;
+        font-size: small;
+    }
+
+    .searched-category {
+        outline: #d9d9d9;
+        outline-style: solid;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Category Category { get; set; }
+
+    [Parameter]
+    public int Count { get; set; }
+}

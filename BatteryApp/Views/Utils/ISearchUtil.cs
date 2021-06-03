@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.ChargeModel;
 using BatteryApp.Models.TagModel;
 using Microsoft.AspNetCore.Components;
@@ -20,12 +21,15 @@ namespace BatteryApp.Views.Utils
         List<Charge> GetCharges();
         Dictionary<int, List<Charge>> GetChildren();
         List<Charge> GetChildren(int parentId);
+        Category GetCategory();
         Tag GetTag();
         bool HasChildren(int parentId);
         MarkupString HighlightSearchText(string searchText, string text);
+        void Search(Category category);
         void Search(Tag tag);
         void SearchBatteries(string searchText);
         void SearchCharges(string searchText);
+        void SearchCharges(Category category);
         void SearchCharges(Tag tag);
         void SearchChildren(string searchText);
         void SearchChildren(Tag tag);
