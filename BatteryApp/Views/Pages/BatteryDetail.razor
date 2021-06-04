@@ -97,8 +97,12 @@ else
                 </div>
             </div>
         </EditForm>
+        <!-- Tag List -->
         <div class="row mb-3">
             <div class="col-lg-12">
+                <IndexCategoryList Categories="@categories"
+                                   CategoryCounts="@categoryCounts"
+                                   FilterChargesByCategory="@SearchCategories"></IndexCategoryList>
                 <IndexTagList_Battery Tags="@tags"
                                       TagCounts="@(btnClassActiveCharges == btnActive ? tagActiveCounts : tagAllCounts)"
                                       FilterChargesByTag="@SearchTags"
@@ -258,6 +262,7 @@ else
     private ChargeTable chargeTable;
 
     private Dictionary<int, int> activeChargesCounts = new();
+    private Dictionary<int, int> categoryCounts = new();
     private Dictionary<int, int> inactiveChargesCounts = new();
     private Dictionary<int, int> tagActiveCounts = new();
     private Dictionary<int, int> tagAllCounts = new();
@@ -309,6 +314,7 @@ else
         _search.Initialize(charges);
         await InitializeChargeChildrenAsync();
         await InitializeTagSearchAsync();
+        await InitializeCategoryCountDictAsync();
 
         // Set filter button bootstrap classes
         btnClassActiveCharges = btnActive;
@@ -332,6 +338,12 @@ else
         {
             _navManager.NavigateTo("/");
         }
+    }
+
+    private async Task InitializeCategoryCountDictAsync()
+    {
+        categoryCounts = await _chargeCountService.GetCategoryCountAsync(battery, categories);
+
     }
 
     private async Task InitializeChargeChildrenAsync()
@@ -415,6 +427,21 @@ else
         _search.SearchChildren(searchText);
 
         showChargeCardChildren = true;
+    }
+
+    private void SearchCategories(Category category)
+    {
+        if (category == _search.GetCategory())
+        {
+            ClearSearch();
+            return;
+        }
+
+        _search.Search(category);
+
+        showChargeCardChildren = true;
+
+        StateHasChanged();
     }
 
     private void SearchTags(Tag tag)

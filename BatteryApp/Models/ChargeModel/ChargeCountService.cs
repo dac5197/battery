@@ -1,4 +1,5 @@
 ﻿using BatteryApp.Models.BatteryModel;
+using BatteryApp.Models.CategoryModel;
 using BatteryApp.Models.StatusModel;
 using System;
 using System.Collections.Generic;
@@ -74,6 +75,46 @@ namespace BatteryApp.Models.ChargeModel
             return counts;
         }
 
+        public async Task<Dictionary<int, int>> GetCategoryCountAsync(List<Battery> batteries, List<Category> categories)
+        {
+            Dictionary<int, int> categoryCounts = new();
+
+            foreach (var battery in batteries)
+            {
+                var charges = await _chargeService.GetActiveParentsAndChildrenAsync(battery);
+
+                foreach (var category in categories.Where(x => x.BatteryId == battery.Id).ToList())
+                {
+
+                    var chargeCatCount = charges.Where(x => x.CategoryId == category.Id)
+                                                .Count();
+
+                    categoryCounts.Add(category.Id, chargeCatCount);
+                }
+            }
+
+            return categoryCounts;
+        }
+
+        public async Task<Dictionary<int,int>> GetCategoryCountAsync(Battery battery, List<Category> categories)
+        {
+            Dictionary<int, int> categoryCounts = new();
+
+            var charges = await _chargeService.GetActiveParentsAndChildrenAsync(battery);
+
+            foreach (var category in categories)
+            {
+
+                var chargeCatCount = charges.Where(x => x.CategoryId == category.Id)
+                                            //.Where(x => x.ParentId is null)
+                                            .Count();
+
+                categoryCounts.Add(category.Id, chargeCatCount);
+            }
+
+            return categoryCounts;
+        }
+
         public async Task<List<ChargeChildrenCount>> GetChildrenCountAsync(List<Charge> charges)
         {
 
@@ -92,5 +133,6 @@ namespace BatteryApp.Models.ChargeModel
 
             return chargeChildrenCounts;
         }
+        
     }
 }

@@ -5,9 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace BatteryApp.Views.Utils
-{
+{   
+    // Darken or Lighted a hex html color
+    // https://www.pvladov.com/2012/09/make-color-lighter-or-darker.html
     public class ColorChanger : IColorChanger
     {
+        
         public string LightenBy(string colorHex, int percent)
         {
             Color color = GetColorFromHex(colorHex);

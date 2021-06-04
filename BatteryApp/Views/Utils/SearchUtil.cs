@@ -158,6 +158,7 @@ namespace BatteryApp.Views.Utils
             _searchTag = new();
 
             SearchCharges(category);
+            SearchChildren(category);
         }
 
         public void Search(Tag tag)
@@ -213,6 +214,19 @@ namespace BatteryApp.Views.Utils
             foreach (var kvp in _chargeChildren)
             {
                 _searchedChargeChildren[kvp.Key] = kvp.Value.Where(x => x.Title.ToLower().Contains(searchText.ToLower())).ToList();
+
+                if (_searchedChargeChildren[kvp.Key].Any())
+                {
+                    AddChargeToResults(kvp.Key);
+                }
+            }
+        }
+
+        public void SearchChildren(Category category)
+        {
+            foreach (var kvp in _chargeChildren)
+            {
+                _searchedChargeChildren[kvp.Key] = kvp.Value.Where(x => x.CategoryId == category.Id).ToList();
 
                 if (_searchedChargeChildren[kvp.Key].Any())
                 {

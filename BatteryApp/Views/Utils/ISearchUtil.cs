@@ -32,6 +32,7 @@ namespace BatteryApp.Views.Utils
         void SearchCharges(Category category);
         void SearchCharges(Tag tag);
         void SearchChildren(string searchText);
+        void SearchChildren(Category category);
         void SearchChildren(Tag tag);
     }
 }

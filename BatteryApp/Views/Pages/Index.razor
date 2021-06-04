@@ -8,6 +8,7 @@
 @inject IBatteryService _batteryService
 @inject IBreadcrumbManager _breadcrumb
 @inject IChargeService _chargeService
+@inject IChargeCountService _chargeCountService
 @inject ICategoryService _categoryService
 @inject IPriorityService _priorityService
 @inject ISearchUtil _search
@@ -133,7 +134,7 @@ else
                         </div>
                         @if (showBatteryCategories.ContainsKey(battery.Id) ? showBatteryCategories[battery.Id] : false)
                         {
-                            <IndexCategoryList Categories="@categories.Where(x => x.BatteryId == battery.Id).Where(x => x.IsDefaultChildCategory is false).ToList()"
+                            <IndexCategoryList Categories="@categories.Where(x => x.BatteryId == battery.Id).ToList()"
                                                CategoryCounts="@categoryCounts"
                                                FilterChargesByCategory="@SearchCategories"></IndexCategoryList>
                         }
@@ -266,10 +267,11 @@ else
     {
         batteries = await _batteryService.GetActiveAsync(userId);
         _search.Initialize(batteries);
-        InitializeCategoryCountDict();
         InitializeShowBatteryCategoriesDict();
         InitializeShowBatteryChargesDict();
         InitializeShowBatteryTagsDict();
+
+        await InitializeCategoryCountDict();
 
         StateHasChanged();
     }
@@ -285,10 +287,10 @@ else
 
         // Initialize other values
         SortChargesByStatus();
-        InitializeCategoryCountDict();
         InitializeShowBatteryCategoriesDict();
         InitializeShowBatteryChargesDict();
         InitializeShowBatteryTagsDict();
+        await InitializeCategoryCountDict();
         await InitializeChargeChildrenAsync();
         await InitializeTagSearchAsync();
         await GetTagCountsAsync();
@@ -298,18 +300,9 @@ else
         _search.Initialize(batteries, charges);
     }
 
-    private void InitializeCategoryCountDict()
+    private async Task InitializeCategoryCountDict()
     {
-        categoryCounts = new();
-
-        foreach (var category in categories)
-        {
-            var chargeCatCount = charges.Where(x => x.CategoryId == category.Id)
-                                        .Where(x => x.ParentId is null)
-                                        .Count();
-
-            categoryCounts.Add(category.Id, chargeCatCount);
-        }
+        categoryCounts = await _chargeCountService.GetCategoryCountAsync(batteries, categories);
     }
 
     private void InitializeShowBatteryCategoriesDict()
@@ -439,6 +432,7 @@ else
         _search.Search(category);
 
         ShowBatteryByBattery(batteries.Where(x => x.Id == category.BatteryId).FirstOrDefault());
+        showChargeChildren = true;
 
         StateHasChanged();
     }
